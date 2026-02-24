@@ -1,0 +1,8 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../data/repositories/task_repository.dart';
+import 'database_provider.dart';
+
+final taskRepositoryProvider = Provider<TaskRepository>((ref) {
+  final database = ref.watch(databaseProvider);
+  return TaskRepository(database);
+});
