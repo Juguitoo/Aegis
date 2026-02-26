@@ -1,8 +1,31 @@
+import 'dart:io';
+import 'dart:ui';
 import 'package:aegis/presentation/screens/task_list_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:window_manager/window_manager.dart';
 
-void main() {
+void main() async {
+  // Asegura que el motor y el gestor de ventanas estén inicializados
+  WidgetsFlutterBinding.ensureInitialized();
+
+  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+    await windowManager.ensureInitialized();
+
+    // Configuración de la ventana para escritorio
+    WindowOptions windowOptions = const WindowOptions(
+      size: Size(1200, 800),
+      minimumSize: Size(1200, 750),
+      center: true,
+      title: 'Aegis Productivity',
+    );
+
+    windowManager.waitUntilReadyToShow(windowOptions, () async {
+      await windowManager.show();
+      await windowManager.focus();
+    });
+  }
+
   runApp(const ProviderScope(child: AegisApp()));
 }
 
@@ -12,23 +35,32 @@ class AegisApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return MaterialApp(
-        title: 'Aegis Productivity',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color(0xFF006A6A), // Un tono sobrio/productivo
-            brightness: Brightness.light,
-          ),
-          useMaterial3: true,
+      title: 'Aegis Productivity',
+      debugShowCheckedModeBanner: false,
+      scrollBehavior: const MaterialScrollBehavior().copyWith(
+        dragDevices: {
+          PointerDeviceKind.mouse,
+          PointerDeviceKind.touch,
+          PointerDeviceKind.stylus,
+          PointerDeviceKind.trackpad,
+        },
+      ),
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF006A6A),
+          brightness: Brightness.light,
         ),
-        darkTheme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color(0xFF006A6A),
-            brightness: Brightness.dark,
-          ),
-          useMaterial3: true,
+        useMaterial3: true,
+      ),
+      darkTheme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF006A6A),
+          brightness: Brightness.dark,
         ),
-        themeMode: ThemeMode.system, // Se adapta a Windows/Android claro/oscuro
-        home: const TaskListScreen());
+        useMaterial3: true,
+      ),
+      themeMode: ThemeMode.system,
+      home: const TaskListScreen(),
+    );
   }
 }

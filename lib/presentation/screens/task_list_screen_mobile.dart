@@ -1,3 +1,5 @@
+import 'package:aegis/presentation/screens/main_mobile_layout.dart';
+
 import '../../data/local/database/app_database.dart';
 import '../viewmodels/task_list_viewmodel.dart';
 
@@ -11,27 +13,27 @@ class TaskListScreenMobile extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final tasksAsync = ref.watch(taskListViewModelProvider);
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+    return MainMobileLayout(
+      currentIndex: 2,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        title: const Text('Tareas'),
+        backgroundColor: const Color(0xFFF8FAFC),
+        foregroundColor: const Color(0xFF1E293B),
         elevation: 0,
-        title: const Text(
-          'Principal',
-          style: TextStyle(
-            color: Color(0xFF0F172A),
-            fontWeight: FontWeight.bold,
-            fontSize: 28,
-          ),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings, color: Color(0xFF475569)),
-            onPressed: () {},
-          ),
-        ],
       ),
-      body: Column(
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: const Color(0xFF6366F1),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        onPressed: () {
+          ref.read(taskListViewModelProvider.notifier).addTask(
+                TasksCompanion.insert(
+                  title: 'Nueva tarea desde la UI',
+                ),
+              );
+        },
+        child: const Icon(Icons.add, color: Colors.white),
+      ),
+      child: Column(
         children: [
           const _HabitsSectionPlaceholder(),
           const _SearchBarAndFilters(),
@@ -67,19 +69,6 @@ class TaskListScreenMobile extends ConsumerWidget {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: const Color(0xFF6366F1),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        onPressed: () {
-          ref.read(taskListViewModelProvider.notifier).addTask(
-                TasksCompanion.insert(
-                  title: 'Nueva tarea desde la UI',
-                ),
-              );
-        },
-        child: const Icon(Icons.add, color: Colors.white),
-      ),
-      bottomNavigationBar: const _CustomBottomNavBar(),
     );
   }
 }
@@ -89,7 +78,29 @@ class _HabitsSectionPlaceholder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const SizedBox.shrink();
+    return Container(
+      margin: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
+      height: 128,
+      decoration: BoxDecoration(
+        color: const Color(0xFFE0F2FE),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        children: const [
+          Icon(Icons.auto_graph, color: Color(0xFF0284C7)),
+          SizedBox(width: 12),
+          Text(
+            'Sección de hábitos (en desarrollo)',
+            style: TextStyle(
+              color: Color(0xFF0284C7),
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -288,48 +299,6 @@ class _TaskCard extends StatelessWidget {
           const Icon(Icons.chevron_right, color: Color(0xFFCBD5E1)),
         ],
       ),
-    );
-  }
-}
-
-class _CustomBottomNavBar extends StatelessWidget {
-  const _CustomBottomNavBar();
-
-  @override
-  Widget build(BuildContext context) {
-    return BottomNavigationBar(
-      type: BottomNavigationBarType.fixed,
-      backgroundColor: Colors.white,
-      selectedItemColor: const Color(0xFF6366F1),
-      unselectedItemColor: const Color(0xFF94A3B8),
-      showUnselectedLabels: true,
-      selectedLabelStyle:
-          const TextStyle(fontWeight: FontWeight.bold, fontSize: 10),
-      unselectedLabelStyle:
-          const TextStyle(fontWeight: FontWeight.bold, fontSize: 10),
-      elevation: 20,
-      currentIndex: 2,
-      items: [
-        const BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_today), label: 'CALENDARIO'),
-        const BottomNavigationBarItem(
-            icon: Icon(Icons.timer_outlined), label: 'FOCUS'),
-        BottomNavigationBarItem(
-          icon: Container(
-            padding: const EdgeInsets.all(8),
-            decoration: const BoxDecoration(
-              color: Color(0xFFEEF2FF),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(Icons.check_box),
-          ),
-          label: 'TAREAS',
-        ),
-        const BottomNavigationBarItem(
-            icon: Icon(Icons.bar_chart), label: 'ANÁLISIS'),
-        const BottomNavigationBarItem(
-            icon: Icon(Icons.menu_book), label: 'DIARIO'),
-      ],
     );
   }
 }
