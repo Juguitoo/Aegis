@@ -1,8 +1,8 @@
 import 'package:aegis/presentation/screens/main_desktop_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../data/local/database/app_database.dart';
-import '../viewmodels/task_list_viewmodel.dart';
+import '../../../data/local/database/app_database.dart';
+import '../../viewmodels/task_list_viewmodel.dart';
 
 class TaskListScreenDesktop extends ConsumerWidget {
   const TaskListScreenDesktop({super.key});

@@ -1,7 +1,8 @@
 import 'dart:io';
 import 'dart:ui';
-import 'package:aegis/presentation/screens/task_list_screen.dart';
+import 'package:aegis/presentation/screens/tasks/task_list_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -24,6 +25,11 @@ void main() async {
       await windowManager.show();
       await windowManager.focus();
     });
+  } else if (Platform.isAndroid || Platform.isIOS) {
+    await SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
   }
 
   runApp(const ProviderScope(child: AegisApp()));

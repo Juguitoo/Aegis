@@ -1,7 +1,7 @@
 import 'package:aegis/presentation/screens/main_mobile_layout.dart';
 
-import '../../data/local/database/app_database.dart';
-import '../viewmodels/task_list_viewmodel.dart';
+import '../../../data/local/database/app_database.dart';
+import '../../viewmodels/task_list_viewmodel.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
