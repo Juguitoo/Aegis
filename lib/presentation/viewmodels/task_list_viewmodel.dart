@@ -28,6 +28,12 @@ class TaskListViewModel extends StreamNotifier<List<Task>> {
     final taskRepository = ref.read(taskRepositoryProvider);
     await taskRepository.deleteTaskById(id);
   }
+
+  Future<void> toggleTaskCompletion(Task task) async {
+    final taskRepository = ref.read(taskRepositoryProvider);
+    final updatedTask = task.copyWith(isCompleted: !task.isCompleted);
+    await taskRepository.updateTask(updatedTask);
+  }
 }
 
 final taskListViewModelProvider =
