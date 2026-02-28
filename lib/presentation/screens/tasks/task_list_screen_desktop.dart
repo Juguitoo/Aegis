@@ -1,4 +1,5 @@
 import 'package:aegis/presentation/screens/main_desktop_layout.dart';
+import 'package:aegis/presentation/screens/tasks/widgets/task_form_desktop.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../data/local/database/app_database.dart';
@@ -136,9 +137,10 @@ class _MainTaskColumn extends StatelessWidget {
           alignment: Alignment.centerRight,
           child: ElevatedButton.icon(
             onPressed: () {
-              ref.read(taskListViewModelProvider.notifier).addTask(
-                    TasksCompanion.insert(title: 'Nueva tarea (Escritorio)'),
-                  );
+              showDialog(
+                context: context,
+                builder: (context) => const TaskFormDesktop(),
+              );
             },
             icon: const Icon(Icons.add, color: Colors.white),
             label: const Text('Nueva Tarea',
@@ -326,71 +328,83 @@ class _TaskRow extends StatelessWidget {
       tagTextColor = const Color(0xFF16A34A);
     }
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      color: Colors.white,
-      child: Row(
-        children: [
-          SizedBox(
-            width: 48,
-            child: Checkbox(
-              value: isCompleted,
-              onChanged: (val) {
-                ref.read(taskListViewModelProvider.notifier).updateTask(
-                      task.copyWith(isCompleted: val ?? false),
-                    );
-              },
-              activeColor: const Color(0xFF6366F1),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(4)),
-            ),
-          ),
-          Expanded(
-            flex: 4,
-            child: Text(
-              task.title,
-              style: TextStyle(
-                color: isCompleted
-                    ? const Color(0xFF94A3B8)
-                    : const Color(0xFF334155),
-                decoration: isCompleted ? TextDecoration.lineThrough : null,
-                fontWeight: FontWeight.w500,
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: () {
+          showDialog(
+            context: context,
+            builder: (context) => TaskFormDesktop(task: task),
+          );
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          color: Colors.white,
+          child: Row(
+            children: [
+              SizedBox(
+                width: 48,
+                child: Checkbox(
+                  value: isCompleted,
+                  onChanged: (val) {
+                    ref.read(taskListViewModelProvider.notifier).updateTask(
+                          task.copyWith(isCompleted: val ?? false),
+                        );
+                  },
+                  activeColor: const Color(0xFF6366F1),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(4)),
+                ),
               ),
-            ),
-          ),
-          Expanded(
-            flex: 2,
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Icon(Icons.flag, color: flagColor, size: 20),
-            ),
-          ),
-          Expanded(
-            flex: 2,
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: _TagPill(
-                label: tagName,
-                backgroundColor: tagBgColor,
-                textColor: tagTextColor,
+              Expanded(
+                flex: 4,
+                child: Text(
+                  task.title,
+                  style: TextStyle(
+                    color: isCompleted
+                        ? const Color(0xFF94A3B8)
+                        : const Color(0xFF334155),
+                    decoration: isCompleted ? TextDecoration.lineThrough : null,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
               ),
-            ),
+              Expanded(
+                flex: 2,
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Icon(Icons.flag, color: flagColor, size: 20),
+                ),
+              ),
+              Expanded(
+                flex: 2,
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: _TagPill(
+                    label: tagName,
+                    backgroundColor: tagBgColor,
+                    textColor: tagTextColor,
+                  ),
+                ),
+              ),
+              Expanded(
+                flex: 2,
+                child: Text(
+                  _formatDate(task.dueDate),
+                  style:
+                      const TextStyle(color: Color(0xFF64748B), fontSize: 13),
+                ),
+              ),
+              SizedBox(
+                width: 40,
+                child: IconButton(
+                  icon: const Icon(Icons.more_vert, color: Color(0xFF94A3B8)),
+                  onPressed: () {},
+                ),
+              ),
+            ],
           ),
-          Expanded(
-            flex: 2,
-            child: Text(
-              _formatDate(task.dueDate),
-              style: const TextStyle(color: Color(0xFF64748B), fontSize: 13),
-            ),
-          ),
-          SizedBox(
-            width: 40,
-            child: IconButton(
-              icon: const Icon(Icons.more_vert, color: Color(0xFF94A3B8)),
-              onPressed: () {},
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }

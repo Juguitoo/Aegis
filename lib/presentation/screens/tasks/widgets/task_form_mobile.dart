@@ -171,7 +171,6 @@ class _TaskFormMobileState extends ConsumerState<TaskFormMobile> {
             SizedBox(height: 16),
             TextField(
               controller: _descriptionController,
-              autofocus: true,
               textCapitalization: TextCapitalization.sentences,
               maxLines: 3,
               minLines: 1,
