@@ -26,7 +26,8 @@ class TaskListScreenDesktop extends ConsumerWidget {
                 fontSize: 32,
               ),
             ),
-            const SizedBox(height: 32),
+            Divider(height: 16, color: const Color(0xFFE2E8F0)),
+            const SizedBox(height: 16),
             Expanded(
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -132,7 +133,6 @@ class _MainTaskColumn extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 24),
         Align(
           alignment: Alignment.centerRight,
           child: ElevatedButton.icon(
@@ -188,7 +188,7 @@ class _MainTaskColumn extends StatelessWidget {
                         separatorBuilder: (_, __) =>
                             const Divider(height: 1, color: Color(0xFFF1F5F9)),
                         itemBuilder: (context, index) {
-                          return _TaskRow(task: tasks[index], ref: ref);
+                          return TaskRow(task: tasks[index], ref: ref);
                         },
                       );
                     },
@@ -272,11 +272,11 @@ class _TaskTableHeader extends StatelessWidget {
   }
 }
 
-class _TaskRow extends StatelessWidget {
+class TaskRow extends StatelessWidget {
   final Task task;
   final WidgetRef ref;
 
-  const _TaskRow({required this.task, required this.ref});
+  const TaskRow({super.key, required this.task, required this.ref});
 
   String _formatDate(DateTime? date) {
     if (date == null) return 'Sin fecha';
@@ -302,11 +302,11 @@ class _TaskRow extends StatelessWidget {
     final bool isCompleted = task.isCompleted;
 
     Color flagColor = const Color(0xFF64748B);
-    if (task.id % 3 == 0) {
+    if (task.priority == 3) {
       flagColor = const Color(0xFFEF4444);
-    } else if (task.id % 2 == 0) {
+    } else if (task.priority == 2) {
       flagColor = const Color(0xFFEAB308);
-    } else {
+    } else if (task.priority == 1) {
       flagColor = const Color(0xFF22C55E);
     }
 
@@ -397,9 +397,50 @@ class _TaskRow extends StatelessWidget {
               ),
               SizedBox(
                 width: 40,
-                child: IconButton(
-                  icon: const Icon(Icons.more_vert, color: Color(0xFF94A3B8)),
-                  onPressed: () {},
+                child: PopupMenuButton(
+                  icon: Icon(Icons.more_vert, color: Color(0xFF94A3B8)),
+                  color: Colors.white,
+                  surfaceTintColor: Colors.transparent,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
+                  onSelected: (value) {
+                    if (value == 0) {
+                      showDialog(
+                        context: context,
+                        builder: (context) => TaskFormDesktop(task: task),
+                      );
+                    } else if (value == 1) {
+                      ref
+                          .read(taskListViewModelProvider.notifier)
+                          .deleteTask(task);
+                    }
+                  },
+                  itemBuilder: (context) => [
+                    const PopupMenuItem(
+                      value: 0,
+                      child: Row(
+                        children: [
+                          Icon(Icons.edit_outlined,
+                              color: Color(0xFF64748B), size: 20),
+                          SizedBox(width: 12),
+                          Text('Editar',
+                              style: TextStyle(color: Color(0xFF1E293B))),
+                        ],
+                      ),
+                    ),
+                    const PopupMenuItem(
+                      value: 1,
+                      child: Row(
+                        children: [
+                          Icon(Icons.delete_outline,
+                              color: Color(0xFFEF4444), size: 20),
+                          SizedBox(width: 12),
+                          Text('Eliminar',
+                              style: TextStyle(color: Color(0xFFEF4444))),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
