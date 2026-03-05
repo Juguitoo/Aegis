@@ -1,5 +1,6 @@
 import 'package:aegis/presentation/screens/main_mobile_layout.dart';
 import 'package:aegis/presentation/screens/tasks/widgets/task_form_mobile.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import '../../../data/local/database/app_database.dart';
 import '../../viewmodels/task_list_viewmodel.dart';
 import 'package:flutter/material.dart';
@@ -61,6 +62,55 @@ class _TaskListScreenMobileState extends ConsumerState<TaskListScreenMobile> {
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 8.0),
+            child: PopupMenuButton<int>(
+              icon: const Icon(Icons.more_vert, color: Color(0xFF1E293B)),
+              color: Colors.white,
+              surfaceTintColor: Colors.transparent,
+              position: PopupMenuPosition.under,
+              elevation: 4,
+              onSelected: (value) {
+                if (value == 1) {
+                  // Gestionar proyectos (en desarrollo)
+                } else if (value == 2) {
+                  // Gestionar etiquetas (en desarrollo)
+                }
+              },
+              itemBuilder: (context) => [
+                const PopupMenuItem(
+                  value: 1,
+                  height: 48,
+                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.folder_outlined,
+                          color: Color(0xFF64748B), size: 20),
+                      SizedBox(width: 24),
+                      Text('Gestionar proyectos',
+                          style: TextStyle(color: Color(0xFF1E293B))),
+                    ],
+                  ),
+                ),
+                const PopupMenuItem(
+                  value: 2,
+                  height: 48,
+                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.label_outlined,
+                          color: Color(0xFF64748B), size: 20),
+                      SizedBox(width: 24),
+                      Text('Gestionar etiquetas',
+                          style: TextStyle(color: Color(0xFF1E293B))),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0),
             child: IconButton(
               icon: const Icon(Icons.settings, color: Color(0xFF1E293B)),
               onPressed: () {},
@@ -68,21 +118,40 @@ class _TaskListScreenMobileState extends ConsumerState<TaskListScreenMobile> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: SpeedDial(
+        icon: Icons.add,
+        activeIcon: Icons.close,
         backgroundColor: const Color(0xFF6366F1),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        onPressed: () {
-          showModalBottomSheet(
-            context: context,
-            isScrollControlled: true,
+        foregroundColor: Colors.white,
+        activeBackgroundColor: const Color(0xFF4F46E5),
+        activeForegroundColor: Colors.white,
+        overlayColor: Colors.black,
+        overlayOpacity: 0.4,
+        spacing: 12,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        children: [
+          SpeedDialChild(
+            child: const Icon(Icons.check_circle_outline,
+                color: Color(0xFF6366F1)),
             backgroundColor: Colors.white,
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-            ),
-            builder: (context) => const TaskFormMobile(),
-          );
-        },
-        child: const Icon(Icons.add, color: Colors.white),
+            shape: const CircleBorder(),
+            onTap: () => _openTaskForm(),
+          ),
+          SpeedDialChild(
+            child: const Icon(Icons.folder_outlined, color: Color(0xFF0284C7)),
+            backgroundColor: Colors.white,
+            shape: const CircleBorder(),
+            onTap: () {},
+          ),
+          SpeedDialChild(
+            child: const Icon(Icons.label_outline, color: Color(0xFFDB2777)),
+            backgroundColor: Colors.white,
+            shape: const CircleBorder(),
+            onTap: () {},
+          ),
+        ],
       ),
       child: Column(
         children: [
@@ -395,7 +464,7 @@ class TaskCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Container(
-                      width: 8,
+                      width: 4,
                       color: _getFlagColor(),
                     ),
                     Expanded(

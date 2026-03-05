@@ -47,6 +47,7 @@ dependencies:
   # Iconos (defecto)
   cupertino_icons: ^1.0.8
   window_manager: ^0.5.1
+  flutter_speed_dial: ^7.0.0
 
 dev_dependencies:
   flutter_test:
