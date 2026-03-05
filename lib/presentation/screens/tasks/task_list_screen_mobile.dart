@@ -8,6 +8,9 @@ import '../../viewmodels/task_list_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'components/task_card.dart';
+import 'components/mobile_filter_controls.dart';
+
 class TaskListScreenMobile extends ConsumerStatefulWidget {
   const TaskListScreenMobile({super.key});
 
@@ -78,8 +81,6 @@ class _TaskListScreenMobileState extends ConsumerState<TaskListScreenMobile> {
                     backgroundColor: Colors.transparent,
                     builder: (context) => const ManageProjectsBottomSheet(),
                   );
-                } else if (value == 2) {
-                  // Gestionar etiquetas (en desarrollo)
                 }
               },
               itemBuilder: (context) => [
@@ -167,13 +168,13 @@ class _TaskListScreenMobileState extends ConsumerState<TaskListScreenMobile> {
       ),
       child: Column(
         children: [
-          Divider(color: Color(0xFFE2E8F0)),
+          const Divider(color: Color(0xFFE2E8F0)),
           const _HabitsSectionPlaceholder(),
-          Divider(color: Color(0xFFE2E8F0)),
+          const Divider(color: Color(0xFFE2E8F0)),
           Container(
             alignment: Alignment.centerLeft,
             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
-            child: Text(
+            child: const Text(
               "Tareas",
               style: TextStyle(
                   fontSize: 20,
@@ -182,14 +183,14 @@ class _TaskListScreenMobileState extends ConsumerState<TaskListScreenMobile> {
               textAlign: TextAlign.left,
             ),
           ),
-          const _SearchBarAndFilters(),
+          const MobileFilterControls(),
           Expanded(
             child: tasksAsync.when(
               data: (tasks) {
                 if (tasks.isEmpty) {
                   return const Center(
                     child: Text(
-                      'No hay tareas. ¡Pulsa + para crear una!',
+                      'No hay tareas para este filtro.',
                       style: TextStyle(color: Color(0xFF94A3B8)),
                     ),
                   );
@@ -240,7 +241,7 @@ class _HabitsSectionPlaceholder extends StatelessWidget {
       children: [
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
-          child: Text(
+          child: const Text(
             "Hábitos",
             style: TextStyle(
                 fontSize: 20,
@@ -257,361 +258,24 @@ class _HabitsSectionPlaceholder extends StatelessWidget {
             color: const Color(0xFFE0F2FE),
             borderRadius: BorderRadius.circular(20),
           ),
-          child: Row(
-            children: const [
+          child: const Row(
+            children: [
               Icon(Icons.auto_graph, color: Color(0xFF0284C7)),
               SizedBox(width: 12),
-              Text(
-                'Sección de hábitos (en desarrollo)',
-                style: TextStyle(
-                  color: Color(0xFF0284C7),
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
+              Expanded(
+                child: Text(
+                  'Sección de hábitos (en desarrollo)',
+                  style: TextStyle(
+                    color: Color(0xFF0284C7),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
                 ),
               ),
             ],
           ),
         )
       ],
-    );
-  }
-}
-
-class _SearchBarAndFilters extends StatefulWidget {
-  const _SearchBarAndFilters();
-
-  @override
-  State<_SearchBarAndFilters> createState() => _SearchBarAndFiltersState();
-}
-
-class _SearchBarAndFiltersState extends State<_SearchBarAndFilters> {
-  final ScrollController _filterScrollController = ScrollController();
-
-  @override
-  void dispose() {
-    _filterScrollController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  height: 48,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(24),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withAlpha(7),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: const Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          decoration: InputDecoration(
-                            hintText: 'Buscar tarea...',
-                            hintStyle: TextStyle(color: Color(0xFF94A3B8)),
-                            border: InputBorder.none,
-                          ),
-                        ),
-                      ),
-                      Icon(Icons.search, color: Color(0xFF6366F1)),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Container(
-                height: 48,
-                width: 48,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withAlpha(7),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: const Icon(Icons.tune, color: Color(0xFF6366F1)),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Scrollbar(
-            controller: _filterScrollController,
-            thumbVisibility: true,
-            child: SingleChildScrollView(
-              controller: _filterScrollController,
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.only(bottom: 8),
-              child: Row(
-                children: const [
-                  _FilterChip(label: 'Todo', isSelected: true),
-                  _FilterChip(label: 'Completas', isSelected: false),
-                  _FilterChip(label: 'Pendientes', isSelected: false),
-                  _FilterChip(label: 'Alta Prioridad', isSelected: false),
-                  _FilterChip(label: 'Media Prioridad', isSelected: false),
-                  _FilterChip(label: 'Baja Prioridad', isSelected: false),
-                  _FilterChip(label: 'Hoy', isSelected: false),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _FilterChip extends StatelessWidget {
-  final String label;
-  final bool isSelected;
-
-  const _FilterChip({required this.label, required this.isSelected});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(right: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: isSelected ? const Color(0xFF6366F1) : const Color(0xFFF1F5F9),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: isSelected ? Colors.white : const Color(0xFF475569),
-          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-          fontSize: 13,
-        ),
-      ),
-    );
-  }
-}
-
-class TaskCard extends StatelessWidget {
-  final Task task;
-  final VoidCallback onToggle;
-  final VoidCallback onTap;
-  final VoidCallback onDelete;
-
-  const TaskCard({
-    super.key,
-    required this.task,
-    required this.onToggle,
-    required this.onTap,
-    required this.onDelete,
-  });
-
-  Color _getFlagColor() {
-    if (task.priority == 3) {
-      return const Color(0xFFEF4444);
-    } else if (task.priority == 2) {
-      return const Color(0xFFEAB308);
-    } else if (task.priority == 1) {
-      return const Color(0xFF22C55E);
-    }
-    return const Color(0xFFCBD5E1);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final List<String> mockTags = [
-      'URGENTE',
-      'UNIVERSIDAD',
-      'PERSONAL',
-      'TRABAJO',
-      'CASA',
-      'GIMNASIO'
-    ];
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha(7),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
-        child: Dismissible(
-          key: ValueKey(task.id),
-          direction: DismissDirection.endToStart,
-          onDismissed: (_) => onDelete(),
-          background: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            color: const Color(0xFFFEE2E2),
-            alignment: Alignment.centerRight,
-            child: const Icon(Icons.delete_outline,
-                color: Color(0xFFDC2626), size: 28),
-          ),
-          child: GestureDetector(
-            onTap: onTap,
-            child: Container(
-              color: Colors.white,
-              child: IntrinsicHeight(
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Container(
-                      width: 4,
-                      color: _getFlagColor(),
-                    ),
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Row(
-                          children: [
-                            GestureDetector(
-                              onTap: onToggle,
-                              child: Container(
-                                width: 24,
-                                height: 24,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: task.isCompleted
-                                        ? const Color(0xFF94A3B8)
-                                        : const Color(0xFFCBD5E1),
-                                    width: 2,
-                                  ),
-                                  color: task.isCompleted
-                                      ? const Color(0xFF94A3B8)
-                                      : Colors.transparent,
-                                ),
-                                child: task.isCompleted
-                                    ? const Icon(Icons.check,
-                                        size: 16, color: Colors.white)
-                                    : null,
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Expanded(
-                                        child: Text(
-                                          task.title,
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w500,
-                                            color: task.isCompleted
-                                                ? const Color(0xFF94A3B8)
-                                                : const Color(0xFF1E293B),
-                                            decoration: task.isCompleted
-                                                ? TextDecoration.lineThrough
-                                                : null,
-                                          ),
-                                        ),
-                                      ),
-                                      if (task.dueDate != null) ...[
-                                        const SizedBox(width: 12),
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(top: 2),
-                                          child: Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              const Icon(
-                                                  Icons.calendar_today_outlined,
-                                                  size: 14,
-                                                  color: Color(0xFF94A3B8)),
-                                              const SizedBox(width: 4),
-                                              Text(
-                                                '${task.dueDate!.day}/${task.dueDate!.month}/${task.dueDate!.year}',
-                                                style: const TextStyle(
-                                                  fontSize: 12,
-                                                  color: Color(0xFF64748B),
-                                                  fontWeight: FontWeight.w500,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ],
-                                  ),
-                                  if (mockTags.isNotEmpty) ...[
-                                    const SizedBox(height: 8),
-                                    SingleChildScrollView(
-                                      scrollDirection: Axis.horizontal,
-                                      child: Row(
-                                        children: mockTags
-                                            .map((tagName) => Container(
-                                                  margin: const EdgeInsets.only(
-                                                      right: 8),
-                                                  padding: const EdgeInsets
-                                                      .symmetric(
-                                                      horizontal: 8,
-                                                      vertical: 4),
-                                                  decoration: BoxDecoration(
-                                                    color:
-                                                        const Color(0xFFFCE7F3),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            8),
-                                                  ),
-                                                  child: Text(
-                                                    tagName,
-                                                    style: const TextStyle(
-                                                      fontSize: 10,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: Color(0xFFDB2777),
-                                                    ),
-                                                  ),
-                                                ))
-                                            .toList(),
-                                      ),
-                                    ),
-                                  ],
-                                ],
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            const Icon(Icons.chevron_right,
-                                color: Color(0xFFCBD5E1)),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
     );
   }
 }
