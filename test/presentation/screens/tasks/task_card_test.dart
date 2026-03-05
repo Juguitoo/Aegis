@@ -1,9 +1,25 @@
 import 'package:aegis/data/local/database/app_database.dart';
-import 'package:aegis/presentation/screens/tasks/task_list_screen_mobile.dart';
+import 'package:aegis/presentation/screens/tasks/components/task_card.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  Widget buildTestableTaskCard(Task task, {VoidCallback? onToggle}) {
+    return ProviderScope(
+      child: MaterialApp(
+        home: Scaffold(
+          body: TaskCard(
+            task: task,
+            onToggle: onToggle ?? () {},
+            onTap: () {},
+            onDelete: () {},
+          ),
+        ),
+      ),
+    );
+  }
+
   testWidgets('TaskCard renderiza el titulo y no lo tacha si esta pendiente',
       (WidgetTester tester) async {
     final task = Task(
@@ -16,18 +32,7 @@ void main() {
       isCompleted: false,
     );
 
-    await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: TaskCard(
-            task: task,
-            onToggle: () {},
-            onTap: () {},
-            onDelete: () {},
-          ),
-        ),
-      ),
-    );
+    await tester.pumpWidget(buildTestableTaskCard(task));
 
     expect(find.text('Comprar leche'), findsOneWidget);
 
@@ -47,18 +52,7 @@ void main() {
       isCompleted: true,
     );
 
-    await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: TaskCard(
-            task: task,
-            onToggle: () {},
-            onTap: () {},
-            onDelete: () {},
-          ),
-        ),
-      ),
-    );
+    await tester.pumpWidget(buildTestableTaskCard(task));
 
     expect(find.text('Llamar al fontanero'), findsOneWidget);
 
@@ -81,17 +75,11 @@ void main() {
     );
 
     await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: TaskCard(
-            task: task,
-            onToggle: () {
-              togglePressed = true;
-            },
-            onTap: () {},
-            onDelete: () {},
-          ),
-        ),
+      buildTestableTaskCard(
+        task,
+        onToggle: () {
+          togglePressed = true;
+        },
       ),
     );
 
@@ -119,18 +107,7 @@ void main() {
       isCompleted: false,
     );
 
-    await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: TaskCard(
-            task: task,
-            onToggle: () {},
-            onTap: () {},
-            onDelete: () {},
-          ),
-        ),
-      ),
-    );
+    await tester.pumpWidget(buildTestableTaskCard(task));
 
     expect(find.text('28/2/2026'), findsOneWidget);
     expect(find.byIcon(Icons.calendar_today_outlined), findsOneWidget);

@@ -1,5 +1,5 @@
 import 'package:aegis/data/local/database/app_database.dart';
-import 'package:aegis/presentation/screens/tasks/task_list_screen_desktop.dart';
+import 'package:aegis/presentation/screens/tasks/components/task_table_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -9,14 +9,7 @@ void main() {
     return ProviderScope(
       child: MaterialApp(
         home: Scaffold(
-          body: Consumer(
-            builder: (context, ref, child) {
-              return TaskRow(
-                task: task,
-                ref: ref,
-              );
-            },
-          ),
+          body: TaskRow(task: task),
         ),
       ),
     );
