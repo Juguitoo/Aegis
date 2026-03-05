@@ -1,4 +1,5 @@
 import 'package:aegis/data/local/database/app_database.dart';
+import 'package:aegis/presentation/viewmodels/project_list_viewmodel.dart';
 import 'package:aegis/presentation/viewmodels/task_list_viewmodel.dart';
 import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
@@ -20,6 +21,7 @@ class _TaskFormMobileState extends ConsumerState<TaskFormMobile> {
 
   int _selectedPriority = 0;
   DateTime? _selectedDueDate;
+  int? _selectedProjectId;
 
   @override
   void initState() {
@@ -31,6 +33,7 @@ class _TaskFormMobileState extends ConsumerState<TaskFormMobile> {
         text: widget.task?.estimatedDuration?.toString() ?? '');
     _selectedPriority = widget.task?.priority ?? 0;
     _selectedDueDate = widget.task?.dueDate;
+    _selectedProjectId = widget.task?.projectId;
   }
 
   @override
@@ -39,6 +42,18 @@ class _TaskFormMobileState extends ConsumerState<TaskFormMobile> {
     _descriptionController.dispose();
     _estimatedDurationController.dispose();
     super.dispose();
+  }
+
+  Color _parseColor(String? hex) {
+    if (hex == null || hex.isEmpty) return const Color(0xFF94A3B8);
+    final hexCode = hex.replaceAll('#', '');
+    if (hexCode.length == 6) {
+      return Color(int.parse('FF$hexCode', radix: 16));
+    }
+    if (hexCode.length == 8) {
+      return Color(int.parse(hexCode, radix: 16));
+    }
+    return const Color(0xFF94A3B8);
   }
 
   Future<void> _pickDueDate() async {
@@ -84,7 +99,8 @@ class _TaskFormMobileState extends ConsumerState<TaskFormMobile> {
         description: drift.Value(description.isEmpty ? null : description),
         estimatedDuration: drift.Value(estimatedDuration),
         priority: drift.Value(_selectedPriority),
-        dueDate: drift.Value(_selectedDueDate)));
+        dueDate: drift.Value(_selectedDueDate),
+        projectId: drift.Value(_selectedProjectId)));
 
     Navigator.of(context).pop();
   }
@@ -107,6 +123,7 @@ class _TaskFormMobileState extends ConsumerState<TaskFormMobile> {
       estimatedDuration: drift.Value(estimatedDuration),
       priority: _selectedPriority,
       dueDate: drift.Value(_selectedDueDate),
+      projectId: drift.Value(_selectedProjectId),
     );
 
     ref.read(taskListViewModelProvider.notifier).updateTask(updatedTask);
@@ -125,11 +142,14 @@ class _TaskFormMobileState extends ConsumerState<TaskFormMobile> {
     setState(() {
       _selectedPriority = 0;
       _selectedDueDate = null;
+      _selectedProjectId = null;
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final projectsAsync = ref.watch(projectListViewModelProvider);
+
     return Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -247,6 +267,70 @@ class _TaskFormMobileState extends ConsumerState<TaskFormMobile> {
                   ),
                 ),
               ],
+            ),
+            const SizedBox(height: 16),
+            projectsAsync.when(
+              data: (projectsList) {
+                return DropdownButtonFormField<int?>(
+                  initialValue: _selectedProjectId,
+                  decoration: InputDecoration(
+                    labelText: 'Proyecto',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide:
+                          const BorderSide(color: Color(0xFF6366F1), width: 2),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 16),
+                  ),
+                  icon: const Icon(Icons.keyboard_arrow_down,
+                      color: Color(0xFF64748B)),
+                  items: [
+                    const DropdownMenuItem<int?>(
+                      value: null,
+                      child: Row(
+                        children: [
+                          Icon(Icons.folder_outlined,
+                              size: 18, color: Color(0xFF94A3B8)),
+                          SizedBox(width: 12),
+                          Text('Seleccionar proyecto',
+                              style: TextStyle(color: Color(0xFF64748B))),
+                        ],
+                      ),
+                    ),
+                    ...projectsList.map((p) => DropdownMenuItem<int?>(
+                          value: p.id,
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 14,
+                                height: 14,
+                                decoration: BoxDecoration(
+                                  color: _parseColor(p.colorHex),
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Text(p.name,
+                                  style: const TextStyle(
+                                      color: Color(0xFF1E293B))),
+                            ],
+                          ),
+                        )),
+                  ],
+                  onChanged: (value) {
+                    setState(() {
+                      _selectedProjectId = value;
+                    });
+                  },
+                );
+              },
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (err, stack) => Text('Error al cargar proyectos: $err'),
             ),
             const SizedBox(height: 16),
             const Text(

@@ -65,7 +65,7 @@ class AegisApp extends ConsumerWidget {
         ),
         useMaterial3: true,
       ),
-      themeMode: ThemeMode.system,
+      themeMode: ThemeMode.light,
       home: const TaskListScreen(),
     );
   }

@@ -108,6 +108,10 @@ class _ProjectFormDialogState extends ConsumerState<ProjectFormDialog> {
           TextField(
             controller: nameController,
             textCapitalization: TextCapitalization.sentences,
+            style: const TextStyle(
+              color: Color(0xFF1E293B),
+              fontWeight: FontWeight.w600,
+            ),
             decoration: InputDecoration(
               labelText: 'Nombre del proyecto',
               hintText: "Universidad, Trabajo, Personal...",
@@ -132,6 +136,10 @@ class _ProjectFormDialogState extends ConsumerState<ProjectFormDialog> {
             textCapitalization: TextCapitalization.sentences,
             maxLines: 3,
             minLines: 1,
+            style: const TextStyle(
+              color: Color(0xFF1E293B),
+              fontWeight: FontWeight.w600,
+            ),
             decoration: InputDecoration(
               labelText: 'Descripción del proyecto',
               hintText: 'Detalles sobre el proyecto...',

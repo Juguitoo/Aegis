@@ -1,5 +1,6 @@
 import 'package:aegis/presentation/screens/main_mobile_layout.dart';
 import 'package:aegis/presentation/screens/tasks/widgets/manage_projects_bottom_sheet.dart';
+import 'package:aegis/presentation/screens/tasks/widgets/project_form_dialog.dart';
 import 'package:aegis/presentation/screens/tasks/widgets/task_form_mobile.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import '../../../data/local/database/app_database.dart';
@@ -149,7 +150,12 @@ class _TaskListScreenMobileState extends ConsumerState<TaskListScreenMobile> {
             child: const Icon(Icons.folder_outlined, color: Color(0xFF0284C7)),
             backgroundColor: Colors.white,
             shape: const CircleBorder(),
-            onTap: () {},
+            onTap: () {
+              showDialog(
+                context: context,
+                builder: (context) => const ProjectFormDialog(),
+              );
+            },
           ),
           SpeedDialChild(
             child: const Icon(Icons.label_outline, color: Color(0xFFDB2777)),
