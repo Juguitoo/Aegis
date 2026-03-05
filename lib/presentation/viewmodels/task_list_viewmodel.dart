@@ -1,38 +1,35 @@
+import 'package:aegis/data/repositories/task_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/providers/repository_providers.dart';
 import '../../data/local/database/app_database.dart';
 
 class TaskListViewModel extends StreamNotifier<List<Task>> {
+  TaskRepository get _repository => ref.read(taskRepositoryProvider);
+
   @override
   Stream<List<Task>> build() {
-    final taskRepository = ref.watch(taskRepositoryProvider);
-    return taskRepository.watchAllTasks();
+    return ref.watch(taskRepositoryProvider).watchAllTasks();
   }
 
-  Future<void> addTask(TasksCompanion task) async {
-    final taskRepository = ref.read(taskRepositoryProvider);
-    await taskRepository.insertTask(task);
+  Future<int> addTask(TasksCompanion task) {
+    return _repository.insertTask(task);
   }
 
-  Future<void> updateTask(Task task) async {
-    final taskRepository = ref.read(taskRepositoryProvider);
-    await taskRepository.updateTask(task);
+  Future<bool> updateTask(Task task) {
+    return _repository.updateTask(task);
   }
 
-  Future<void> deleteTask(Task task) async {
-    final taskRepository = ref.read(taskRepositoryProvider);
-    await taskRepository.deleteTask(task);
+  Future<int> deleteTask(Task task) {
+    return _repository.deleteTask(task);
   }
 
-  Future<void> deleteTaskById(int id) async {
-    final taskRepository = ref.read(taskRepositoryProvider);
-    await taskRepository.deleteTaskById(id);
+  Future<int> deleteTaskById(int id) {
+    return _repository.deleteTaskById(id);
   }
 
-  Future<void> toggleTaskCompletion(Task task) async {
-    final taskRepository = ref.read(taskRepositoryProvider);
+  Future<bool> toggleTaskCompletion(Task task) {
     final updatedTask = task.copyWith(isCompleted: !task.isCompleted);
-    await taskRepository.updateTask(updatedTask);
+    return _repository.updateTask(updatedTask);
   }
 }
 

@@ -1,4 +1,5 @@
 import 'package:aegis/presentation/screens/main_mobile_layout.dart';
+import 'package:aegis/presentation/screens/tasks/widgets/manage_projects_bottom_sheet.dart';
 import 'package:aegis/presentation/screens/tasks/widgets/task_form_mobile.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import '../../../data/local/database/app_database.dart';
@@ -70,7 +71,12 @@ class _TaskListScreenMobileState extends ConsumerState<TaskListScreenMobile> {
               elevation: 4,
               onSelected: (value) {
                 if (value == 1) {
-                  // Gestionar proyectos (en desarrollo)
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                    builder: (context) => const ManageProjectsBottomSheet(),
+                  );
                 } else if (value == 2) {
                   // Gestionar etiquetas (en desarrollo)
                 }

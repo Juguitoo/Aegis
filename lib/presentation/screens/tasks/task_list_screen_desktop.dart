@@ -1,4 +1,5 @@
 import 'package:aegis/presentation/screens/main_desktop_layout.dart';
+import 'package:aegis/presentation/screens/tasks/widgets/manage_projects_bottom_sheet.dart';
 import 'package:aegis/presentation/screens/tasks/widgets/task_form_desktop.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -133,28 +134,84 @@ class _MainTaskColumn extends StatelessWidget {
             ),
           ],
         ),
-        Align(
-          alignment: Alignment.centerRight,
-          child: ElevatedButton.icon(
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (context) => const TaskFormDesktop(),
-              );
-            },
-            icon: const Icon(Icons.add, color: Colors.white),
-            label: const Text('Nueva Tarea',
-                style: TextStyle(
-                    color: Colors.white, fontWeight: FontWeight.bold)),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF6366F1),
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20)),
-              elevation: 4,
-              shadowColor: const Color(0xFF6366F1).withAlpha(100),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            ElevatedButton.icon(
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => const TaskFormDesktop(),
+                );
+              },
+              icon: const Icon(Icons.add, color: Colors.white),
+              label: const Text('Nueva Tarea',
+                  style: TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.bold)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF6366F1),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20)),
+                elevation: 4,
+                shadowColor: const Color(0xFF6366F1).withAlpha(100),
+              ),
             ),
-          ),
+            const SizedBox(width: 12),
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: const Color(0xFFE2E8F0)),
+              ),
+              child: PopupMenuButton(
+                icon: const Icon(Icons.more_vert, color: Color(0xFF94A3B8)),
+                color: Colors.white,
+                surfaceTintColor: Colors.transparent,
+                position: PopupMenuPosition.under,
+                elevation: 4,
+                onSelected: (value) {
+                  if (value == 1) {
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
+                      builder: (context) => const ManageProjectsBottomSheet(),
+                    );
+                  } else if (value == 2) {
+                    //Gestionar Etiquetas
+                  }
+                },
+                itemBuilder: (context) => [
+                  PopupMenuItem(
+                    value: 1,
+                    child: Row(
+                      children: const [
+                        Icon(Icons.folder_open_outlined,
+                            color: Color(0xFF64748B), size: 20),
+                        SizedBox(width: 12),
+                        Text('Gestionar Proyectos',
+                            style: TextStyle(color: Color(0xFF1E293B))),
+                      ],
+                    ),
+                  ),
+                  PopupMenuItem(
+                    value: 2,
+                    child: Row(
+                      children: const [
+                        Icon(Icons.label_outline,
+                            color: Color(0xFF64748B), size: 20),
+                        SizedBox(width: 12),
+                        Text('Gestionar Etiquetas',
+                            style: TextStyle(color: Color(0xFF1E293B))),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: 16),
         Expanded(
