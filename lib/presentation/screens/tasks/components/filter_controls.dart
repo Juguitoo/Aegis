@@ -1,3 +1,4 @@
+import 'package:aegis/presentation/screens/tasks/widgets/manage_tags_bottom_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:aegis/presentation/viewmodels/project_list_viewmodel.dart';
@@ -44,7 +45,7 @@ class FilterControls extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // 1. FILA DE BÚSQUEDA Y BOTÓN DE AJUSTES
+        // FILA DE BÚSQUEDA Y BOTÓN DE FILTROS
         Row(
           children: [
             Expanded(
@@ -78,11 +79,10 @@ class FilterControls extends ConsumerWidget {
         ),
         const SizedBox(height: 16),
 
-        // 2. TOOLBAR: FILTROS ACTIVOS (Izquierda) + BOTONES DE ACCIÓN (Derecha)
+        // FILTROS ACTIVOS + BOTONES DE ACCIÓN
         Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // Contenedor de Píldoras
             Expanded(
               child: Wrap(
                 spacing: 8,
@@ -196,6 +196,13 @@ class _ActionButtonsRow extends StatelessWidget {
                   backgroundColor: Colors.transparent,
                   builder: (context) => const ManageProjectsBottomSheet(),
                 );
+              } else if (value == 2) {
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  backgroundColor: Colors.transparent,
+                  builder: (context) => const ManageTagsBottomSheet(),
+                );
               }
             },
             itemBuilder: (context) => [
@@ -207,6 +214,18 @@ class _ActionButtonsRow extends StatelessWidget {
                         color: Color(0xFF64748B), size: 20),
                     SizedBox(width: 12),
                     Text('Gestionar Proyectos',
+                        style: TextStyle(color: Color(0xFF1E293B))),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
+                value: 2,
+                child: Row(
+                  children: const [
+                    Icon(Icons.label_outlined,
+                        color: Color(0xFF64748B), size: 20),
+                    SizedBox(width: 12),
+                    Text('Gestionar Etiquetas',
                         style: TextStyle(color: Color(0xFF1E293B))),
                   ],
                 ),

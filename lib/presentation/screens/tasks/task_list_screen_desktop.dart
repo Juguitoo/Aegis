@@ -35,7 +35,6 @@ class TaskListScreenDesktop extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: const [
-                        // Aquí dentro ya van el buscador, los filtros activos Y los botones
                         FilterControls(),
                         SizedBox(height: 16),
                         Expanded(child: TaskTableView()),
