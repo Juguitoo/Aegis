@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/utils/color_utils.dart';
 import '../../../../data/local/database/app_database.dart';
 import '../../../viewmodels/project_list_viewmodel.dart';
-import 'tag_multi_selector.dart';
+import '../../tags/widgets/tag_multi_selector.dart';
 
 class TaskFormDesktop extends ConsumerStatefulWidget {
   final Task? task;

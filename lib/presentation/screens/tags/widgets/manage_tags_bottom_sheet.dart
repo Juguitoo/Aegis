@@ -1,5 +1,5 @@
 import 'package:aegis/core/utils/color_utils.dart';
-import 'package:aegis/presentation/screens/tasks/widgets/tag_form_dialog.dart';
+import 'package:aegis/presentation/screens/tags/widgets/tag_form_dialog.dart';
 import 'package:aegis/presentation/viewmodels/tag_list_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

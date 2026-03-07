@@ -1,8 +1,8 @@
 import 'package:aegis/presentation/screens/main_mobile_layout.dart';
-import 'package:aegis/presentation/screens/tasks/widgets/manage_projects_bottom_sheet.dart';
-import 'package:aegis/presentation/screens/tasks/widgets/manage_tags_bottom_sheet.dart';
-import 'package:aegis/presentation/screens/tasks/widgets/project_form_dialog.dart';
-import 'package:aegis/presentation/screens/tasks/widgets/tag_form_dialog.dart';
+import 'package:aegis/presentation/screens/projects/widgets/manage_projects_bottom_sheet.dart';
+import 'package:aegis/presentation/screens/tags/widgets/manage_tags_bottom_sheet.dart';
+import 'package:aegis/presentation/screens/projects/widgets/project_form_dialog.dart';
+import 'package:aegis/presentation/screens/tags/widgets/tag_form_dialog.dart';
 import 'package:aegis/presentation/screens/tasks/widgets/task_form_mobile.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import '../../../data/local/database/app_database.dart';

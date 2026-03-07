@@ -4,7 +4,7 @@ import 'package:aegis/core/utils/color_utils.dart';
 import 'package:aegis/presentation/viewmodels/project_list_viewmodel.dart';
 import 'package:aegis/presentation/viewmodels/task_list_viewmodel.dart';
 import 'package:aegis/presentation/viewmodels/tag_list_viewmodel.dart';
-import 'package:aegis/presentation/screens/tasks/widgets/tag_multi_selector.dart';
+import 'package:aegis/presentation/screens/tags/widgets/tag_multi_selector.dart';
 
 class MobileFilterControls extends ConsumerWidget {
   const MobileFilterControls({super.key});

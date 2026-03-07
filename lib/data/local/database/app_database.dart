@@ -50,6 +50,7 @@ class Subtasks extends Table {
 @DriftDatabase(tables: [Projects, Tasks, Tags, TaskTags, Subtasks])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
+  AppDatabase.forTesting(QueryExecutor e) : super(e);
 
   @override
   int get schemaVersion => 1;

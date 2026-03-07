@@ -5,8 +5,8 @@ import 'package:aegis/presentation/viewmodels/project_list_viewmodel.dart';
 import 'package:aegis/presentation/viewmodels/task_list_viewmodel.dart';
 import 'package:aegis/presentation/viewmodels/tag_list_viewmodel.dart';
 import 'package:aegis/presentation/screens/tasks/widgets/task_form_desktop.dart';
-import 'package:aegis/presentation/screens/tasks/widgets/manage_projects_bottom_sheet.dart';
-import 'package:aegis/presentation/screens/tasks/widgets/tag_multi_selector.dart';
+import 'package:aegis/presentation/screens/projects/widgets/manage_projects_bottom_sheet.dart';
+import 'package:aegis/presentation/screens/tags/widgets/tag_multi_selector.dart';
 
 class FilterControls extends ConsumerWidget {
   const FilterControls({super.key});
