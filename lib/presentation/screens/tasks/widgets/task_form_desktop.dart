@@ -69,9 +69,11 @@ class _TaskFormDesktopState extends ConsumerState<TaskFormDesktop>
                 autofocus: true,
                 textCapitalization: TextCapitalization.sentences,
                 style: const TextStyle(fontSize: 16, color: Color(0xFF1E293B)),
+                maxLength: 80,
                 decoration: InputDecoration(
                   hintText: '¿Qué quieres hacer?',
                   hintStyle: const TextStyle(color: Color(0xFF94A3B8)),
+                  counterText: "",
                   contentPadding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                   border: OutlineInputBorder(
@@ -92,6 +94,7 @@ class _TaskFormDesktopState extends ConsumerState<TaskFormDesktop>
                 controller: descriptionController,
                 textCapitalization: TextCapitalization.sentences,
                 style: const TextStyle(fontSize: 16, color: Color(0xFF1E293B)),
+                maxLength: 500,
                 maxLines: 3,
                 minLines: 1,
                 decoration: InputDecoration(

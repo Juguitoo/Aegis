@@ -1,3 +1,5 @@
+import 'package:aegis/core/utils/color_utils.dart';
+import 'package:aegis/presentation/viewmodels/tag_list_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:aegis/data/local/database/app_database.dart';
@@ -67,7 +69,7 @@ class _TaskTableHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      padding: const EdgeInsets.only(left: 4, right: 16, top: 16, bottom: 16),
       decoration: const BoxDecoration(
         color: Color(0xFFEEF2FF),
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
@@ -86,23 +88,14 @@ class _TaskTableHeader extends StatelessWidget {
               ],
             ),
           ),
+          SizedBox(width: 16),
           Expanded(
-            flex: 2,
-            child: Row(
-              children: [
-                Text('Prioridad',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold, color: Color(0xFF1E293B))),
-                Icon(Icons.arrow_drop_down, color: Color(0xFF64748B), size: 18),
-              ],
-            ),
-          ),
-          Expanded(
-            flex: 2,
+            flex: 4,
             child: Text('Etiquetas',
                 style: TextStyle(
                     fontWeight: FontWeight.bold, color: Color(0xFF1E293B))),
           ),
+          SizedBox(width: 16),
           Expanded(
             flex: 2,
             child: Row(
@@ -149,7 +142,7 @@ class TaskRow extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final bool isCompleted = task.isCompleted;
 
-    Color flagColor = const Color(0xFF64748B);
+    Color flagColor = Colors.transparent;
     if (task.priority == 3) {
       flagColor = const Color(0xFFEF4444);
     } else if (task.priority == 2) {
@@ -158,23 +151,8 @@ class TaskRow extends ConsumerWidget {
       flagColor = const Color(0xFF22C55E);
     }
 
-    String tagName = 'UNIVERSIDAD';
-    Color tagBgColor = const Color(0xFFE0F2FE);
-    Color tagTextColor = const Color(0xFF0284C7);
-
-    if (task.id % 3 == 0) {
-      tagName = 'TRABAJO';
-      tagBgColor = const Color(0xFFFCE7F3);
-      tagTextColor = const Color(0xFFDB2777);
-    } else if (task.id % 4 == 0) {
-      tagName = 'COMPRAS';
-      tagBgColor = const Color(0xFFFEF9C3);
-      tagTextColor = const Color(0xFFCA8A04);
-    } else if (task.id % 5 == 0) {
-      tagName = 'CASA';
-      tagBgColor = const Color(0xFFDCFCE7);
-      tagTextColor = const Color(0xFF16A34A);
-    }
+    final tagIdsAsync = ref.watch(taskTagsProvider(task.id));
+    final allTagsAsync = ref.watch(tagListViewModelProvider);
 
     return MouseRegion(
       cursor: SystemMouseCursors.click,
@@ -186,112 +164,173 @@ class TaskRow extends ConsumerWidget {
           );
         },
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           color: Colors.white,
-          child: Row(
-            children: [
-              SizedBox(
-                width: 48,
-                child: Checkbox(
-                  value: isCompleted,
-                  onChanged: (val) {
-                    ref.read(taskListViewModelProvider.notifier).updateTask(
-                          task.copyWith(isCompleted: val ?? false),
-                        );
-                  },
-                  activeColor: const Color(0xFF6366F1),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(4)),
+          child: IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Container(
+                  width: 4,
+                  color: flagColor,
                 ),
-              ),
-              Expanded(
-                flex: 4,
-                child: Text(
-                  task.title,
-                  style: TextStyle(
-                    color: isCompleted
-                        ? const Color(0xFF94A3B8)
-                        : const Color(0xFF334155),
-                    decoration: isCompleted ? TextDecoration.lineThrough : null,
-                    fontWeight: FontWeight.w500,
+                Expanded(
+                  child: Padding(
+                    padding:
+                        const EdgeInsets.only(right: 16, top: 12, bottom: 12),
+                    child: Row(
+                      children: [
+                        SizedBox(
+                          width: 48,
+                          child: Checkbox(
+                            value: isCompleted,
+                            onChanged: (val) {
+                              ref
+                                  .read(taskListViewModelProvider.notifier)
+                                  .toggleTaskCompletion(task);
+                            },
+                            activeColor: const Color(0xFF6366F1),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(4)),
+                          ),
+                        ),
+                        Expanded(
+                          flex: 4,
+                          child: Text(
+                            task.title,
+                            maxLines:
+                                2, // <-- Evita que un texto infinito rompa la tabla hacia abajo
+                            overflow: TextOverflow
+                                .ellipsis, // <-- Pone "..." si no cabe
+                            style: TextStyle(
+                              color: isCompleted
+                                  ? const Color(0xFF94A3B8)
+                                  : const Color(0xFF334155),
+                              decoration: isCompleted
+                                  ? TextDecoration.lineThrough
+                                  : null,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16), // <--- NUEVO MARGEN
+                        Expanded(
+                          flex: 4,
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: tagIdsAsync.when(
+                              data: (tagIds) => allTagsAsync.when(
+                                data: (allTags) {
+                                  final taskTags = allTags
+                                      .where((t) => tagIds.contains(t.id))
+                                      .toList();
+                                  if (taskTags.isEmpty) {
+                                    return const Text('-',
+                                        style: TextStyle(
+                                            color: Color(0xFF94A3B8)));
+                                  }
+                                  return SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    child: Row(
+                                      children: taskTags.map((tag) {
+                                        final tagColor =
+                                            ColorUtils.parseColor(tag.colorHex);
+                                        return Padding(
+                                          padding:
+                                              const EdgeInsets.only(right: 8.0),
+                                          child: _TagPill(
+                                            label: tag.name,
+                                            backgroundColor:
+                                                tagColor.withAlpha(20),
+                                            textColor: tagColor,
+                                          ),
+                                        );
+                                      }).toList(),
+                                    ),
+                                  );
+                                },
+                                loading: () => const SizedBox(
+                                    width: 16,
+                                    height: 16,
+                                    child: CircularProgressIndicator(
+                                        strokeWidth: 2)),
+                                error: (_, __) => const SizedBox(),
+                              ),
+                              loading: () => const SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
+                                      strokeWidth: 2)),
+                              error: (_, __) => const SizedBox(),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16), // <--- NUEVO MARGEN
+                        Expanded(
+                          flex: 2,
+                          child: Text(
+                            _formatDate(task.dueDate),
+                            style: const TextStyle(
+                                color: Color(0xFF64748B), fontSize: 13),
+                          ),
+                        ),
+                        SizedBox(
+                          width: 40,
+                          child: PopupMenuButton(
+                            icon: const Icon(Icons.more_vert,
+                                color: Color(0xFF94A3B8)),
+                            color: Colors.white,
+                            surfaceTintColor: Colors.transparent,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12)),
+                            onSelected: (value) {
+                              if (value == 0) {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) =>
+                                      TaskFormDesktop(task: task),
+                                );
+                              } else if (value == 1) {
+                                ref
+                                    .read(taskListViewModelProvider.notifier)
+                                    .deleteTask(task);
+                              }
+                            },
+                            itemBuilder: (context) => [
+                              const PopupMenuItem(
+                                value: 0,
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.edit_outlined,
+                                        color: Color(0xFF64748B), size: 20),
+                                    SizedBox(width: 12),
+                                    Text('Editar',
+                                        style: TextStyle(
+                                            color: Color(0xFF1E293B))),
+                                  ],
+                                ),
+                              ),
+                              const PopupMenuItem(
+                                value: 1,
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.delete_outline,
+                                        color: Color(0xFFEF4444), size: 20),
+                                    SizedBox(width: 12),
+                                    Text('Eliminar',
+                                        style: TextStyle(
+                                            color: Color(0xFFEF4444))),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              Expanded(
-                flex: 2,
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Icon(Icons.flag, color: flagColor, size: 20),
-                ),
-              ),
-              Expanded(
-                flex: 2,
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: _TagPill(
-                    label: tagName,
-                    backgroundColor: tagBgColor,
-                    textColor: tagTextColor,
-                  ),
-                ),
-              ),
-              Expanded(
-                flex: 2,
-                child: Text(
-                  _formatDate(task.dueDate),
-                  style:
-                      const TextStyle(color: Color(0xFF64748B), fontSize: 13),
-                ),
-              ),
-              SizedBox(
-                width: 40,
-                child: PopupMenuButton(
-                  icon: const Icon(Icons.more_vert, color: Color(0xFF94A3B8)),
-                  color: Colors.white,
-                  surfaceTintColor: Colors.transparent,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
-                  onSelected: (value) {
-                    if (value == 0) {
-                      showDialog(
-                        context: context,
-                        builder: (context) => TaskFormDesktop(task: task),
-                      );
-                    } else if (value == 1) {
-                      ref
-                          .read(taskListViewModelProvider.notifier)
-                          .deleteTask(task);
-                    }
-                  },
-                  itemBuilder: (context) => [
-                    const PopupMenuItem(
-                      value: 0,
-                      child: Row(
-                        children: [
-                          Icon(Icons.edit_outlined,
-                              color: Color(0xFF64748B), size: 20),
-                          SizedBox(width: 12),
-                          Text('Editar',
-                              style: TextStyle(color: Color(0xFF1E293B))),
-                        ],
-                      ),
-                    ),
-                    const PopupMenuItem(
-                      value: 1,
-                      child: Row(
-                        children: [
-                          Icon(Icons.delete_outline,
-                              color: Color(0xFFEF4444), size: 20),
-                          SizedBox(width: 12),
-                          Text('Eliminar',
-                              style: TextStyle(color: Color(0xFFEF4444))),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -341,7 +380,7 @@ class _TableFooter extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       decoration: const BoxDecoration(
-        color: Color(0xFFF8FAFC),
+        color: Color(0xFFEEF2FF),
         borderRadius: BorderRadius.vertical(bottom: Radius.circular(24)),
       ),
       child: Row(

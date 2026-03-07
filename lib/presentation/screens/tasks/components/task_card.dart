@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../data/local/database/app_database.dart';
+import '../../../viewmodels/task_list_viewmodel.dart';
+import '../../../viewmodels/tag_list_viewmodel.dart';
+import '../../../../core/utils/color_utils.dart';
 
 class TaskCard extends ConsumerWidget {
   final Task task;
@@ -29,14 +32,8 @@ class TaskCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final List<String> mockTags = [
-      'URGENTE',
-      'UNIVERSIDAD',
-      'PERSONAL',
-      'TRABAJO',
-      'CASA',
-      'GIMNASIO'
-    ];
+    final tagIdsAsync = ref.watch(taskTagsProvider(task.id));
+    final allTagsAsync = ref.watch(tagListViewModelProvider);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -157,13 +154,26 @@ class TaskCard extends ConsumerWidget {
                                       ],
                                     ],
                                   ),
-                                  if (mockTags.isNotEmpty) ...[
-                                    const SizedBox(height: 8),
-                                    SingleChildScrollView(
-                                      scrollDirection: Axis.horizontal,
-                                      child: Row(
-                                        children: mockTags
-                                            .map((tagName) => Container(
+                                  tagIdsAsync.when(
+                                    data: (tagIds) => allTagsAsync.when(
+                                      data: (allTags) {
+                                        final taskTags = allTags
+                                            .where((t) => tagIds.contains(t.id))
+                                            .toList();
+                                        if (taskTags.isEmpty) {
+                                          return const SizedBox();
+                                        }
+                                        return Padding(
+                                          padding:
+                                              const EdgeInsets.only(top: 8.0),
+                                          child: SingleChildScrollView(
+                                            scrollDirection: Axis.horizontal,
+                                            child: Row(
+                                              children: taskTags.map((tag) {
+                                                final tagColor =
+                                                    ColorUtils.parseColor(
+                                                        tag.colorHex);
+                                                return Container(
                                                   margin: const EdgeInsets.only(
                                                       right: 8),
                                                   padding: const EdgeInsets
@@ -172,25 +182,32 @@ class TaskCard extends ConsumerWidget {
                                                       vertical: 4),
                                                   decoration: BoxDecoration(
                                                     color:
-                                                        const Color(0xFFFCE7F3),
+                                                        tagColor.withAlpha(20),
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                             8),
                                                   ),
                                                   child: Text(
-                                                    tagName,
-                                                    style: const TextStyle(
+                                                    tag.name,
+                                                    style: TextStyle(
                                                       fontSize: 10,
                                                       fontWeight:
                                                           FontWeight.bold,
-                                                      color: Color(0xFFDB2777),
+                                                      color: tagColor,
                                                     ),
                                                   ),
-                                                ))
-                                            .toList(),
-                                      ),
+                                                );
+                                              }).toList(),
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      loading: () => const SizedBox(),
+                                      error: (_, __) => const SizedBox(),
                                     ),
-                                  ],
+                                    loading: () => const SizedBox(),
+                                    error: (_, __) => const SizedBox(),
+                                  ),
                                 ],
                               ),
                             ),

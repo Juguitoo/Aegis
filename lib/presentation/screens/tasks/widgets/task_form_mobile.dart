@@ -48,9 +48,11 @@ class _TaskFormMobileState extends ConsumerState<TaskFormMobile>
               controller: titleController,
               autofocus: true,
               textCapitalization: TextCapitalization.sentences,
+              maxLength: 80,
               decoration: InputDecoration(
                 labelText: 'Título',
                 hintText: '¿Qué quieres hacer?',
+                counterText: "",
                 hintStyle: const TextStyle(color: Color(0xFF94A3B8)),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -69,6 +71,7 @@ class _TaskFormMobileState extends ConsumerState<TaskFormMobile>
               textCapitalization: TextCapitalization.sentences,
               maxLines: 3,
               minLines: 1,
+              maxLength: 500,
               decoration: InputDecoration(
                 labelText: 'Descripción',
                 hintText: 'Añade detalles sobre la tarea',

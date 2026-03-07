@@ -77,169 +77,175 @@ class _TagFormDialogState extends ConsumerState<TagFormDialog> {
           fontWeight: FontWeight.bold,
         ),
       ),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          TextField(
-            controller: nameController,
-            textCapitalization: TextCapitalization.sentences,
-            style: const TextStyle(
-              color: Color(0xFF1E293B),
-              fontWeight: FontWeight.w600,
-            ),
-            decoration: InputDecoration(
-              labelText: 'Nombre de la etiqueta',
-              hintText: "Email, 5mins...",
-              hintStyle: const TextStyle(color: Color(0xFF94A3B8)),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
+      content: Container(
+        constraints: const BoxConstraints(maxWidth: 400),
+        width: double.maxFinite,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            TextField(
+              controller: nameController,
+              textCapitalization: TextCapitalization.sentences,
+              style: const TextStyle(
+                color: Color(0xFF1E293B),
+                fontWeight: FontWeight.w600,
               ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide:
-                    const BorderSide(color: Color(0xFF6366F1), width: 2),
-              ),
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            ),
-            autofocus: true,
-          ),
-          const SizedBox(height: 24),
-          TextField(
-            controller: descriptionController,
-            textCapitalization: TextCapitalization.sentences,
-            maxLines: 3,
-            minLines: 1,
-            style: const TextStyle(
-              color: Color(0xFF1E293B),
-              fontWeight: FontWeight.w600,
-            ),
-            decoration: InputDecoration(
-              labelText: 'Descripción de la etiqueta',
-              hintText: 'Detalles sobre la etiqueta...',
-              hintStyle: const TextStyle(color: Color(0xFF94A3B8)),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide:
-                    const BorderSide(color: Color(0xFF6366F1), width: 2),
-              ),
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            ),
-          ),
-          const SizedBox(height: 24),
-          const Text(
-            'Color',
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF475569),
-            ),
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              GestureDetector(
-                onTap: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) {
-                      Color tempColor = selectedColor;
-                      return AlertDialog(
-                        title: const Text('Selecciona un color'),
-                        content: SingleChildScrollView(
-                          child: ColorPicker(
-                            pickerColor: selectedColor,
-                            onColorChanged: (color) {
-                              tempColor = color;
-                            },
-                            enableAlpha: false,
-                            displayThumbColor: true,
-                            pickerAreaHeightPercent: 0.8,
-                          ),
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: const Text('Cancelar'),
-                          ),
-                          ElevatedButton(
-                            onPressed: () {
-                              setState(() {
-                                selectedColor = tempColor;
-                                hexController.text =
-                                    ColorUtils.colorToHex(selectedColor);
-                              });
-                              Navigator.pop(context);
-                            },
-                            child: const Text('Seleccionar'),
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                },
-                child: Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    color: selectedColor,
-                    shape: BoxShape.circle,
-                    border:
-                        Border.all(color: const Color(0xFFE2E8F0), width: 2),
-                    boxShadow: [
-                      BoxShadow(
-                        color: selectedColor.withAlpha(100),
-                        blurRadius: 8,
-                        offset: const Offset(0, 4),
-                      )
-                    ],
-                  ),
+              maxLength: 80,
+              decoration: InputDecoration(
+                labelText: 'Nombre de la etiqueta',
+                hintText: "Email, 5mins...",
+                hintStyle: const TextStyle(color: Color(0xFF94A3B8)),
+                counterText: "",
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
                 ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide:
+                      const BorderSide(color: Color(0xFF6366F1), width: 2),
+                ),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: TextField(
-                  controller: hexController,
-                  focusNode: hexFocusNode,
-                  onChanged: (value) {
-                    final newColor = ColorUtils.parseColorStrict(value);
-                    if (newColor != null) {
-                      setState(() {
-                        selectedColor = newColor;
-                      });
-                    }
+              autofocus: true,
+            ),
+            const SizedBox(height: 24),
+            TextField(
+              controller: descriptionController,
+              textCapitalization: TextCapitalization.sentences,
+              maxLines: 3,
+              minLines: 1,
+              maxLength: 120,
+              style: const TextStyle(
+                color: Color(0xFF1E293B),
+                fontWeight: FontWeight.w600,
+              ),
+              decoration: InputDecoration(
+                labelText: 'Descripción de la etiqueta',
+                hintText: 'Detalles sobre la etiqueta...',
+                hintStyle: const TextStyle(color: Color(0xFF94A3B8)),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide:
+                      const BorderSide(color: Color(0xFF6366F1), width: 2),
+                ),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              ),
+            ),
+            const Text(
+              'Color',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF475569),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        Color tempColor = selectedColor;
+                        return AlertDialog(
+                          title: const Text('Selecciona un color'),
+                          content: SingleChildScrollView(
+                            child: ColorPicker(
+                              pickerColor: selectedColor,
+                              onColorChanged: (color) {
+                                tempColor = color;
+                              },
+                              enableAlpha: false,
+                              displayThumbColor: true,
+                              pickerAreaHeightPercent: 0.8,
+                            ),
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text('Cancelar'),
+                            ),
+                            ElevatedButton(
+                              onPressed: () {
+                                setState(() {
+                                  selectedColor = tempColor;
+                                  hexController.text =
+                                      ColorUtils.colorToHex(selectedColor);
+                                });
+                                Navigator.pop(context);
+                              },
+                              child: const Text('Seleccionar'),
+                            ),
+                          ],
+                        );
+                      },
+                    );
                   },
-                  style: const TextStyle(
-                    color: Color(0xFF64748B),
-                    fontWeight: FontWeight.w500,
-                    letterSpacing: 1,
-                  ),
-                  decoration: InputDecoration(
-                    hintText: '#HEX',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
+                  child: Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: selectedColor,
+                      shape: BoxShape.circle,
+                      border:
+                          Border.all(color: const Color(0xFFE2E8F0), width: 2),
+                      boxShadow: [
+                        BoxShadow(
+                          color: selectedColor.withAlpha(100),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        )
+                      ],
                     ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide:
-                          const BorderSide(color: Color(0xFF6366F1), width: 2),
-                    ),
-                    contentPadding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
                   ),
                 ),
-              ),
-            ],
-          ),
-        ],
+                const SizedBox(width: 16),
+                Expanded(
+                  child: TextField(
+                    controller: hexController,
+                    focusNode: hexFocusNode,
+                    onChanged: (value) {
+                      final newColor = ColorUtils.parseColorStrict(value);
+                      if (newColor != null) {
+                        setState(() {
+                          selectedColor = newColor;
+                        });
+                      }
+                    },
+                    style: const TextStyle(
+                      color: Color(0xFF64748B),
+                      fontWeight: FontWeight.w500,
+                      letterSpacing: 1,
+                    ),
+                    decoration: InputDecoration(
+                      hintText: '#HEX',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(
+                            color: Color(0xFF6366F1), width: 2),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 0),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
       actions: [
         Row(

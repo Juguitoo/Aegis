@@ -63,11 +63,25 @@ class TaskRepository {
     return result.map((row) => row.tagId).toList();
   }
 
+  Stream<List<int>> watchTagIdsForTask(int taskId) {
+    final query = _db.select(_db.taskTags)
+      ..where((t) => t.taskId.equals(taskId));
+    return query.watch().map((rows) => rows.map((row) => row.tagId).toList());
+  }
+
   Future<int> deleteTaskById(int id) {
-    return (_db.delete(_db.tasks)..where((t) => t.id.equals(id))).go();
+    return _db.transaction(() async {
+      await (_db.delete(_db.taskTags)..where((t) => t.taskId.equals(id))).go();
+      return await (_db.delete(_db.tasks)..where((t) => t.id.equals(id))).go();
+    });
   }
 
   Future<int> deleteTask(Task task) {
-    return (_db.delete(_db.tasks)).delete(task);
+    return _db.transaction(() async {
+      await (_db.delete(_db.taskTags)..where((t) => t.taskId.equals(task.id)))
+          .go();
+      return await (_db.delete(_db.tasks)..where((t) => t.id.equals(task.id)))
+          .go();
+    });
   }
 }

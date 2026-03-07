@@ -62,3 +62,7 @@ final taskListViewModelProvider =
     StreamNotifierProvider<TaskListViewModel, List<Task>>(() {
   return TaskListViewModel();
 });
+
+final taskTagsProvider = StreamProvider.family<List<int>, int>((ref, taskId) {
+  return ref.watch(taskRepositoryProvider).watchTagIdsForTask(taskId);
+});
