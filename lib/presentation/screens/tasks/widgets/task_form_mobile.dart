@@ -1,8 +1,7 @@
 import 'package:aegis/core/utils/color_utils.dart';
 import 'package:aegis/data/local/database/app_database.dart';
+import 'package:aegis/presentation/screens/tasks/widgets/task_form_mixin.dart';
 import 'package:aegis/presentation/viewmodels/project_list_viewmodel.dart';
-import 'package:aegis/presentation/viewmodels/task_list_viewmodel.dart';
-import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'tag_multi_selector.dart'; // Importante añadir esto
@@ -16,130 +15,10 @@ class TaskFormMobile extends ConsumerStatefulWidget {
   ConsumerState<TaskFormMobile> createState() => _TaskFormMobileState();
 }
 
-class _TaskFormMobileState extends ConsumerState<TaskFormMobile> {
-  late TextEditingController _titleController;
-  late TextEditingController _descriptionController;
-  late TextEditingController _estimatedDurationController;
-
-  int _selectedPriority = 0;
-  DateTime? _selectedDueDate;
-  int? _selectedProjectId;
-  List<int> _selectedTagIds = [];
-
+class _TaskFormMobileState extends ConsumerState<TaskFormMobile>
+    with TaskFormMixin {
   @override
-  void initState() {
-    super.initState();
-    _titleController = TextEditingController(text: widget.task?.title ?? '');
-    _descriptionController =
-        TextEditingController(text: widget.task?.description ?? '');
-    _estimatedDurationController = TextEditingController(
-        text: widget.task?.estimatedDuration?.toString() ?? '');
-    _selectedPriority = widget.task?.priority ?? 0;
-    _selectedDueDate = widget.task?.dueDate;
-    _selectedProjectId = widget.task?.projectId;
-    _selectedTagIds = [];
-  }
-
-  @override
-  void dispose() {
-    _titleController.dispose();
-    _descriptionController.dispose();
-    _estimatedDurationController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _pickDueDate() async {
-    final pickedDate = await showDatePicker(
-      context: context,
-      initialDate: _selectedDueDate ?? DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: Color(0xFF6366F1),
-              onPrimary: Colors.white,
-              onSurface: Color(0xFF1E293B),
-            ),
-          ),
-          child: child!,
-        );
-      },
-    );
-    if (pickedDate != null) {
-      setState(() {
-        _selectedDueDate = pickedDate;
-      });
-    }
-  }
-
-  void _saveTask() {
-    final title = _titleController.text.trim();
-    final description = _descriptionController.text.trim();
-    final estimatedDuration =
-        int.tryParse(_estimatedDurationController.text.trim());
-    if (title.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('El título es obligatorio')),
-      );
-      return;
-    }
-
-    // TODO: Falta mandar _selectedTagIds al viewmodel
-    ref.read(taskListViewModelProvider.notifier).addTask(TasksCompanion.insert(
-        title: title,
-        description: drift.Value(description.isEmpty ? null : description),
-        estimatedDuration: drift.Value(estimatedDuration),
-        priority: drift.Value(_selectedPriority),
-        dueDate: drift.Value(_selectedDueDate),
-        projectId: drift.Value(_selectedProjectId)));
-
-    Navigator.of(context).pop();
-  }
-
-  void _updateTask() {
-    final title = _titleController.text.trim();
-    final description = _descriptionController.text.trim();
-    final estimatedDuration =
-        int.tryParse(_estimatedDurationController.text.trim());
-    if (title.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('El título es obligatorio')),
-      );
-      return;
-    }
-
-    final updatedTask = widget.task!.copyWith(
-      title: title,
-      description: drift.Value(description.isEmpty ? null : description),
-      estimatedDuration: drift.Value(estimatedDuration),
-      priority: _selectedPriority,
-      dueDate: drift.Value(_selectedDueDate),
-      projectId: drift.Value(_selectedProjectId),
-    );
-
-    // TODO: Falta mandar _selectedTagIds al viewmodel
-    ref.read(taskListViewModelProvider.notifier).updateTask(updatedTask);
-    Navigator.of(context).pop();
-  }
-
-  void _deleteTask() {
-    ref.read(taskListViewModelProvider.notifier).deleteTask(widget.task!);
-    Navigator.of(context).pop();
-  }
-
-  void _clearTask() {
-    _titleController.clear();
-    _descriptionController.clear();
-    _estimatedDurationController.clear();
-    setState(() {
-      _selectedPriority = 0;
-      _selectedDueDate = null;
-      _selectedProjectId = null;
-      _selectedTagIds = [];
-    });
-  }
+  Task? get initialTask => widget.task;
 
   @override
   Widget build(BuildContext context) {
@@ -166,7 +45,7 @@ class _TaskFormMobileState extends ConsumerState<TaskFormMobile> {
             ),
             const SizedBox(height: 16),
             TextField(
-              controller: _titleController,
+              controller: titleController,
               autofocus: true,
               textCapitalization: TextCapitalization.sentences,
               decoration: InputDecoration(
@@ -186,7 +65,7 @@ class _TaskFormMobileState extends ConsumerState<TaskFormMobile> {
             ),
             const SizedBox(height: 16),
             TextField(
-              controller: _descriptionController,
+              controller: descriptionController,
               textCapitalization: TextCapitalization.sentences,
               maxLines: 3,
               minLines: 1,
@@ -210,7 +89,7 @@ class _TaskFormMobileState extends ConsumerState<TaskFormMobile> {
               children: [
                 Expanded(
                   child: TextField(
-                    controller: _estimatedDurationController,
+                    controller: estimatedDurationController,
                     keyboardType: TextInputType.number,
                     decoration: InputDecoration(
                       labelText: 'Estimación (min)',
@@ -231,7 +110,7 @@ class _TaskFormMobileState extends ConsumerState<TaskFormMobile> {
                 const SizedBox(width: 16),
                 Expanded(
                   child: InkWell(
-                    onTap: _pickDueDate,
+                    onTap: pickDueDate,
                     borderRadius: BorderRadius.circular(12),
                     child: Container(
                       padding: const EdgeInsets.symmetric(
@@ -247,11 +126,11 @@ class _TaskFormMobileState extends ConsumerState<TaskFormMobile> {
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
-                              _selectedDueDate == null
+                              selectedDueDate == null
                                   ? 'Sin fecha'
-                                  : '${_selectedDueDate!.day}/${_selectedDueDate!.month}/${_selectedDueDate!.year}',
+                                  : '${selectedDueDate!.day}/${selectedDueDate!.month}/${selectedDueDate!.year}',
                               style: TextStyle(
-                                color: _selectedDueDate == null
+                                color: selectedDueDate == null
                                     ? const Color(0xFF94A3B8)
                                     : const Color(0xFF1E293B),
                               ),
@@ -269,7 +148,7 @@ class _TaskFormMobileState extends ConsumerState<TaskFormMobile> {
             projectsAsync.when(
               data: (projectsList) {
                 return DropdownButtonFormField<int?>(
-                  initialValue: _selectedProjectId,
+                  initialValue: selectedProjectId,
                   decoration: InputDecoration(
                     labelText: 'Proyecto',
                     border: OutlineInputBorder(
@@ -321,7 +200,7 @@ class _TaskFormMobileState extends ConsumerState<TaskFormMobile> {
                   ],
                   onChanged: (value) {
                     setState(() {
-                      _selectedProjectId = value;
+                      selectedProjectId = value;
                     });
                   },
                 );
@@ -344,80 +223,80 @@ class _TaskFormMobileState extends ConsumerState<TaskFormMobile> {
               children: [
                 ChoiceChip(
                   label: const Text('Ninguna'),
-                  selected: _selectedPriority == 0,
+                  selected: selectedPriority == 0,
                   onSelected: (selected) =>
-                      setState(() => _selectedPriority = 0),
+                      setState(() => selectedPriority = 0),
                   selectedColor: const Color(0xFFE0F2FE),
                   labelStyle: TextStyle(
-                    color: _selectedPriority == 0
+                    color: selectedPriority == 0
                         ? const Color(0xFF0284C7)
                         : const Color(0xFF64748B),
-                    fontWeight: _selectedPriority == 0
+                    fontWeight: selectedPriority == 0
                         ? FontWeight.bold
                         : FontWeight.normal,
                   ),
                   side: BorderSide(
-                    color: _selectedPriority == 0
+                    color: selectedPriority == 0
                         ? Colors.transparent
                         : const Color(0xFFCBD5E1),
                   ),
                 ),
                 ChoiceChip(
                   label: const Text('Baja'),
-                  selected: _selectedPriority == 1,
+                  selected: selectedPriority == 1,
                   onSelected: (selected) =>
-                      setState(() => _selectedPriority = 1),
+                      setState(() => selectedPriority = 1),
                   selectedColor: const Color(0xFFDCFCE7),
                   labelStyle: TextStyle(
-                    color: _selectedPriority == 1
+                    color: selectedPriority == 1
                         ? const Color(0xFF16A34A)
                         : const Color(0xFF64748B),
-                    fontWeight: _selectedPriority == 1
+                    fontWeight: selectedPriority == 1
                         ? FontWeight.bold
                         : FontWeight.normal,
                   ),
                   side: BorderSide(
-                    color: _selectedPriority == 1
+                    color: selectedPriority == 1
                         ? Colors.transparent
                         : const Color(0xFFCBD5E1),
                   ),
                 ),
                 ChoiceChip(
                   label: const Text('Media'),
-                  selected: _selectedPriority == 2,
+                  selected: selectedPriority == 2,
                   onSelected: (selected) =>
-                      setState(() => _selectedPriority = 2),
+                      setState(() => selectedPriority = 2),
                   selectedColor: const Color(0xFFFEF9C3),
                   labelStyle: TextStyle(
-                    color: _selectedPriority == 2
+                    color: selectedPriority == 2
                         ? const Color(0xFFCA8A04)
                         : const Color(0xFF64748B),
-                    fontWeight: _selectedPriority == 2
+                    fontWeight: selectedPriority == 2
                         ? FontWeight.bold
                         : FontWeight.normal,
                   ),
                   side: BorderSide(
-                    color: _selectedPriority == 2
+                    color: selectedPriority == 2
                         ? Colors.transparent
                         : const Color(0xFFCBD5E1),
                   ),
                 ),
                 ChoiceChip(
                   label: const Text('Alta'),
-                  selected: _selectedPriority == 3,
+                  selected: selectedPriority == 3,
                   onSelected: (selected) =>
-                      setState(() => _selectedPriority = 3),
+                      setState(() => selectedPriority = 3),
                   selectedColor: const Color(0xFFFEE2E2),
                   labelStyle: TextStyle(
-                    color: _selectedPriority == 3
+                    color: selectedPriority == 3
                         ? const Color(0xFFDC2626)
                         : const Color(0xFF64748B),
-                    fontWeight: _selectedPriority == 3
+                    fontWeight: selectedPriority == 3
                         ? FontWeight.bold
                         : FontWeight.normal,
                   ),
                   side: BorderSide(
-                    color: _selectedPriority == 3
+                    color: selectedPriority == 3
                         ? Colors.transparent
                         : const Color(0xFFCBD5E1),
                   ),
@@ -435,10 +314,10 @@ class _TaskFormMobileState extends ConsumerState<TaskFormMobile> {
             ),
             const SizedBox(height: 8),
             TagMultiSelector(
-              initialSelectedIds: _selectedTagIds,
+              initialSelectedIds: selectedTagIds,
               onTagsChanged: (newTagIds) {
                 setState(() {
-                  _selectedTagIds = newTagIds;
+                  selectedTagIds = newTagIds;
                 });
               },
             ),
@@ -448,7 +327,7 @@ class _TaskFormMobileState extends ConsumerState<TaskFormMobile> {
               children: [
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: widget.task != null ? _deleteTask : _clearTask,
+                    onPressed: widget.task != null ? deleteTask : clearTask,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: widget.task != null
                           ? const Color(0xFFFEE2E2)
@@ -471,7 +350,7 @@ class _TaskFormMobileState extends ConsumerState<TaskFormMobile> {
                 ),
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: widget.task == null ? _saveTask : _updateTask,
+                    onPressed: widget.task == null ? saveTask : updateTask,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF6366F1),
                       foregroundColor: Colors.white,

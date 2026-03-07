@@ -1,10 +1,9 @@
+import 'package:aegis/presentation/screens/tasks/widgets/task_form_mixin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:drift/drift.dart' as drift;
 import '../../../../core/utils/color_utils.dart';
 import '../../../../data/local/database/app_database.dart';
 import '../../../viewmodels/project_list_viewmodel.dart';
-import '../../../viewmodels/task_list_viewmodel.dart';
 import 'tag_multi_selector.dart';
 
 class TaskFormDesktop extends ConsumerStatefulWidget {
@@ -16,135 +15,10 @@ class TaskFormDesktop extends ConsumerStatefulWidget {
   ConsumerState<TaskFormDesktop> createState() => _TaskFormDesktopState();
 }
 
-class _TaskFormDesktopState extends ConsumerState<TaskFormDesktop> {
-  late TextEditingController _titleController;
-  late TextEditingController _descriptionController;
-  late TextEditingController _estimatedDurationController;
-
-  int _selectedPriority = 0;
-  DateTime? _selectedDueDate;
-  int? _selectedProjectId;
-  List<int> _selectedTagIds = []; // Aquí almacenamos las N etiquetas
-
+class _TaskFormDesktopState extends ConsumerState<TaskFormDesktop>
+    with TaskFormMixin {
   @override
-  void initState() {
-    super.initState();
-    _titleController = TextEditingController(text: widget.task?.title ?? '');
-    _descriptionController =
-        TextEditingController(text: widget.task?.description ?? '');
-    _estimatedDurationController = TextEditingController(
-        text: widget.task?.estimatedDuration?.toString() ?? '');
-    _selectedPriority = widget.task?.priority ?? 0;
-    _selectedDueDate = widget.task?.dueDate;
-    _selectedProjectId = widget.task?.projectId;
-
-    // NOTA: Si vas a editar una tarea, aquí deberías cargar sus IDs de etiquetas
-    // desde el ViewModel (ej. ref.read(taskListViewModelProvider.notifier).getTagsForTask(widget.task!.id))
-    _selectedTagIds = [];
-  }
-
-  @override
-  void dispose() {
-    _titleController.dispose();
-    _descriptionController.dispose();
-    _estimatedDurationController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _pickDueDate() async {
-    final pickedDate = await showDatePicker(
-      context: context,
-      initialDate: _selectedDueDate ?? DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: Color(0xFF6366F1),
-              onPrimary: Colors.white,
-              onSurface: Color(0xFF1E293B),
-            ),
-          ),
-          child: child!,
-        );
-      },
-    );
-    if (pickedDate != null) {
-      setState(() {
-        _selectedDueDate = pickedDate;
-      });
-    }
-  }
-
-  void _saveTask() {
-    final title = _titleController.text.trim();
-    final description = _descriptionController.text.trim();
-    final estimatedDuration =
-        int.tryParse(_estimatedDurationController.text.trim());
-
-    if (title.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('El título es obligatorio')),
-      );
-      return;
-    }
-
-    // TODO: Enviar _selectedTagIds al ViewModel para que los guarde en TaskTags
-    ref.read(taskListViewModelProvider.notifier).addTask(TasksCompanion.insert(
-        title: title,
-        description: drift.Value(description.isEmpty ? null : description),
-        estimatedDuration: drift.Value(estimatedDuration),
-        priority: drift.Value(_selectedPriority),
-        dueDate: drift.Value(_selectedDueDate),
-        projectId: drift.Value(_selectedProjectId)));
-
-    Navigator.of(context).pop();
-  }
-
-  void _updateTask() {
-    final title = _titleController.text.trim();
-    final description = _descriptionController.text.trim();
-    final estimatedDuration =
-        int.tryParse(_estimatedDurationController.text.trim());
-
-    if (title.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('El título es obligatorio')),
-      );
-      return;
-    }
-
-    final updatedTask = widget.task!.copyWith(
-      title: title,
-      description: drift.Value(description.isEmpty ? null : description),
-      estimatedDuration: drift.Value(estimatedDuration),
-      priority: _selectedPriority,
-      dueDate: drift.Value(_selectedDueDate),
-      projectId: drift.Value(_selectedProjectId),
-    );
-
-    // TODO: Enviar _selectedTagIds al ViewModel para que actualice TaskTags
-    ref.read(taskListViewModelProvider.notifier).updateTask(updatedTask);
-    Navigator.of(context).pop();
-  }
-
-  void _deleteTask() {
-    ref.read(taskListViewModelProvider.notifier).deleteTask(widget.task!);
-    Navigator.of(context).pop();
-  }
-
-  void _clearTask() {
-    _titleController.clear();
-    _descriptionController.clear();
-    _estimatedDurationController.clear();
-    setState(() {
-      _selectedPriority = 0;
-      _selectedDueDate = null;
-      _selectedProjectId = null;
-      _selectedTagIds = [];
-    });
-  }
+  Task? get initialTask => widget.task;
 
   @override
   Widget build(BuildContext context) {
@@ -191,7 +65,7 @@ class _TaskFormDesktopState extends ConsumerState<TaskFormDesktop> {
               const Text('Título', style: labelStyle),
               const SizedBox(height: 8),
               TextField(
-                controller: _titleController,
+                controller: titleController,
                 autofocus: true,
                 textCapitalization: TextCapitalization.sentences,
                 style: const TextStyle(fontSize: 16, color: Color(0xFF1E293B)),
@@ -215,7 +89,7 @@ class _TaskFormDesktopState extends ConsumerState<TaskFormDesktop> {
               const Text('Descripción', style: labelStyle),
               const SizedBox(height: 8),
               TextField(
-                controller: _descriptionController,
+                controller: descriptionController,
                 textCapitalization: TextCapitalization.sentences,
                 style: const TextStyle(fontSize: 16, color: Color(0xFF1E293B)),
                 maxLines: 3,
@@ -247,7 +121,7 @@ class _TaskFormDesktopState extends ConsumerState<TaskFormDesktop> {
                         const Text('Estimación (min)', style: labelStyle),
                         const SizedBox(height: 8),
                         TextField(
-                          controller: _estimatedDurationController,
+                          controller: estimatedDurationController,
                           keyboardType: TextInputType.number,
                           style: const TextStyle(
                               fontSize: 16, color: Color(0xFF1E293B)),
@@ -280,7 +154,7 @@ class _TaskFormDesktopState extends ConsumerState<TaskFormDesktop> {
                         const Text('Fecha límite', style: labelStyle),
                         const SizedBox(height: 8),
                         InkWell(
-                          onTap: _pickDueDate,
+                          onTap: pickDueDate,
                           borderRadius: BorderRadius.circular(12),
                           child: Container(
                             padding: const EdgeInsets.symmetric(
@@ -297,12 +171,12 @@ class _TaskFormDesktopState extends ConsumerState<TaskFormDesktop> {
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: Text(
-                                    _selectedDueDate == null
+                                    selectedDueDate == null
                                         ? 'Sin fecha'
-                                        : '${_selectedDueDate!.day}/${_selectedDueDate!.month}/${_selectedDueDate!.year}',
+                                        : '${selectedDueDate!.day}/${selectedDueDate!.month}/${selectedDueDate!.year}',
                                     style: TextStyle(
                                       fontSize: 16,
-                                      color: _selectedDueDate == null
+                                      color: selectedDueDate == null
                                           ? const Color(0xFF94A3B8)
                                           : const Color(0xFF1E293B),
                                     ),
@@ -326,7 +200,7 @@ class _TaskFormDesktopState extends ConsumerState<TaskFormDesktop> {
                         projectsAsync.when(
                           data: (projectsList) {
                             return DropdownButtonFormField<int?>(
-                              initialValue: _selectedProjectId,
+                              initialValue: selectedProjectId,
                               dropdownColor: Colors.white,
                               decoration: InputDecoration(
                                 border: OutlineInputBorder(
@@ -390,7 +264,7 @@ class _TaskFormDesktopState extends ConsumerState<TaskFormDesktop> {
                               ],
                               onChanged: (value) {
                                 setState(() {
-                                  _selectedProjectId = value;
+                                  selectedProjectId = value;
                                 });
                               },
                             );
@@ -420,35 +294,31 @@ class _TaskFormDesktopState extends ConsumerState<TaskFormDesktop> {
                           children: [
                             _CustomPriorityChip(
                               label: 'Ninguna',
-                              isSelected: _selectedPriority == 0,
+                              isSelected: selectedPriority == 0,
                               activeBgColor: const Color(0xFFE0F2FE),
                               activeTextColor: const Color(0xFF0284C7),
-                              onTap: () =>
-                                  setState(() => _selectedPriority = 0),
+                              onTap: () => setState(() => selectedPriority = 0),
                             ),
                             _CustomPriorityChip(
                               label: 'Baja',
-                              isSelected: _selectedPriority == 1,
+                              isSelected: selectedPriority == 1,
                               activeBgColor: const Color(0xFFDCFCE7),
                               activeTextColor: const Color(0xFF16A34A),
-                              onTap: () =>
-                                  setState(() => _selectedPriority = 1),
+                              onTap: () => setState(() => selectedPriority = 1),
                             ),
                             _CustomPriorityChip(
                               label: 'Media',
-                              isSelected: _selectedPriority == 2,
+                              isSelected: selectedPriority == 2,
                               activeBgColor: const Color(0xFFFEF9C3),
                               activeTextColor: const Color(0xFFCA8A04),
-                              onTap: () =>
-                                  setState(() => _selectedPriority = 2),
+                              onTap: () => setState(() => selectedPriority = 2),
                             ),
                             _CustomPriorityChip(
                               label: 'Alta',
-                              isSelected: _selectedPriority == 3,
+                              isSelected: selectedPriority == 3,
                               activeBgColor: const Color(0xFFFEE2E2),
                               activeTextColor: const Color(0xFFDC2626),
-                              onTap: () =>
-                                  setState(() => _selectedPriority = 3),
+                              onTap: () => setState(() => selectedPriority = 3),
                             ),
                           ],
                         ),
@@ -464,10 +334,10 @@ class _TaskFormDesktopState extends ConsumerState<TaskFormDesktop> {
                         const Text('Etiquetas', style: labelStyle),
                         const SizedBox(height: 8),
                         TagMultiSelector(
-                          initialSelectedIds: _selectedTagIds,
+                          initialSelectedIds: selectedTagIds,
                           onTagsChanged: (newTagIds) {
                             setState(() {
-                              _selectedTagIds = newTagIds;
+                              selectedTagIds = newTagIds;
                             });
                           },
                         ),
@@ -482,7 +352,7 @@ class _TaskFormDesktopState extends ConsumerState<TaskFormDesktop> {
                 children: [
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: widget.task != null ? _deleteTask : _clearTask,
+                      onPressed: widget.task != null ? deleteTask : clearTask,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: widget.task != null
                             ? const Color(0xFFFEE2E2)
@@ -505,7 +375,7 @@ class _TaskFormDesktopState extends ConsumerState<TaskFormDesktop> {
                   ),
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: widget.task == null ? _saveTask : _updateTask,
+                      onPressed: widget.task == null ? saveTask : updateTask,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF6366F1),
                         foregroundColor: Colors.white,

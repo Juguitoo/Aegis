@@ -24,8 +24,20 @@ class TaskListViewModel extends StreamNotifier<List<Task>> {
     });
   }
 
+  Future<List<int>> getTagsForTask(int taskId) {
+    return _repository.getTagIdsForTask(taskId);
+  }
+
+  Future<int> addTaskWithTags(TasksCompanion task, List<int> tagIds) {
+    return _repository.insertTaskWithTags(task, tagIds);
+  }
+
   Future<int> addTask(TasksCompanion task) {
     return _repository.insertTask(task);
+  }
+
+  Future<void> updateTaskWithTags(Task task, List<int> tagIds) {
+    return _repository.updateTaskWithTags(task, tagIds);
   }
 
   Future<bool> updateTask(Task task) {
