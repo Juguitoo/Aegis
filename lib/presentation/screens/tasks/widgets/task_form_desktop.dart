@@ -1,10 +1,11 @@
-import 'package:aegis/core/utils/color_utils.dart';
-import 'package:aegis/data/local/database/app_database.dart';
-import 'package:aegis/presentation/viewmodels/project_list_viewmodel.dart';
-import 'package:aegis/presentation/viewmodels/task_list_viewmodel.dart';
-import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:drift/drift.dart' as drift;
+import '../../../../core/utils/color_utils.dart';
+import '../../../../data/local/database/app_database.dart';
+import '../../../viewmodels/project_list_viewmodel.dart';
+import '../../../viewmodels/task_list_viewmodel.dart';
+import 'tag_multi_selector.dart';
 
 class TaskFormDesktop extends ConsumerStatefulWidget {
   final Task? task;
@@ -23,6 +24,7 @@ class _TaskFormDesktopState extends ConsumerState<TaskFormDesktop> {
   int _selectedPriority = 0;
   DateTime? _selectedDueDate;
   int? _selectedProjectId;
+  List<int> _selectedTagIds = []; // Aquí almacenamos las N etiquetas
 
   @override
   void initState() {
@@ -35,6 +37,10 @@ class _TaskFormDesktopState extends ConsumerState<TaskFormDesktop> {
     _selectedPriority = widget.task?.priority ?? 0;
     _selectedDueDate = widget.task?.dueDate;
     _selectedProjectId = widget.task?.projectId;
+
+    // NOTA: Si vas a editar una tarea, aquí deberías cargar sus IDs de etiquetas
+    // desde el ViewModel (ej. ref.read(taskListViewModelProvider.notifier).getTagsForTask(widget.task!.id))
+    _selectedTagIds = [];
   }
 
   @override
@@ -84,6 +90,7 @@ class _TaskFormDesktopState extends ConsumerState<TaskFormDesktop> {
       return;
     }
 
+    // TODO: Enviar _selectedTagIds al ViewModel para que los guarde en TaskTags
     ref.read(taskListViewModelProvider.notifier).addTask(TasksCompanion.insert(
         title: title,
         description: drift.Value(description.isEmpty ? null : description),
@@ -117,6 +124,7 @@ class _TaskFormDesktopState extends ConsumerState<TaskFormDesktop> {
       projectId: drift.Value(_selectedProjectId),
     );
 
+    // TODO: Enviar _selectedTagIds al ViewModel para que actualice TaskTags
     ref.read(taskListViewModelProvider.notifier).updateTask(updatedTask);
     Navigator.of(context).pop();
   }
@@ -134,6 +142,7 @@ class _TaskFormDesktopState extends ConsumerState<TaskFormDesktop> {
       _selectedPriority = 0;
       _selectedDueDate = null;
       _selectedProjectId = null;
+      _selectedTagIds = [];
     });
   }
 
@@ -154,7 +163,7 @@ class _TaskFormDesktopState extends ConsumerState<TaskFormDesktop> {
         borderRadius: BorderRadius.circular(24),
       ),
       child: Container(
-        width: 700,
+        width: 750,
         padding: const EdgeInsets.all(32),
         child: SingleChildScrollView(
           child: Column(
@@ -341,7 +350,7 @@ class _TaskFormDesktopState extends ConsumerState<TaskFormDesktop> {
                                   value: null,
                                   child: Row(
                                     children: [
-                                      Icon(Icons.folder_outlined,
+                                      Icon(Icons.inbox_outlined,
                                           size: 18, color: Color(0xFF94A3B8)),
                                       SizedBox(width: 8),
                                       Expanded(
@@ -396,38 +405,74 @@ class _TaskFormDesktopState extends ConsumerState<TaskFormDesktop> {
                 ],
               ),
               const SizedBox(height: 16),
-              const Text('Prioridad', style: labelStyle),
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 8,
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _CustomPriorityChip(
-                    label: 'Ninguna',
-                    isSelected: _selectedPriority == 0,
-                    activeBgColor: const Color(0xFFE0F2FE),
-                    activeTextColor: const Color(0xFF0284C7),
-                    onTap: () => setState(() => _selectedPriority = 0),
+                  Expanded(
+                    flex: 1,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text('Prioridad', style: labelStyle),
+                        const SizedBox(height: 8),
+                        Wrap(
+                          spacing: 8,
+                          children: [
+                            _CustomPriorityChip(
+                              label: 'Ninguna',
+                              isSelected: _selectedPriority == 0,
+                              activeBgColor: const Color(0xFFE0F2FE),
+                              activeTextColor: const Color(0xFF0284C7),
+                              onTap: () =>
+                                  setState(() => _selectedPriority = 0),
+                            ),
+                            _CustomPriorityChip(
+                              label: 'Baja',
+                              isSelected: _selectedPriority == 1,
+                              activeBgColor: const Color(0xFFDCFCE7),
+                              activeTextColor: const Color(0xFF16A34A),
+                              onTap: () =>
+                                  setState(() => _selectedPriority = 1),
+                            ),
+                            _CustomPriorityChip(
+                              label: 'Media',
+                              isSelected: _selectedPriority == 2,
+                              activeBgColor: const Color(0xFFFEF9C3),
+                              activeTextColor: const Color(0xFFCA8A04),
+                              onTap: () =>
+                                  setState(() => _selectedPriority = 2),
+                            ),
+                            _CustomPriorityChip(
+                              label: 'Alta',
+                              isSelected: _selectedPriority == 3,
+                              activeBgColor: const Color(0xFFFEE2E2),
+                              activeTextColor: const Color(0xFFDC2626),
+                              onTap: () =>
+                                  setState(() => _selectedPriority = 3),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
-                  _CustomPriorityChip(
-                    label: 'Baja',
-                    isSelected: _selectedPriority == 1,
-                    activeBgColor: const Color(0xFFDCFCE7),
-                    activeTextColor: const Color(0xFF16A34A),
-                    onTap: () => setState(() => _selectedPriority = 1),
-                  ),
-                  _CustomPriorityChip(
-                    label: 'Media',
-                    isSelected: _selectedPriority == 2,
-                    activeBgColor: const Color(0xFFFEF9C3),
-                    activeTextColor: const Color(0xFFCA8A04),
-                    onTap: () => setState(() => _selectedPriority = 2),
-                  ),
-                  _CustomPriorityChip(
-                    label: 'Alta',
-                    isSelected: _selectedPriority == 3,
-                    activeBgColor: const Color(0xFFFEE2E2),
-                    activeTextColor: const Color(0xFFDC2626),
-                    onTap: () => setState(() => _selectedPriority = 3),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    flex: 1,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text('Etiquetas', style: labelStyle),
+                        const SizedBox(height: 8),
+                        TagMultiSelector(
+                          initialSelectedIds: _selectedTagIds,
+                          onTagsChanged: (newTagIds) {
+                            setState(() {
+                              _selectedTagIds = newTagIds;
+                            });
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),

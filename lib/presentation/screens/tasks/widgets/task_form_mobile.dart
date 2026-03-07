@@ -5,6 +5,7 @@ import 'package:aegis/presentation/viewmodels/task_list_viewmodel.dart';
 import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'tag_multi_selector.dart'; // Importante añadir esto
 
 class TaskFormMobile extends ConsumerStatefulWidget {
   final Task? task;
@@ -23,6 +24,7 @@ class _TaskFormMobileState extends ConsumerState<TaskFormMobile> {
   int _selectedPriority = 0;
   DateTime? _selectedDueDate;
   int? _selectedProjectId;
+  List<int> _selectedTagIds = [];
 
   @override
   void initState() {
@@ -35,6 +37,7 @@ class _TaskFormMobileState extends ConsumerState<TaskFormMobile> {
     _selectedPriority = widget.task?.priority ?? 0;
     _selectedDueDate = widget.task?.dueDate;
     _selectedProjectId = widget.task?.projectId;
+    _selectedTagIds = [];
   }
 
   @override
@@ -83,6 +86,7 @@ class _TaskFormMobileState extends ConsumerState<TaskFormMobile> {
       return;
     }
 
+    // TODO: Falta mandar _selectedTagIds al viewmodel
     ref.read(taskListViewModelProvider.notifier).addTask(TasksCompanion.insert(
         title: title,
         description: drift.Value(description.isEmpty ? null : description),
@@ -115,6 +119,7 @@ class _TaskFormMobileState extends ConsumerState<TaskFormMobile> {
       projectId: drift.Value(_selectedProjectId),
     );
 
+    // TODO: Falta mandar _selectedTagIds al viewmodel
     ref.read(taskListViewModelProvider.notifier).updateTask(updatedTask);
     Navigator.of(context).pop();
   }
@@ -132,6 +137,7 @@ class _TaskFormMobileState extends ConsumerState<TaskFormMobile> {
       _selectedPriority = 0;
       _selectedDueDate = null;
       _selectedProjectId = null;
+      _selectedTagIds = [];
     });
   }
 
@@ -153,12 +159,12 @@ class _TaskFormMobileState extends ConsumerState<TaskFormMobile> {
           children: [
             Text(
               widget.task == null ? "Crear Nueva Tarea" : "Editar Tarea",
-              style: TextStyle(
+              style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF1E293B)),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             TextField(
               controller: _titleController,
               autofocus: true,
@@ -166,18 +172,19 @@ class _TaskFormMobileState extends ConsumerState<TaskFormMobile> {
               decoration: InputDecoration(
                 labelText: 'Título',
                 hintText: '¿Qué quieres hacer?',
-                hintStyle: TextStyle(color: Color(0xFF94A3B8)),
+                hintStyle: const TextStyle(color: Color(0xFF94A3B8)),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Color(0xFFCBD5E1)),
+                  borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Color(0xFF6366F1), width: 2),
+                  borderSide:
+                      const BorderSide(color: Color(0xFF6366F1), width: 2),
                 ),
               ),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             TextField(
               controller: _descriptionController,
               textCapitalization: TextCapitalization.sentences,
@@ -186,18 +193,19 @@ class _TaskFormMobileState extends ConsumerState<TaskFormMobile> {
               decoration: InputDecoration(
                 labelText: 'Descripción',
                 hintText: 'Añade detalles sobre la tarea',
-                hintStyle: TextStyle(color: Color(0xFF94A3B8)),
+                hintStyle: const TextStyle(color: Color(0xFF94A3B8)),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Color(0xFFCBD5E1)),
+                  borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Color(0xFF6366F1), width: 2),
+                  borderSide:
+                      const BorderSide(color: Color(0xFF6366F1), width: 2),
                 ),
               ),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             Row(
               children: [
                 Expanded(
@@ -348,6 +356,11 @@ class _TaskFormMobileState extends ConsumerState<TaskFormMobile> {
                         ? FontWeight.bold
                         : FontWeight.normal,
                   ),
+                  side: BorderSide(
+                    color: _selectedPriority == 0
+                        ? Colors.transparent
+                        : const Color(0xFFCBD5E1),
+                  ),
                 ),
                 ChoiceChip(
                   label: const Text('Baja'),
@@ -362,6 +375,11 @@ class _TaskFormMobileState extends ConsumerState<TaskFormMobile> {
                     fontWeight: _selectedPriority == 1
                         ? FontWeight.bold
                         : FontWeight.normal,
+                  ),
+                  side: BorderSide(
+                    color: _selectedPriority == 1
+                        ? Colors.transparent
+                        : const Color(0xFFCBD5E1),
                   ),
                 ),
                 ChoiceChip(
@@ -378,6 +396,11 @@ class _TaskFormMobileState extends ConsumerState<TaskFormMobile> {
                         ? FontWeight.bold
                         : FontWeight.normal,
                   ),
+                  side: BorderSide(
+                    color: _selectedPriority == 2
+                        ? Colors.transparent
+                        : const Color(0xFFCBD5E1),
+                  ),
                 ),
                 ChoiceChip(
                   label: const Text('Alta'),
@@ -393,8 +416,31 @@ class _TaskFormMobileState extends ConsumerState<TaskFormMobile> {
                         ? FontWeight.bold
                         : FontWeight.normal,
                   ),
+                  side: BorderSide(
+                    color: _selectedPriority == 3
+                        ? Colors.transparent
+                        : const Color(0xFFCBD5E1),
+                  ),
                 ),
               ],
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Etiquetas',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF64748B),
+              ),
+            ),
+            const SizedBox(height: 8),
+            TagMultiSelector(
+              initialSelectedIds: _selectedTagIds,
+              onTagsChanged: (newTagIds) {
+                setState(() {
+                  _selectedTagIds = newTagIds;
+                });
+              },
             ),
             const SizedBox(height: 24),
             Row(
