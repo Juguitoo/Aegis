@@ -1,11 +1,12 @@
-import 'package:aegis/core/utils/color_utils.dart';
-import 'package:aegis/presentation/screens/tasks/widgets/manage_tags_bottom_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:aegis/core/utils/color_utils.dart';
 import 'package:aegis/presentation/viewmodels/project_list_viewmodel.dart';
 import 'package:aegis/presentation/viewmodels/task_list_viewmodel.dart';
+import 'package:aegis/presentation/viewmodels/tag_list_viewmodel.dart';
 import 'package:aegis/presentation/screens/tasks/widgets/task_form_desktop.dart';
 import 'package:aegis/presentation/screens/tasks/widgets/manage_projects_bottom_sheet.dart';
+import 'package:aegis/presentation/screens/tasks/widgets/tag_multi_selector.dart';
 
 class FilterControls extends ConsumerWidget {
   const FilterControls({super.key});
@@ -13,7 +14,10 @@ class FilterControls extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedProjectId = ref.watch(projectFilterProvider);
+    final selectedTagIds = ref.watch(tagFilterProvider);
+
     final projectsAsync = ref.watch(projectListViewModelProvider);
+    final tagsAsync = ref.watch(tagListViewModelProvider);
 
     String? activeProjectName;
     Color? activeProjectColor;
@@ -34,7 +38,7 @@ class FilterControls extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // FILA DE BÚSQUEDA Y BOTÓN DE FILTROS
+        // 1. FILA DE BÚSQUEDA Y BOTÓN DE AJUSTES
         Row(
           children: [
             Expanded(
@@ -68,10 +72,11 @@ class FilterControls extends ConsumerWidget {
         ),
         const SizedBox(height: 16),
 
-        // FILTROS ACTIVOS + BOTONES DE ACCIÓN
+        // 2. TOOLBAR: FILTROS ACTIVOS (Izquierda) + BOTONES DE ACCIÓN (Derecha)
         Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Contenedor de Píldoras
             Expanded(
               child: Wrap(
                 spacing: 8,
@@ -121,7 +126,61 @@ class FilterControls extends ConsumerWidget {
                         ],
                       ),
                     ),
-                  // En el futuro, más píldoras (etiquetas) irán aquí
+
+                  // Píldoras de Etiquetas Activas
+                  if (selectedTagIds.isNotEmpty)
+                    ...tagsAsync.maybeWhen(
+                      data: (allTags) {
+                        final activeTags =
+                            allTags.where((t) => selectedTagIds.contains(t.id));
+                        return activeTags.map((tag) {
+                          final tagColor = ColorUtils.parseColor(tag.colorHex);
+                          return Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: tagColor.withAlpha(20),
+                              borderRadius: BorderRadius.circular(12),
+                              border:
+                                  Border.all(color: tagColor.withAlpha(100)),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.label_outline,
+                                    size: 14, color: tagColor),
+                                const SizedBox(width: 6),
+                                Text(
+                                  tag.name,
+                                  style: TextStyle(
+                                    color: tagColor,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                MouseRegion(
+                                  cursor: SystemMouseCursors.click,
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      final currentList = List<int>.from(
+                                          ref.read(tagFilterProvider));
+                                      currentList.remove(tag.id);
+                                      ref
+                                          .read(tagFilterProvider.notifier)
+                                          .state = currentList;
+                                    },
+                                    child: Icon(Icons.close,
+                                        size: 16, color: tagColor),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }).toList();
+                      },
+                      orElse: () => [const SizedBox()],
+                    ),
                 ],
               ),
             ),
@@ -135,7 +194,6 @@ class FilterControls extends ConsumerWidget {
   }
 }
 
-// --- BOTONES DE ACCIÓN (Movidos aquí desde la pantalla principal) ---
 class _ActionButtonsRow extends StatelessWidget {
   const _ActionButtonsRow();
 
@@ -185,36 +243,17 @@ class _ActionButtonsRow extends StatelessWidget {
                   backgroundColor: Colors.transparent,
                   builder: (context) => const ManageProjectsBottomSheet(),
                 );
-              } else if (value == 2) {
-                showModalBottomSheet(
-                  context: context,
-                  isScrollControlled: true,
-                  backgroundColor: Colors.transparent,
-                  builder: (context) => const ManageTagsBottomSheet(),
-                );
               }
             },
             itemBuilder: (context) => [
-              PopupMenuItem(
+              const PopupMenuItem(
                 value: 1,
                 child: Row(
-                  children: const [
+                  children: [
                     Icon(Icons.folder_open_outlined,
                         color: Color(0xFF64748B), size: 20),
                     SizedBox(width: 12),
                     Text('Gestionar Proyectos',
-                        style: TextStyle(color: Color(0xFF1E293B))),
-                  ],
-                ),
-              ),
-              PopupMenuItem(
-                value: 2,
-                child: Row(
-                  children: const [
-                    Icon(Icons.label_outlined,
-                        color: Color(0xFF64748B), size: 20),
-                    SizedBox(width: 12),
-                    Text('Gestionar Etiquetas',
                         style: TextStyle(color: Color(0xFF1E293B))),
                   ],
                 ),
@@ -282,6 +321,7 @@ class TaskFiltersDialog extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final projectsAsync = ref.watch(projectListViewModelProvider);
     final selectedProjectId = ref.watch(projectFilterProvider);
+    final selectedTagIds = ref.watch(tagFilterProvider);
 
     return AlertDialog(
       backgroundColor: Colors.white,
@@ -373,20 +413,12 @@ class TaskFiltersDialog extends ConsumerWidget {
                   fontWeight: FontWeight.w600, color: Color(0xFF64748B)),
             ),
             const SizedBox(height: 8),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: const Color(0xFFF8FAFC),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                    color: const Color(0xFFE2E8F0), style: BorderStyle.solid),
-              ),
-              child: const Text(
-                'El filtro por etiquetas estará disponible pronto.',
-                style: TextStyle(
-                    color: Color(0xFF94A3B8), fontStyle: FontStyle.italic),
-              ),
+            // AQUÍ INYECTAMOS EL SELECTOR MULTIPLE PARA FILTROS
+            TagMultiSelector(
+              initialSelectedIds: selectedTagIds,
+              onTagsChanged: (newTags) {
+                ref.read(tagFilterProvider.notifier).state = newTags;
+              },
             ),
           ],
         ),
@@ -395,6 +427,8 @@ class TaskFiltersDialog extends ConsumerWidget {
         TextButton(
           onPressed: () {
             ref.read(projectFilterProvider.notifier).state = null;
+            ref.read(tagFilterProvider.notifier).state =
+                []; // Limpia también las etiquetas
           },
           child: const Text('Limpiar filtros',
               style: TextStyle(color: Color(0xFF64748B))),

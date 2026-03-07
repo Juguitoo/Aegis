@@ -1,8 +1,10 @@
-import 'package:aegis/core/utils/color_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:aegis/core/utils/color_utils.dart';
 import 'package:aegis/presentation/viewmodels/project_list_viewmodel.dart';
 import 'package:aegis/presentation/viewmodels/task_list_viewmodel.dart';
+import 'package:aegis/presentation/viewmodels/tag_list_viewmodel.dart';
+import 'package:aegis/presentation/screens/tasks/widgets/tag_multi_selector.dart';
 
 class MobileFilterControls extends ConsumerWidget {
   const MobileFilterControls({super.key});
@@ -10,7 +12,10 @@ class MobileFilterControls extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedProjectId = ref.watch(projectFilterProvider);
+    final selectedTagIds = ref.watch(tagFilterProvider);
+
     final projectsAsync = ref.watch(projectListViewModelProvider);
+    final tagsAsync = ref.watch(tagListViewModelProvider);
 
     String? activeProjectName;
     Color? activeProjectColor;
@@ -96,47 +101,110 @@ class MobileFilterControls extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: 16),
-          if (activeProjectName != null)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 16),
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: activeProjectColor?.withAlpha(20) ??
-                      const Color(0xFFF1F5F9),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: activeProjectColor?.withAlpha(100) ??
-                        const Color(0xFFCBD5E1),
-                  ),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'Proyecto: $activeProjectName',
-                      style: TextStyle(
-                        color: activeProjectColor ?? const Color(0xFF475569),
-                        fontWeight: FontWeight.bold,
-                        fontSize: 13,
+
+          // Fila de píldoras activas (Horizontal en móvil)
+          if (activeProjectName != null || selectedTagIds.isNotEmpty)
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.only(bottom: 12),
+              child: Row(
+                children: [
+                  if (activeProjectName != null)
+                    Container(
+                      margin: const EdgeInsets.only(right: 8),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: activeProjectColor?.withAlpha(20) ??
+                            const Color(0xFFF1F5F9),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: activeProjectColor?.withAlpha(100) ??
+                              const Color(0xFFCBD5E1),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'Proyecto: $activeProjectName',
+                            style: TextStyle(
+                              color:
+                                  activeProjectColor ?? const Color(0xFF475569),
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          GestureDetector(
+                            onTap: () {
+                              ref.read(projectFilterProvider.notifier).state =
+                                  null;
+                            },
+                            child: Icon(
+                              Icons.close,
+                              size: 16,
+                              color:
+                                  activeProjectColor ?? const Color(0xFF475569),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    const SizedBox(width: 8),
-                    GestureDetector(
-                      onTap: () {
-                        ref.read(projectFilterProvider.notifier).state = null;
+                  if (selectedTagIds.isNotEmpty)
+                    ...tagsAsync.maybeWhen(
+                      data: (allTags) {
+                        final activeTags =
+                            allTags.where((t) => selectedTagIds.contains(t.id));
+                        return activeTags.map((tag) {
+                          final tagColor = ColorUtils.parseColor(tag.colorHex);
+                          return Container(
+                            margin: const EdgeInsets.only(right: 8),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: tagColor.withAlpha(20),
+                              borderRadius: BorderRadius.circular(12),
+                              border:
+                                  Border.all(color: tagColor.withAlpha(100)),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.label_outline,
+                                    size: 14, color: tagColor),
+                                const SizedBox(width: 6),
+                                Text(
+                                  tag.name,
+                                  style: TextStyle(
+                                    color: tagColor,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                GestureDetector(
+                                  onTap: () {
+                                    final currentList = List<int>.from(
+                                        ref.read(tagFilterProvider));
+                                    currentList.remove(tag.id);
+                                    ref.read(tagFilterProvider.notifier).state =
+                                        currentList;
+                                  },
+                                  child: Icon(Icons.close,
+                                      size: 16, color: tagColor),
+                                ),
+                              ],
+                            ),
+                          );
+                        }).toList();
                       },
-                      child: Icon(
-                        Icons.close,
-                        size: 16,
-                        color: activeProjectColor ?? const Color(0xFF475569),
-                      ),
+                      orElse: () => [const SizedBox()],
                     ),
-                  ],
-                ),
+                ],
               ),
             ),
+
           const SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             padding: EdgeInsets.only(bottom: 8),
@@ -162,6 +230,7 @@ class MobileTaskFiltersBottomSheet extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final projectsAsync = ref.watch(projectListViewModelProvider);
     final selectedProjectId = ref.watch(projectFilterProvider);
+    final selectedTagIds = ref.watch(tagFilterProvider);
 
     return Container(
       decoration: const BoxDecoration(
@@ -272,19 +341,11 @@ class MobileTaskFiltersBottomSheet extends ConsumerWidget {
                 fontWeight: FontWeight.w600, color: Color(0xFF64748B)),
           ),
           const SizedBox(height: 8),
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: const Color(0xFFF8FAFC),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                  color: const Color(0xFFE2E8F0), style: BorderStyle.solid),
-            ),
-            child: const Text(
-              'El filtro por etiquetas estará disponible pronto.',
-              style: TextStyle(
-                  color: Color(0xFF94A3B8), fontStyle: FontStyle.italic),
-            ),
+          TagMultiSelector(
+            initialSelectedIds: selectedTagIds,
+            onTagsChanged: (newTags) {
+              ref.read(tagFilterProvider.notifier).state = newTags;
+            },
           ),
           const SizedBox(height: 32),
           Row(
@@ -293,6 +354,8 @@ class MobileTaskFiltersBottomSheet extends ConsumerWidget {
                 child: TextButton(
                   onPressed: () {
                     ref.read(projectFilterProvider.notifier).state = null;
+                    ref.read(tagFilterProvider.notifier).state =
+                        []; // Limpia etiquetas
                     Navigator.pop(context);
                   },
                   child: const Text('Limpiar',

@@ -1,4 +1,5 @@
 import 'package:aegis/data/local/database/app_database.dart';
+import 'package:drift/drift.dart';
 
 class ProjectRepository {
   final AppDatabase _db;
@@ -27,6 +28,24 @@ class ProjectRepository {
   }
 
   Future<int> deleteProject(Project project) {
-    return _db.delete(_db.projects).delete(project);
+    return _db.transaction(() async {
+      await (_db.update(_db.tasks)
+            ..where((t) => t.projectId.equals(project.id)))
+          .write(const TasksCompanion(projectId: Value(null)));
+
+      return await (_db.delete(_db.projects)
+            ..where((p) => p.id.equals(project.id)))
+          .go();
+    });
+  }
+
+  Future<int> deleteProjectById(int id) {
+    return _db.transaction(() async {
+      await (_db.update(_db.tasks)..where((t) => t.projectId.equals(id)))
+          .write(const TasksCompanion(projectId: Value(null)));
+
+      return await (_db.delete(_db.projects)..where((p) => p.id.equals(id)))
+          .go();
+    });
   }
 }

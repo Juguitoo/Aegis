@@ -5,6 +5,7 @@ import '../../core/providers/repository_providers.dart';
 import '../../data/local/database/app_database.dart';
 
 final projectFilterProvider = StateProvider<int?>((ref) => null);
+final tagFilterProvider = StateProvider<List<int>>((ref) => []);
 
 class TaskListViewModel extends StreamNotifier<List<Task>> {
   TaskRepository get _repository => ref.read(taskRepositoryProvider);
@@ -12,15 +13,33 @@ class TaskListViewModel extends StreamNotifier<List<Task>> {
   @override
   Stream<List<Task>> build() {
     final selectedProjectId = ref.watch(projectFilterProvider);
+    final selectedTagIds = ref.watch(tagFilterProvider);
 
-    return ref.watch(taskRepositoryProvider).watchAllTasks().map((tasks) {
-      if (selectedProjectId == null) {
-        return tasks;
-      } else if (selectedProjectId == -1) {
-        return tasks.where((t) => t.projectId == null).toList();
-      } else {
-        return tasks.where((t) => t.projectId == selectedProjectId).toList();
+    return ref
+        .watch(taskRepositoryProvider)
+        .watchAllTasks()
+        .asyncMap((tasks) async {
+      List<Task> filteredTasks = tasks;
+
+      if (selectedProjectId == -1) {
+        filteredTasks = tasks.where((t) => t.projectId == null).toList();
+      } else if (selectedProjectId != null) {
+        filteredTasks =
+            tasks.where((t) => t.projectId == selectedProjectId).toList();
       }
+
+      if (selectedTagIds.isNotEmpty) {
+        final List<Task> tasksWithSelectedTags = [];
+        for (final t in filteredTasks) {
+          final List<int> taskTagIds = await _repository.getTagIdsForTask(t.id);
+          if (selectedTagIds.any((tagId) => taskTagIds.contains(tagId))) {
+            tasksWithSelectedTags.add(t);
+          }
+        }
+        filteredTasks = tasksWithSelectedTags;
+      }
+
+      return filteredTasks;
     });
   }
 

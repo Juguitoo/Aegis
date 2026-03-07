@@ -22,6 +22,12 @@ class TagRepository {
   }
 
   Future<int> deleteTag(Tag tag) {
-    return _db.delete(_db.tags).delete(tag);
+    return _db.transaction(() async {
+      await (_db.delete(_db.taskTags)..where((t) => t.tagId.equals(tag.id)))
+          .go();
+
+      return await (_db.delete(_db.tags)..where((t) => t.id.equals(tag.id)))
+          .go();
+    });
   }
 }
