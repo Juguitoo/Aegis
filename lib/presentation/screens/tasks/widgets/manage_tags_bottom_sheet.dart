@@ -1,3 +1,4 @@
+import 'package:aegis/core/utils/color_utils.dart';
 import 'package:aegis/presentation/screens/tasks/widgets/tag_form_dialog.dart';
 import 'package:aegis/presentation/viewmodels/tag_list_viewmodel.dart';
 import 'package:flutter/material.dart';
@@ -13,18 +14,6 @@ class ManageTagsBottomSheet extends ConsumerStatefulWidget {
 }
 
 class _ManageTagsBottomSheetState extends ConsumerState<ManageTagsBottomSheet> {
-  Color _parseColor(String? hex) {
-    if (hex == null || hex.isEmpty) return const Color(0xFF94A3B8);
-    final hexCode = hex.replaceAll('#', '');
-    if (hexCode.length == 6) {
-      return Color(int.parse('FF$hexCode', radix: 16));
-    }
-    if (hexCode.length == 8) {
-      return Color(int.parse(hexCode, radix: 16));
-    }
-    return const Color(0xFF94A3B8);
-  }
-
   void _showTagDialog([Tag? existingTag]) {
     showDialog(
       context: context,
@@ -100,7 +89,7 @@ class _ManageTagsBottomSheetState extends ConsumerState<ManageTagsBottomSheet> {
                         width: 16,
                         height: 16,
                         decoration: BoxDecoration(
-                          color: _parseColor(tag.colorHex),
+                          color: ColorUtils.parseColor(tag.colorHex),
                           shape: BoxShape.circle,
                         ),
                       ),

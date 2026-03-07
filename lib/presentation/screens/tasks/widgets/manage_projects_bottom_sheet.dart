@@ -1,3 +1,4 @@
+import 'package:aegis/core/utils/color_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../data/local/database/app_database.dart';
@@ -14,18 +15,6 @@ class ManageProjectsBottomSheet extends ConsumerStatefulWidget {
 
 class _ManageProjectsBottomSheetState
     extends ConsumerState<ManageProjectsBottomSheet> {
-  Color _parseColor(String? hex) {
-    if (hex == null || hex.isEmpty) return const Color(0xFF94A3B8);
-    final hexCode = hex.replaceAll('#', '');
-    if (hexCode.length == 6) {
-      return Color(int.parse('FF$hexCode', radix: 16));
-    }
-    if (hexCode.length == 8) {
-      return Color(int.parse(hexCode, radix: 16));
-    }
-    return const Color(0xFF94A3B8);
-  }
-
   void _showProjectDialog([Project? existingProject]) {
     showDialog(
       context: context,
@@ -101,7 +90,7 @@ class _ManageProjectsBottomSheetState
                         width: 16,
                         height: 16,
                         decoration: BoxDecoration(
-                          color: _parseColor(project.colorHex),
+                          color: ColorUtils.parseColor(project.colorHex),
                           shape: BoxShape.circle,
                         ),
                       ),

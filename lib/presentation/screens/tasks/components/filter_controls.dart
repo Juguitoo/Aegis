@@ -1,3 +1,4 @@
+import 'package:aegis/core/utils/color_utils.dart';
 import 'package:aegis/presentation/screens/tasks/widgets/manage_tags_bottom_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -5,18 +6,6 @@ import 'package:aegis/presentation/viewmodels/project_list_viewmodel.dart';
 import 'package:aegis/presentation/viewmodels/task_list_viewmodel.dart';
 import 'package:aegis/presentation/screens/tasks/widgets/task_form_desktop.dart';
 import 'package:aegis/presentation/screens/tasks/widgets/manage_projects_bottom_sheet.dart';
-
-Color _parseColor(String? hex) {
-  if (hex == null || hex.isEmpty) return const Color(0xFF94A3B8);
-  final hexCode = hex.replaceAll('#', '');
-  if (hexCode.length == 6) {
-    return Color(int.parse('FF$hexCode', radix: 16));
-  }
-  if (hexCode.length == 8) {
-    return Color(int.parse(hexCode, radix: 16));
-  }
-  return const Color(0xFF94A3B8);
-}
 
 class FilterControls extends ConsumerWidget {
   const FilterControls({super.key});
@@ -38,7 +27,7 @@ class FilterControls extends ConsumerWidget {
           .firstOrNull;
       if (projectVal != null) {
         activeProjectName = projectVal.name;
-        activeProjectColor = _parseColor(projectVal.colorHex);
+        activeProjectColor = ColorUtils.parseColor(projectVal.colorHex);
       }
     }
 
@@ -359,7 +348,7 @@ class TaskFiltersDialog extends ConsumerWidget {
                                 width: 12,
                                 height: 12,
                                 decoration: BoxDecoration(
-                                  color: _parseColor(p.colorHex),
+                                  color: ColorUtils.parseColor(p.colorHex),
                                   shape: BoxShape.circle,
                                 ),
                               ),

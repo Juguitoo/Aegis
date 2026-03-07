@@ -1,35 +1,10 @@
+import 'package:aegis/core/utils/color_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:drift/drift.dart' as drift;
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import '../../../../data/local/database/app_database.dart';
 import '../../../viewmodels/project_list_viewmodel.dart';
-
-Color _parseColor(String? hex) {
-  if (hex == null || hex.isEmpty) return const Color(0xFF94A3B8);
-  final hexCode = hex.replaceAll('#', '');
-  if (hexCode.length == 6) {
-    return Color(int.parse('FF$hexCode', radix: 16));
-  }
-  if (hexCode.length == 8) {
-    return Color(int.parse(hexCode, radix: 16));
-  }
-  return const Color(0xFF94A3B8);
-}
-
-Color? _parseColorStrict(String hex) {
-  final hexCode = hex.replaceAll('#', '');
-  if (hexCode.length == 6 || hexCode.length == 8) {
-    final paddedHex = hexCode.length == 6 ? 'FF$hexCode' : hexCode;
-    final value = int.tryParse(paddedHex, radix: 16);
-    if (value != null) return Color(value);
-  }
-  return null;
-}
-
-String _colorToHex(Color color) {
-  return '#${color.value.toRadixString(16).substring(2).toUpperCase()}';
-}
 
 class ProjectFormDialog extends ConsumerStatefulWidget {
   final Project? existingProject;
@@ -58,10 +33,11 @@ class _ProjectFormDialogState extends ConsumerState<ProjectFormDialog> {
         TextEditingController(text: widget.existingProject?.description ?? '');
 
     selectedColor = isEditing
-        ? _parseColor(widget.existingProject!.colorHex)
+        ? ColorUtils.parseColor(widget.existingProject!.colorHex)
         : const Color(0xFF3B82F6);
 
-    hexController = TextEditingController(text: _colorToHex(selectedColor));
+    hexController =
+        TextEditingController(text: ColorUtils.colorToHex(selectedColor));
     hexFocusNode = FocusNode();
 
     hexFocusNode.addListener(_onFocusChange);
@@ -69,8 +45,8 @@ class _ProjectFormDialogState extends ConsumerState<ProjectFormDialog> {
 
   void _onFocusChange() {
     if (!hexFocusNode.hasFocus) {
-      if (_parseColorStrict(hexController.text) == null) {
-        hexController.text = _colorToHex(selectedColor);
+      if (ColorUtils.parseColorStrict(hexController.text) == null) {
+        hexController.text = ColorUtils.colorToHex(selectedColor);
       }
     }
   }
@@ -197,7 +173,8 @@ class _ProjectFormDialogState extends ConsumerState<ProjectFormDialog> {
                             onPressed: () {
                               setState(() {
                                 selectedColor = tempColor;
-                                hexController.text = _colorToHex(selectedColor);
+                                hexController.text =
+                                    ColorUtils.colorToHex(selectedColor);
                               });
                               Navigator.pop(context);
                             },
@@ -232,7 +209,7 @@ class _ProjectFormDialogState extends ConsumerState<ProjectFormDialog> {
                   controller: hexController,
                   focusNode: hexFocusNode,
                   onChanged: (value) {
-                    final newColor = _parseColorStrict(value);
+                    final newColor = ColorUtils.parseColorStrict(value);
                     if (newColor != null) {
                       setState(() {
                         selectedColor = newColor;
@@ -293,7 +270,7 @@ class _ProjectFormDialogState extends ConsumerState<ProjectFormDialog> {
               child: ElevatedButton(
                 onPressed: () {
                   if (nameController.text.trim().isNotEmpty) {
-                    final hexToSave = _colorToHex(selectedColor);
+                    final hexToSave = ColorUtils.colorToHex(selectedColor);
                     final description = descriptionController.text.trim();
 
                     if (isEditing) {

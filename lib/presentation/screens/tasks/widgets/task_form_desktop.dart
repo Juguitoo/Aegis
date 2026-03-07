@@ -1,3 +1,4 @@
+import 'package:aegis/core/utils/color_utils.dart';
 import 'package:aegis/data/local/database/app_database.dart';
 import 'package:aegis/presentation/viewmodels/project_list_viewmodel.dart';
 import 'package:aegis/presentation/viewmodels/task_list_viewmodel.dart';
@@ -42,18 +43,6 @@ class _TaskFormDesktopState extends ConsumerState<TaskFormDesktop> {
     _descriptionController.dispose();
     _estimatedDurationController.dispose();
     super.dispose();
-  }
-
-  Color _parseColor(String? hex) {
-    if (hex == null || hex.isEmpty) return const Color(0xFF94A3B8);
-    final hexCode = hex.replaceAll('#', '');
-    if (hexCode.length == 6) {
-      return Color(int.parse('FF$hexCode', radix: 16));
-    }
-    if (hexCode.length == 8) {
-      return Color(int.parse(hexCode, radix: 16));
-    }
-    return const Color(0xFF94A3B8);
   }
 
   Future<void> _pickDueDate() async {
@@ -364,29 +353,31 @@ class _TaskFormDesktopState extends ConsumerState<TaskFormDesktop> {
                                     ],
                                   ),
                                 ),
-                                ...projectsList.map((p) =>
-                                    DropdownMenuItem<int?>(
-                                      value: p.id,
-                                      child: Row(
-                                        children: [
-                                          Container(
-                                            width: 14,
-                                            height: 14,
-                                            decoration: BoxDecoration(
-                                              color: _parseColor(p.colorHex),
-                                              shape: BoxShape.circle,
-                                            ),
+                                ...projectsList
+                                    .map((p) => DropdownMenuItem<int?>(
+                                          value: p.id,
+                                          child: Row(
+                                            children: [
+                                              Container(
+                                                width: 14,
+                                                height: 14,
+                                                decoration: BoxDecoration(
+                                                  color: ColorUtils.parseColor(
+                                                      p.colorHex),
+                                                  shape: BoxShape.circle,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 8),
+                                              Expanded(
+                                                  child: Text(p.name,
+                                                      style: const TextStyle(
+                                                          color:
+                                                              Color(0xFF1E293B),
+                                                          overflow: TextOverflow
+                                                              .ellipsis))),
+                                            ],
                                           ),
-                                          const SizedBox(width: 8),
-                                          Expanded(
-                                              child: Text(p.name,
-                                                  style: const TextStyle(
-                                                      color: Color(0xFF1E293B),
-                                                      overflow: TextOverflow
-                                                          .ellipsis))),
-                                        ],
-                                      ),
-                                    )),
+                                        )),
                               ],
                               onChanged: (value) {
                                 setState(() {
