@@ -6,6 +6,7 @@ import 'package:aegis/presentation/viewmodels/task_list_viewmodel.dart';
 import 'package:aegis/presentation/viewmodels/tag_list_viewmodel.dart';
 import 'package:aegis/presentation/screens/tasks/widgets/task_form_desktop.dart';
 import 'package:aegis/presentation/screens/projects/widgets/manage_projects_bottom_sheet.dart';
+import 'package:aegis/presentation/screens/tags/widgets/manage_tags_bottom_sheet.dart';
 import 'package:aegis/presentation/screens/tags/widgets/tag_multi_selector.dart';
 
 class FilterControls extends ConsumerWidget {
@@ -244,6 +245,14 @@ class _ActionButtonsRow extends StatelessWidget {
                   builder: (context) => const ManageProjectsBottomSheet(),
                 );
               }
+              if (value == 2) {
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  backgroundColor: Colors.transparent,
+                  builder: (context) => const ManageTagsBottomSheet(),
+                );
+              }
             },
             itemBuilder: (context) => [
               const PopupMenuItem(
@@ -254,6 +263,18 @@ class _ActionButtonsRow extends StatelessWidget {
                         color: Color(0xFF64748B), size: 20),
                     SizedBox(width: 12),
                     Text('Gestionar Proyectos',
+                        style: TextStyle(color: Color(0xFF1E293B))),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: 2,
+                child: Row(
+                  children: [
+                    Icon(Icons.label_outlined,
+                        color: Color(0xFF64748B), size: 20),
+                    SizedBox(width: 12),
+                    Text('Gestionar Etiquetas',
                         style: TextStyle(color: Color(0xFF1E293B))),
                   ],
                 ),
