@@ -1,3 +1,5 @@
+import 'package:drift/drift.dart';
+
 import '../local/database/app_database.dart';
 
 class TaskRepository {
@@ -72,6 +74,7 @@ class TaskRepository {
   Future<int> deleteTaskById(int id) {
     return _db.transaction(() async {
       await (_db.delete(_db.taskTags)..where((t) => t.taskId.equals(id))).go();
+      await (_db.delete(_db.subtasks)..where((s) => s.taskId.equals(id))).go();
       return await (_db.delete(_db.tasks)..where((t) => t.id.equals(id))).go();
     });
   }
@@ -80,8 +83,44 @@ class TaskRepository {
     return _db.transaction(() async {
       await (_db.delete(_db.taskTags)..where((t) => t.taskId.equals(task.id)))
           .go();
+      await (_db.delete(_db.subtasks)..where((s) => s.taskId.equals(task.id)))
+          .go();
       return await (_db.delete(_db.tasks)..where((t) => t.id.equals(task.id)))
           .go();
     });
+  }
+
+  Future<List<Subtask>> getSubtasksForTask(int taskId) {
+    return (_db.select(_db.subtasks)
+          ..where((t) => t.taskId.equals(taskId))
+          ..orderBy([
+            (t) => OrderingTerm(expression: t.order, mode: OrderingMode.asc),
+            (t) => OrderingTerm(expression: t.id, mode: OrderingMode.asc),
+          ]))
+        .get();
+  }
+
+  Stream<List<Subtask>> watchSubtasksForTask(int taskId) {
+    return (_db.select(_db.subtasks)
+          ..where((t) => t.taskId.equals(taskId))
+          ..orderBy([
+            (t) => OrderingTerm(expression: t.order, mode: OrderingMode.asc),
+            (t) => OrderingTerm(expression: t.id, mode: OrderingMode.asc),
+          ]))
+        .watch();
+  }
+
+  Future<int> insertSubtask(int parentId, SubtasksCompanion subtask) {
+    return _db.into(_db.subtasks).insert(
+          subtask.copyWith(taskId: Value(parentId)),
+        );
+  }
+
+  Future<bool> updateSubtask(Subtask subtask) {
+    return _db.update(_db.subtasks).replace(subtask);
+  }
+
+  Future<int> deleteSubtaskById(int id) {
+    return (_db.delete(_db.subtasks)..where((s) => s.id.equals(id))).go();
   }
 }
