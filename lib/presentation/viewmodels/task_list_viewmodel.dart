@@ -1,8 +1,26 @@
-import 'package:aegis/data/repositories/task_repository.dart';
+import 'dart:async';
+import 'dart:math';
+import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import '../../core/providers/repository_providers.dart';
 import '../../data/local/database/app_database.dart';
+import '../../data/repositories/task_repository.dart';
+
+class TaskChecklistItem {
+  final int? id;
+  final String title;
+  final bool isCompleted;
+  final String localId;
+
+  TaskChecklistItem({
+    this.id,
+    required this.title,
+    this.isCompleted = false,
+    String? localId,
+  }) : localId = localId ??
+            '${DateTime.now().microsecondsSinceEpoch}_${Random().nextInt(10000)}';
+}
 
 final projectFilterProvider = StateProvider<int?>((ref) => null);
 final tagFilterProvider = StateProvider<List<int>>((ref) => []);
@@ -47,20 +65,58 @@ class TaskListViewModel extends StreamNotifier<List<Task>> {
     return _repository.getTagIdsForTask(taskId);
   }
 
-  Future<int> addTaskWithTags(TasksCompanion task, List<int> tagIds) {
-    return _repository.insertTaskWithTags(task, tagIds);
+  Future<int> addTask({
+    required String title,
+    String? description,
+    int? estimatedDuration,
+    DateTime? dueDate,
+    int? projectId,
+    int priority = 0,
+    List<int> tagIds = const [],
+    List<TaskChecklistItem> checklist = const [],
+  }) {
+    final taskCompanion = TasksCompanion(
+      title: Value(title),
+      description: Value(description ?? ''),
+      estimatedDuration: Value(estimatedDuration),
+      dueDate: Value(dueDate),
+      projectId: Value(projectId),
+      priority: Value(priority),
+    );
+
+    final subtasksCompanions = checklist.asMap().entries.map((entry) {
+      return SubtasksCompanion(
+        title: Value(entry.value.title),
+        isCompleted: Value(entry.value.isCompleted),
+        position: Value(entry.key),
+      );
+    }).toList();
+
+    return _repository.insertTask(
+      taskCompanion,
+      tagIds: tagIds,
+      subtasks: subtasksCompanions,
+    );
   }
 
-  Future<int> addTask(TasksCompanion task) {
-    return _repository.insertTask(task);
-  }
+  Future<void> updateTask({
+    required Task task,
+    List<int> tagIds = const [],
+    List<TaskChecklistItem> checklist = const [],
+  }) {
+    final subtasksCompanions = checklist.asMap().entries.map((entry) {
+      return SubtasksCompanion(
+        id: entry.value.id != null
+            ? Value(entry.value.id!)
+            : const Value.absent(),
+        title: Value(entry.value.title),
+        isCompleted: Value(entry.value.isCompleted),
+        position: Value(entry.key),
+      );
+    }).toList();
 
-  Future<void> updateTaskWithTags(Task task, List<int> tagIds) {
-    return _repository.updateTaskWithTags(task, tagIds);
-  }
-
-  Future<bool> updateTask(Task task) {
-    return _repository.updateTask(task);
+    return _repository.updateTask(task,
+        tagIds: tagIds, subtasks: subtasksCompanions);
   }
 
   Future<int> deleteTask(Task task) {
@@ -73,7 +129,7 @@ class TaskListViewModel extends StreamNotifier<List<Task>> {
 
   Future<bool> toggleTaskCompletion(Task task) {
     final updatedTask = task.copyWith(isCompleted: !task.isCompleted);
-    return _repository.updateTask(updatedTask);
+    return _repository.updateTaskBasic(updatedTask);
   }
 }
 

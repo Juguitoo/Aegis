@@ -1242,15 +1242,17 @@ class $SubtasksTable extends Subtasks with TableInfo<$SubtasksTable, Subtask> {
       defaultConstraints: GeneratedColumn.constraintIsAlways(
           'CHECK ("is_completed" IN (0, 1))'),
       defaultValue: const Constant(false));
-  static const VerificationMeta _orderMeta = const VerificationMeta('order');
+  static const VerificationMeta _positionMeta =
+      const VerificationMeta('position');
   @override
-  late final GeneratedColumn<int> order = GeneratedColumn<int>(
-      'order', aliasedName, false,
+  late final GeneratedColumn<int> position = GeneratedColumn<int>(
+      'position', aliasedName, false,
       type: DriftSqlType.int,
       requiredDuringInsert: false,
       defaultValue: const Constant(0));
   @override
-  List<GeneratedColumn> get $columns => [id, taskId, title, isCompleted, order];
+  List<GeneratedColumn> get $columns =>
+      [id, taskId, title, isCompleted, position];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -1282,9 +1284,9 @@ class $SubtasksTable extends Subtasks with TableInfo<$SubtasksTable, Subtask> {
           isCompleted.isAcceptableOrUnknown(
               data['is_completed']!, _isCompletedMeta));
     }
-    if (data.containsKey('order')) {
-      context.handle(
-          _orderMeta, order.isAcceptableOrUnknown(data['order']!, _orderMeta));
+    if (data.containsKey('position')) {
+      context.handle(_positionMeta,
+          position.isAcceptableOrUnknown(data['position']!, _positionMeta));
     }
     return context;
   }
@@ -1303,8 +1305,8 @@ class $SubtasksTable extends Subtasks with TableInfo<$SubtasksTable, Subtask> {
           .read(DriftSqlType.string, data['${effectivePrefix}title'])!,
       isCompleted: attachedDatabase.typeMapping
           .read(DriftSqlType.bool, data['${effectivePrefix}is_completed'])!,
-      order: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}order'])!,
+      position: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}position'])!,
     );
   }
 
@@ -1319,13 +1321,13 @@ class Subtask extends DataClass implements Insertable<Subtask> {
   final int taskId;
   final String title;
   final bool isCompleted;
-  final int order;
+  final int position;
   const Subtask(
       {required this.id,
       required this.taskId,
       required this.title,
       required this.isCompleted,
-      required this.order});
+      required this.position});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -1333,7 +1335,7 @@ class Subtask extends DataClass implements Insertable<Subtask> {
     map['task_id'] = Variable<int>(taskId);
     map['title'] = Variable<String>(title);
     map['is_completed'] = Variable<bool>(isCompleted);
-    map['order'] = Variable<int>(order);
+    map['position'] = Variable<int>(position);
     return map;
   }
 
@@ -1343,7 +1345,7 @@ class Subtask extends DataClass implements Insertable<Subtask> {
       taskId: Value(taskId),
       title: Value(title),
       isCompleted: Value(isCompleted),
-      order: Value(order),
+      position: Value(position),
     );
   }
 
@@ -1355,7 +1357,7 @@ class Subtask extends DataClass implements Insertable<Subtask> {
       taskId: serializer.fromJson<int>(json['taskId']),
       title: serializer.fromJson<String>(json['title']),
       isCompleted: serializer.fromJson<bool>(json['isCompleted']),
-      order: serializer.fromJson<int>(json['order']),
+      position: serializer.fromJson<int>(json['position']),
     );
   }
   @override
@@ -1366,7 +1368,7 @@ class Subtask extends DataClass implements Insertable<Subtask> {
       'taskId': serializer.toJson<int>(taskId),
       'title': serializer.toJson<String>(title),
       'isCompleted': serializer.toJson<bool>(isCompleted),
-      'order': serializer.toJson<int>(order),
+      'position': serializer.toJson<int>(position),
     };
   }
 
@@ -1375,13 +1377,13 @@ class Subtask extends DataClass implements Insertable<Subtask> {
           int? taskId,
           String? title,
           bool? isCompleted,
-          int? order}) =>
+          int? position}) =>
       Subtask(
         id: id ?? this.id,
         taskId: taskId ?? this.taskId,
         title: title ?? this.title,
         isCompleted: isCompleted ?? this.isCompleted,
-        order: order ?? this.order,
+        position: position ?? this.position,
       );
   Subtask copyWithCompanion(SubtasksCompanion data) {
     return Subtask(
@@ -1390,7 +1392,7 @@ class Subtask extends DataClass implements Insertable<Subtask> {
       title: data.title.present ? data.title.value : this.title,
       isCompleted:
           data.isCompleted.present ? data.isCompleted.value : this.isCompleted,
-      order: data.order.present ? data.order.value : this.order,
+      position: data.position.present ? data.position.value : this.position,
     );
   }
 
@@ -1401,13 +1403,13 @@ class Subtask extends DataClass implements Insertable<Subtask> {
           ..write('taskId: $taskId, ')
           ..write('title: $title, ')
           ..write('isCompleted: $isCompleted, ')
-          ..write('order: $order')
+          ..write('position: $position')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, taskId, title, isCompleted, order);
+  int get hashCode => Object.hash(id, taskId, title, isCompleted, position);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -1416,7 +1418,7 @@ class Subtask extends DataClass implements Insertable<Subtask> {
           other.taskId == this.taskId &&
           other.title == this.title &&
           other.isCompleted == this.isCompleted &&
-          other.order == this.order);
+          other.position == this.position);
 }
 
 class SubtasksCompanion extends UpdateCompanion<Subtask> {
@@ -1424,20 +1426,20 @@ class SubtasksCompanion extends UpdateCompanion<Subtask> {
   final Value<int> taskId;
   final Value<String> title;
   final Value<bool> isCompleted;
-  final Value<int> order;
+  final Value<int> position;
   const SubtasksCompanion({
     this.id = const Value.absent(),
     this.taskId = const Value.absent(),
     this.title = const Value.absent(),
     this.isCompleted = const Value.absent(),
-    this.order = const Value.absent(),
+    this.position = const Value.absent(),
   });
   SubtasksCompanion.insert({
     this.id = const Value.absent(),
     required int taskId,
     required String title,
     this.isCompleted = const Value.absent(),
-    this.order = const Value.absent(),
+    this.position = const Value.absent(),
   })  : taskId = Value(taskId),
         title = Value(title);
   static Insertable<Subtask> custom({
@@ -1445,14 +1447,14 @@ class SubtasksCompanion extends UpdateCompanion<Subtask> {
     Expression<int>? taskId,
     Expression<String>? title,
     Expression<bool>? isCompleted,
-    Expression<int>? order,
+    Expression<int>? position,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (taskId != null) 'task_id': taskId,
       if (title != null) 'title': title,
       if (isCompleted != null) 'is_completed': isCompleted,
-      if (order != null) 'order': order,
+      if (position != null) 'position': position,
     });
   }
 
@@ -1461,13 +1463,13 @@ class SubtasksCompanion extends UpdateCompanion<Subtask> {
       Value<int>? taskId,
       Value<String>? title,
       Value<bool>? isCompleted,
-      Value<int>? order}) {
+      Value<int>? position}) {
     return SubtasksCompanion(
       id: id ?? this.id,
       taskId: taskId ?? this.taskId,
       title: title ?? this.title,
       isCompleted: isCompleted ?? this.isCompleted,
-      order: order ?? this.order,
+      position: position ?? this.position,
     );
   }
 
@@ -1486,8 +1488,8 @@ class SubtasksCompanion extends UpdateCompanion<Subtask> {
     if (isCompleted.present) {
       map['is_completed'] = Variable<bool>(isCompleted.value);
     }
-    if (order.present) {
-      map['order'] = Variable<int>(order.value);
+    if (position.present) {
+      map['position'] = Variable<int>(position.value);
     }
     return map;
   }
@@ -1499,7 +1501,7 @@ class SubtasksCompanion extends UpdateCompanion<Subtask> {
           ..write('taskId: $taskId, ')
           ..write('title: $title, ')
           ..write('isCompleted: $isCompleted, ')
-          ..write('order: $order')
+          ..write('position: $position')
           ..write(')'))
         .toString();
   }
@@ -2741,14 +2743,14 @@ typedef $$SubtasksTableCreateCompanionBuilder = SubtasksCompanion Function({
   required int taskId,
   required String title,
   Value<bool> isCompleted,
-  Value<int> order,
+  Value<int> position,
 });
 typedef $$SubtasksTableUpdateCompanionBuilder = SubtasksCompanion Function({
   Value<int> id,
   Value<int> taskId,
   Value<String> title,
   Value<bool> isCompleted,
-  Value<int> order,
+  Value<int> position,
 });
 
 final class $$SubtasksTableReferences
@@ -2788,8 +2790,8 @@ class $$SubtasksTableFilterComposer
   ColumnFilters<bool> get isCompleted => $composableBuilder(
       column: $table.isCompleted, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<int> get order => $composableBuilder(
-      column: $table.order, builder: (column) => ColumnFilters(column));
+  ColumnFilters<int> get position => $composableBuilder(
+      column: $table.position, builder: (column) => ColumnFilters(column));
 
   $$TasksTableFilterComposer get taskId {
     final $$TasksTableFilterComposer composer = $composerBuilder(
@@ -2830,8 +2832,8 @@ class $$SubtasksTableOrderingComposer
   ColumnOrderings<bool> get isCompleted => $composableBuilder(
       column: $table.isCompleted, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<int> get order => $composableBuilder(
-      column: $table.order, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<int> get position => $composableBuilder(
+      column: $table.position, builder: (column) => ColumnOrderings(column));
 
   $$TasksTableOrderingComposer get taskId {
     final $$TasksTableOrderingComposer composer = $composerBuilder(
@@ -2872,8 +2874,8 @@ class $$SubtasksTableAnnotationComposer
   GeneratedColumn<bool> get isCompleted => $composableBuilder(
       column: $table.isCompleted, builder: (column) => column);
 
-  GeneratedColumn<int> get order =>
-      $composableBuilder(column: $table.order, builder: (column) => column);
+  GeneratedColumn<int> get position =>
+      $composableBuilder(column: $table.position, builder: (column) => column);
 
   $$TasksTableAnnotationComposer get taskId {
     final $$TasksTableAnnotationComposer composer = $composerBuilder(
@@ -2923,28 +2925,28 @@ class $$SubtasksTableTableManager extends RootTableManager<
             Value<int> taskId = const Value.absent(),
             Value<String> title = const Value.absent(),
             Value<bool> isCompleted = const Value.absent(),
-            Value<int> order = const Value.absent(),
+            Value<int> position = const Value.absent(),
           }) =>
               SubtasksCompanion(
             id: id,
             taskId: taskId,
             title: title,
             isCompleted: isCompleted,
-            order: order,
+            position: position,
           ),
           createCompanionCallback: ({
             Value<int> id = const Value.absent(),
             required int taskId,
             required String title,
             Value<bool> isCompleted = const Value.absent(),
-            Value<int> order = const Value.absent(),
+            Value<int> position = const Value.absent(),
           }) =>
               SubtasksCompanion.insert(
             id: id,
             taskId: taskId,
             title: title,
             isCompleted: isCompleted,
-            order: order,
+            position: position,
           ),
           withReferenceMapper: (p0) => p0
               .map((e) =>

@@ -45,7 +45,7 @@ class Subtasks extends Table {
   IntColumn get taskId => integer().references(Tasks, #id)();
   TextColumn get title => text().withLength(min: 1, max: 100)();
   BoolColumn get isCompleted => boolean().withDefault(const Constant(false))();
-  IntColumn get order => integer().withDefault(const Constant(0))();
+  IntColumn get position => integer().withDefault(const Constant(0))();
 }
 
 @DriftDatabase(tables: [Projects, Tasks, Tags, TaskTags, Subtasks])

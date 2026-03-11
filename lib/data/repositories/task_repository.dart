@@ -1,5 +1,4 @@
 import 'package:drift/drift.dart';
-
 import '../local/database/app_database.dart';
 
 class TaskRepository {
@@ -7,55 +6,16 @@ class TaskRepository {
 
   TaskRepository(this._db);
 
-  Future<List<Task>> getAllTasks() {
-    return _db.select(_db.tasks).get();
-  }
-
-  Future<Task> getTaskById(int id) {
-    return (_db.select(_db.tasks)..where((t) => t.id.equals(id))).getSingle();
-  }
-
   Stream<List<Task>> watchAllTasks() {
     return _db.select(_db.tasks).watch();
   }
 
-  Future<int> insertTaskWithTags(TasksCompanion task, List<int> tagIds) {
-    return _db.transaction(() async {
-      final taskId = await _db.into(_db.tasks).insert(task);
-      for (final tagId in tagIds) {
-        await _db.into(_db.taskTags).insert(
-              TaskTagsCompanion.insert(
-                taskId: taskId,
-                tagId: tagId,
-              ),
-            );
-      }
-      return taskId;
-    });
+  Future<int> deleteTask(Task task) {
+    return _db.delete(_db.tasks).delete(task);
   }
 
-  Future<int> insertTask(TasksCompanion task) {
-    return _db.into(_db.tasks).insert(task);
-  }
-
-  Future<void> updateTaskWithTags(Task task, List<int> tagIds) {
-    return _db.transaction(() async {
-      await _db.update(_db.tasks).replace(task);
-      await (_db.delete(_db.taskTags)..where((t) => t.taskId.equals(task.id)))
-          .go();
-      for (final tagId in tagIds) {
-        await _db.into(_db.taskTags).insert(
-              TaskTagsCompanion.insert(
-                taskId: task.id,
-                tagId: tagId,
-              ),
-            );
-      }
-    });
-  }
-
-  Future<bool> updateTask(Task task) {
-    return _db.update(_db.tasks).replace(task);
+  Future<int> deleteTaskById(int id) {
+    return (_db.delete(_db.tasks)..where((t) => t.id.equals(id))).go();
   }
 
   Future<List<int>> getTagIdsForTask(int taskId) async {
@@ -71,30 +31,11 @@ class TaskRepository {
     return query.watch().map((rows) => rows.map((row) => row.tagId).toList());
   }
 
-  Future<int> deleteTaskById(int id) {
-    return _db.transaction(() async {
-      await (_db.delete(_db.taskTags)..where((t) => t.taskId.equals(id))).go();
-      await (_db.delete(_db.subtasks)..where((s) => s.taskId.equals(id))).go();
-      return await (_db.delete(_db.tasks)..where((t) => t.id.equals(id))).go();
-    });
-  }
-
-  Future<int> deleteTask(Task task) {
-    return _db.transaction(() async {
-      await (_db.delete(_db.taskTags)..where((t) => t.taskId.equals(task.id)))
-          .go();
-      await (_db.delete(_db.subtasks)..where((s) => s.taskId.equals(task.id)))
-          .go();
-      return await (_db.delete(_db.tasks)..where((t) => t.id.equals(task.id)))
-          .go();
-    });
-  }
-
   Future<List<Subtask>> getSubtasksForTask(int taskId) {
     return (_db.select(_db.subtasks)
           ..where((t) => t.taskId.equals(taskId))
           ..orderBy([
-            (t) => OrderingTerm(expression: t.order, mode: OrderingMode.asc),
+            (t) => OrderingTerm(expression: t.position, mode: OrderingMode.asc),
             (t) => OrderingTerm(expression: t.id, mode: OrderingMode.asc),
           ]))
         .get();
@@ -104,23 +45,63 @@ class TaskRepository {
     return (_db.select(_db.subtasks)
           ..where((t) => t.taskId.equals(taskId))
           ..orderBy([
-            (t) => OrderingTerm(expression: t.order, mode: OrderingMode.asc),
+            (t) => OrderingTerm(expression: t.position, mode: OrderingMode.asc),
             (t) => OrderingTerm(expression: t.id, mode: OrderingMode.asc),
           ]))
         .watch();
   }
 
-  Future<int> insertSubtask(int parentId, SubtasksCompanion subtask) {
-    return _db.into(_db.subtasks).insert(
-          subtask.copyWith(taskId: Value(parentId)),
-        );
+  Future<int> insertTask(
+    TasksCompanion task, {
+    List<int> tagIds = const [],
+    List<SubtasksCompanion> subtasks = const [],
+  }) {
+    return _db.transaction(() async {
+      final taskId = await _db.into(_db.tasks).insert(task);
+
+      for (final tagId in tagIds) {
+        await _db.into(_db.taskTags).insert(
+              TaskTagsCompanion.insert(taskId: taskId, tagId: tagId),
+            );
+      }
+
+      for (final subtask in subtasks) {
+        await _db.into(_db.subtasks).insert(
+              subtask.copyWith(taskId: Value(taskId)),
+            );
+      }
+
+      return taskId;
+    });
   }
 
-  Future<bool> updateSubtask(Subtask subtask) {
-    return _db.update(_db.subtasks).replace(subtask);
+  Future<void> updateTask(
+    Task task, {
+    List<int> tagIds = const [],
+    List<SubtasksCompanion> subtasks = const [],
+  }) {
+    return _db.transaction(() async {
+      await _db.update(_db.tasks).replace(task);
+
+      await (_db.delete(_db.taskTags)..where((t) => t.taskId.equals(task.id)))
+          .go();
+      for (final tagId in tagIds) {
+        await _db.into(_db.taskTags).insert(
+              TaskTagsCompanion.insert(taskId: task.id, tagId: tagId),
+            );
+      }
+
+      await (_db.delete(_db.subtasks)..where((t) => t.taskId.equals(task.id)))
+          .go();
+      for (final subtask in subtasks) {
+        await _db.into(_db.subtasks).insert(
+              subtask.copyWith(taskId: Value(task.id)),
+            );
+      }
+    });
   }
 
-  Future<int> deleteSubtaskById(int id) {
-    return (_db.delete(_db.subtasks)..where((s) => s.id.equals(id))).go();
+  Future<bool> updateTaskBasic(Task task) {
+    return _db.update(_db.tasks).replace(task);
   }
 }
