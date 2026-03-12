@@ -86,7 +86,7 @@ class _TaskFormMobileState extends ConsumerState<TaskFormMobile>
                       onRemove: removeChecklistItem,
                       onReorder: reorderChecklist,
                     ),
-                    const _TaskNotesTab(),
+                    _TaskNotesTab(notesController: notesController),
                   ],
                 ),
               ),
@@ -708,15 +708,33 @@ class _InlineChecklistRowState extends State<_InlineChecklistRow> {
 }
 
 class _TaskNotesTab extends StatelessWidget {
-  const _TaskNotesTab();
+  final TextEditingController notesController;
+
+  const _TaskNotesTab({required this.notesController});
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Text(
-        'Módulo de notas en desarrollo...',
-        style: TextStyle(color: Color(0xFF94A3B8)),
-      ),
-    );
+    return Padding(
+        padding: const EdgeInsets.all(16),
+        child: TextField(
+          controller: notesController,
+          textCapitalization: TextCapitalization.sentences,
+          maxLines: null,
+          expands: true,
+          textAlignVertical: TextAlignVertical.top,
+          decoration: InputDecoration(
+            hintText: 'Añade cualquier información adicional sobre la tarea',
+            hintStyle: const TextStyle(color: Color(0xFF94A3B8)),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Color(0xFF6366F1), width: 2),
+            ),
+            contentPadding: const EdgeInsets.all(16),
+          ),
+        ));
   }
 }

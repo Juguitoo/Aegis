@@ -149,13 +149,50 @@ class _TaskFormDesktopState extends ConsumerState<TaskFormDesktop>
                                     border: Border.all(
                                         color: const Color(0xFFE2E8F0)),
                                   ),
-                                  child: const Center(
-                                    child: Text(
-                                      'Módulo de notas en desarrollo...',
-                                      style:
-                                          TextStyle(color: Color(0xFF94A3B8)),
-                                    ),
-                                  ),
+                                  child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.stretch,
+                                      children: [
+                                        const Text(
+                                          "Notas",
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                            color: Color(0xFF1E293B),
+                                          ),
+                                        ),
+                                        const SizedBox(height: 16),
+                                        Expanded(
+                                          child: TextField(
+                                            controller: notesController,
+                                            textCapitalization:
+                                                TextCapitalization.sentences,
+                                            maxLines: null,
+                                            expands: true,
+                                            textAlignVertical:
+                                                TextAlignVertical.top,
+                                            decoration: InputDecoration(
+                                              hintText:
+                                                  'Añade cualquier información adicional sobre la tarea',
+                                              hintStyle: const TextStyle(
+                                                  color: Color(0xFF94A3B8)),
+                                              border: OutlineInputBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                                borderSide: const BorderSide(
+                                                    color: Color(0xFFCBD5E1)),
+                                              ),
+                                              focusedBorder: OutlineInputBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                                borderSide: const BorderSide(
+                                                    color: Color(0xFF6366F1),
+                                                    width: 2),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ]),
                                 ),
                               ),
                             ],
@@ -569,8 +606,8 @@ class _TaskChecklistColumn extends StatelessWidget {
                         value: value,
                         backgroundColor: const Color(0xFFE2E8F0),
                         color: value == 1.0
-                            ? const Color(0xFF10B981) // Verde al completar
-                            : const Color(0xFF6366F1), // Índigo en progreso
+                            ? const Color(0xFF10B981)
+                            : const Color(0xFF6366F1),
                         minHeight: 6,
                       ),
                     ),

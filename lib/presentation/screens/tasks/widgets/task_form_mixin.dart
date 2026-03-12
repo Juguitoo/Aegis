@@ -11,6 +11,7 @@ mixin TaskFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
   final titleController = TextEditingController();
   final descriptionController = TextEditingController();
   final estimatedDurationController = TextEditingController();
+  final notesController = TextEditingController();
 
   DateTime? selectedDueDate;
   int? selectedProjectId;
@@ -35,6 +36,7 @@ mixin TaskFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
     if (task != null) {
       titleController.text = task.title;
       descriptionController.text = task.description ?? '';
+      notesController.text = task.notes ?? '';
       if (task.estimatedDuration != null) {
         estimatedDurationController.text = task.estimatedDuration.toString();
       }
@@ -150,6 +152,9 @@ mixin TaskFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
           priority: selectedPriority,
           tagIds: selectedTagIds,
           checklist: validChecklist,
+          notes: notesController.text.trim().isEmpty
+              ? null
+              : notesController.text.trim(),
         );
 
     if (mounted) Navigator.of(context).pop();
@@ -169,6 +174,7 @@ mixin TaskFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
       dueDate: Value(selectedDueDate),
       projectId: Value(selectedProjectId),
       priority: selectedPriority,
+      notes: Value(notesController.text.trim()),
     );
 
     final validChecklist =
@@ -194,6 +200,7 @@ mixin TaskFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
       titleController.clear();
       descriptionController.clear();
       estimatedDurationController.clear();
+      notesController.clear();
       selectedDueDate = null;
       selectedProjectId = null;
       selectedPriority = 0;
@@ -208,6 +215,7 @@ mixin TaskFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
     titleController.dispose();
     descriptionController.dispose();
     estimatedDurationController.dispose();
+    notesController.dispose();
     super.dispose();
   }
 }
