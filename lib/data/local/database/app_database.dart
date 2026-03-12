@@ -48,13 +48,58 @@ class Subtasks extends Table {
   IntColumn get position => integer().withDefault(const Constant(0))();
 }
 
-@DriftDatabase(tables: [Projects, Tasks, Tags, TaskTags, Subtasks])
+@DriftDatabase(tables: [Tasks, Projects, Tags, TaskTags, Subtasks])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
   AppDatabase.forTesting(super.e);
 
   @override
   int get schemaVersion => 1;
+
+  @override
+  MigrationStrategy get migration {
+    return MigrationStrategy(
+      onCreate: (Migrator m) async {
+        await m.createAll();
+
+        await batch((batch) {
+          batch.insertAll(projects, [
+            ProjectsCompanion.insert(
+              name: 'Personal',
+              colorHex: Value('#3B82F6'),
+            ),
+            ProjectsCompanion.insert(
+              name: 'Trabajo',
+              colorHex: Value('#10B981'),
+            ),
+            ProjectsCompanion.insert(
+              name: 'Estudios',
+              colorHex: Value('#8B5CF6'),
+            ),
+          ]);
+
+          batch.insertAll(tags, [
+            TagsCompanion.insert(
+              name: 'Urgente',
+              colorHex: Value('#EF4444'),
+            ),
+            TagsCompanion.insert(
+              name: 'Salud',
+              colorHex: Value('#EC4899'),
+            ),
+            TagsCompanion.insert(
+              name: 'Casa',
+              colorHex: Value('#F59E0B'),
+            ),
+            TagsCompanion.insert(
+              name: 'Ocio',
+              colorHex: Value('#06B6D4'),
+            ),
+          ]);
+        });
+      },
+    );
+  }
 }
 
 LazyDatabase _openConnection() {
