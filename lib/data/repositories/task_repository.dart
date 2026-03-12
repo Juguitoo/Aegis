@@ -11,11 +11,21 @@ class TaskRepository {
   }
 
   Future<int> deleteTask(Task task) {
-    return _db.delete(_db.tasks).delete(task);
+    return _db.transaction(() async {
+      await (_db.delete(_db.taskTags)..where((t) => t.taskId.equals(task.id)))
+          .go();
+      await (_db.delete(_db.subtasks)..where((t) => t.taskId.equals(task.id)))
+          .go();
+      return await _db.delete(_db.tasks).delete(task);
+    });
   }
 
   Future<int> deleteTaskById(int id) {
-    return (_db.delete(_db.tasks)..where((t) => t.id.equals(id))).go();
+    return _db.transaction(() async {
+      await (_db.delete(_db.taskTags)..where((t) => t.taskId.equals(id))).go();
+      await (_db.delete(_db.subtasks)..where((t) => t.taskId.equals(id))).go();
+      return await (_db.delete(_db.tasks)..where((t) => t.id.equals(id))).go();
+    });
   }
 
   Future<List<int>> getTagIdsForTask(int taskId) async {

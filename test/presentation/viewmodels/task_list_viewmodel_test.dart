@@ -1,4 +1,3 @@
-import 'package:drift/drift.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -34,6 +33,8 @@ void main() {
   setUpAll(() {
     registerFallbackValue(FakeTask());
     registerFallbackValue(FakeTasksCompanion());
+    registerFallbackValue(<int>[]);
+    registerFallbackValue(<SubtasksCompanion>[]);
   });
 
   setUp(() {
@@ -110,37 +111,62 @@ void main() {
   });
 
   group('TaskListViewModel Methods', () {
-    test('Debe llamar al repositorio al añadir tarea con etiquetas', () async {
-      final companion =
-          const TasksCompanion(title: Value('Nueva'), priority: Value(0));
-      when(() => mockRepository.insertTaskWithTags(any(), any()))
-          .thenAnswer((_) async => 5);
+    test('Debe fabricar los Companions y llamar al repositorio al añadir tarea',
+        () async {
+      when(() => mockRepository.insertTask(
+            any(),
+            tagIds: any(named: 'tagIds'),
+            subtasks: any(named: 'subtasks'),
+          )).thenAnswer((_) async => 5);
 
-      await container
-          .read(taskListViewModelProvider.notifier)
-          .addTaskWithTags(companion, [1, 2]);
-      verify(() => mockRepository.insertTaskWithTags(companion, [1, 2]))
-          .called(1);
+      await container.read(taskListViewModelProvider.notifier).addTask(
+        title: 'Nueva Tarea',
+        priority: 1,
+        tagIds: [1, 2],
+        checklist: [TaskChecklistItem(title: 'Primer paso')],
+      );
+
+      final captured = verify(() => mockRepository.insertTask(
+            captureAny(),
+            tagIds: captureAny(named: 'tagIds'),
+            subtasks: captureAny(named: 'subtasks'),
+          )).captured;
+
+      final taskCompanion = captured[0] as TasksCompanion;
+      final tagsPassed = captured[1] as List<int>;
+      final subtasksPassed = captured[2] as List<SubtasksCompanion>;
+
+      expect(taskCompanion.title.value, 'Nueva Tarea');
+      expect(tagsPassed, [1, 2]);
+      expect(subtasksPassed.length, 1);
+      expect(subtasksPassed.first.title.value, 'Primer paso');
+      expect(subtasksPassed.first.position.value,
+          0); // Verifica que el ViewModel le asignó posición
     });
 
     test('Debe llamar al repositorio al eliminar una tarea', () async {
       when(() => mockRepository.deleteTask(any())).thenAnswer((_) async => 1);
+
       await container
           .read(taskListViewModelProvider.notifier)
           .deleteTask(task1);
+
       verify(() => mockRepository.deleteTask(task1)).called(1);
     });
 
-    test('Debe hacer toggle de isCompleted y actualizar la tarea', () async {
-      when(() => mockRepository.updateTask(any()))
+    test('Debe hacer toggle de isCompleted y actualizar usando updateTaskBasic',
+        () async {
+      when(() => mockRepository.updateTaskBasic(any()))
           .thenAnswer((_) async => true);
+
       await container
           .read(taskListViewModelProvider.notifier)
           .toggleTaskCompletion(task1);
 
       final captured =
-          verify(() => mockRepository.updateTask(captureAny())).captured;
+          verify(() => mockRepository.updateTaskBasic(captureAny())).captured;
       final updatedTask = captured.first as Task;
+
       expect(updatedTask.isCompleted, true);
     });
   });

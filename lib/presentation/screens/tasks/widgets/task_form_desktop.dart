@@ -543,29 +543,84 @@ class _TaskChecklistColumn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ReorderableListView.builder(
-      itemCount: checklist.length,
-      buildDefaultDragHandles: false,
-      onReorder: (oldIndex, newIndex) {
-        final lastIndex = checklist.length - 1;
-        if (oldIndex == lastIndex) return;
-        if (newIndex > lastIndex) newIndex = lastIndex;
-        onReorder(oldIndex, newIndex);
-      },
-      itemBuilder: (context, index) {
-        final item = checklist[index];
-        final isLastEmpty = index == checklist.length - 1 && item.title.isEmpty;
+    final validItems =
+        checklist.where((item) => item.title.trim().isNotEmpty).toList();
+    final total = validItems.length;
+    final completed = validItems.where((item) => item.isCompleted).length;
+    final progress = total == 0 ? 0.0 : completed / total;
 
-        return _InlineChecklistRow(
-          key: ValueKey(item.localId),
-          index: index,
-          item: item,
-          isLastEmpty: isLastEmpty,
-          onChanged: (text) => onUpdate(index, text),
-          onToggle: () => onToggle(index),
-          onRemove: () => onRemove(index),
-        );
-      },
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        if (total > 0) ...[
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: TweenAnimationBuilder<double>(
+                      tween: Tween<double>(begin: 0, end: progress),
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeInOut,
+                      builder: (context, value, _) => LinearProgressIndicator(
+                        value: value,
+                        backgroundColor: const Color(0xFFE2E8F0),
+                        color: value == 1.0
+                            ? const Color(0xFF10B981) // Verde al completar
+                            : const Color(0xFF6366F1), // Índigo en progreso
+                        minHeight: 6,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Text(
+                  '$completed/$total',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: progress == 1.0
+                        ? const Color(0xFF10B981)
+                        : const Color(0xFF64748B),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const Divider(color: Color(0xFFE2E8F0), height: 1),
+          const SizedBox(height: 8),
+        ],
+        Expanded(
+          child: ReorderableListView.builder(
+            itemCount: checklist.length,
+            buildDefaultDragHandles: false,
+            onReorder: (oldIndex, newIndex) {
+              final lastIndex = checklist.length - 1;
+              if (oldIndex == lastIndex) return;
+              if (newIndex > lastIndex) newIndex = lastIndex;
+              onReorder(oldIndex, newIndex);
+            },
+            itemBuilder: (context, index) {
+              final item = checklist[index];
+              final isLastEmpty =
+                  index == checklist.length - 1 && item.title.isEmpty;
+
+              return _InlineChecklistRow(
+                key: ValueKey(item.localId),
+                index: index,
+                item: item,
+                isLastEmpty: isLastEmpty,
+                onChanged: (text) => onUpdate(index, text),
+                onToggle: () => onToggle(index),
+                onRemove: () => onRemove(index),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 }
