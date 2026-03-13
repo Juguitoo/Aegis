@@ -112,10 +112,18 @@ class _ManageTagsBottomSheetState extends ConsumerState<ManageTagsBottomSheet> {
                           IconButton(
                             icon: const Icon(Icons.delete_outline,
                                 color: Color(0xFFEF4444), size: 20),
-                            onPressed: () {
-                              ref
-                                  .read(tagListViewModelProvider.notifier)
-                                  .deleteTag(tag);
+                            onPressed: () async {
+                              try {
+                                ref
+                                    .read(tagListViewModelProvider.notifier)
+                                    .deleteTag(tag);
+                              } catch (e) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                        content: Text(
+                                            'Error al eliminar la etiqueta.')));
+                                return;
+                              }
                             },
                           ),
                         ],

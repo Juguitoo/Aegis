@@ -2,7 +2,6 @@ import 'package:aegis/core/utils/color_utils.dart';
 import 'package:aegis/presentation/viewmodels/tag_list_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:drift/drift.dart' as drift;
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import '../../../../data/local/database/app_database.dart';
 
@@ -254,11 +253,19 @@ class _TagFormDialogState extends ConsumerState<TagFormDialog> {
           children: [
             Expanded(
               child: ElevatedButton(
-                onPressed: () {
-                  if (isEditing) {
-                    ref
-                        .read(tagListViewModelProvider.notifier)
-                        .deleteTag(widget.existingTag!);
+                onPressed: () async {
+                  try {
+                    if (isEditing) {
+                      ref
+                          .read(tagListViewModelProvider.notifier)
+                          .deleteTag(widget.existingTag!);
+                    }
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                          content: Text('Error al eliminar la etiqueta')),
+                    );
+                    return;
                   }
                   Navigator.pop(context);
                 },
@@ -274,37 +281,43 @@ class _TagFormDialogState extends ConsumerState<TagFormDialog> {
             ),
             Expanded(
               child: ElevatedButton(
-                onPressed: () {
-                  if (nameController.text.trim().isNotEmpty) {
-                    final hexToSave = ColorUtils.colorToHex(selectedColor);
-                    final description = descriptionController.text.trim();
+                onPressed: () async {
+                  try {
+                    if (nameController.text.trim().isNotEmpty) {
+                      final hexToSave = ColorUtils.colorToHex(selectedColor);
+                      final description = descriptionController.text.trim();
 
-                    if (isEditing) {
-                      final updatedTag = Tag(
-                        id: widget.existingTag!.id,
-                        name: nameController.text.trim(),
-                        colorHex: hexToSave,
-                        description: description,
-                      );
-                      ref
-                          .read(tagListViewModelProvider.notifier)
-                          .updateTag(updatedTag);
+                      if (isEditing) {
+                        final updatedTag = Tag(
+                          id: widget.existingTag!.id,
+                          name: nameController.text.trim(),
+                          colorHex: hexToSave,
+                          description: description,
+                        );
+                        ref
+                            .read(tagListViewModelProvider.notifier)
+                            .updateTag(updatedTag);
+                      } else {
+                        ref.read(tagListViewModelProvider.notifier).addTag(
+                              nameController.text.trim(),
+                              hexToSave,
+                              description,
+                            );
+                      }
+                      Navigator.pop(context);
                     } else {
-                      ref.read(tagListViewModelProvider.notifier).addTag(
-                            TagsCompanion.insert(
-                              name: nameController.text.trim(),
-                              colorHex: drift.Value(hexToSave),
-                              description: drift.Value(description),
-                            ),
-                          );
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content:
+                                Text('El nombre del proyecto es obligatorio')),
+                      );
                     }
-                    Navigator.pop(context);
-                  } else {
+                  } catch (e) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                          content:
-                              Text('El nombre del proyecto es obligatorio')),
+                          content: Text('Error al guardar la etiqueta')),
                     );
+                    return;
                   }
                 },
                 style: ElevatedButton.styleFrom(

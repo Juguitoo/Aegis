@@ -183,10 +183,18 @@ class TaskRow extends ConsumerWidget {
                           width: 48,
                           child: Checkbox(
                             value: isCompleted,
-                            onChanged: (val) {
-                              ref
-                                  .read(taskListViewModelProvider.notifier)
-                                  .toggleTaskCompletion(task);
+                            onChanged: (val) async {
+                              try {
+                                ref
+                                    .read(taskListViewModelProvider.notifier)
+                                    .toggleTaskCompletion(task);
+                              } catch (e) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                      content: Text(
+                                          'Error al actualizar tarea: $e')),
+                                );
+                              }
                             },
                             activeColor: const Color(0xFF6366F1),
                             shape: RoundedRectangleBorder(
@@ -197,10 +205,8 @@ class TaskRow extends ConsumerWidget {
                           flex: 4,
                           child: Text(
                             task.title,
-                            maxLines:
-                                2, // <-- Evita que un texto infinito rompa la tabla hacia abajo
-                            overflow: TextOverflow
-                                .ellipsis, // <-- Pone "..." si no cabe
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               color: isCompleted
                                   ? const Color(0xFF94A3B8)
@@ -212,7 +218,7 @@ class TaskRow extends ConsumerWidget {
                             ),
                           ),
                         ),
-                        const SizedBox(width: 16), // <--- NUEVO MARGEN
+                        const SizedBox(width: 16),
                         Expanded(
                           flex: 4,
                           child: Align(
@@ -264,7 +270,7 @@ class TaskRow extends ConsumerWidget {
                             ),
                           ),
                         ),
-                        const SizedBox(width: 16), // <--- NUEVO MARGEN
+                        const SizedBox(width: 16),
                         Expanded(
                           flex: 2,
                           child: Text(
@@ -290,9 +296,18 @@ class TaskRow extends ConsumerWidget {
                                       TaskFormDesktop(task: task),
                                 );
                               } else if (value == 1) {
-                                ref
-                                    .read(taskListViewModelProvider.notifier)
-                                    .deleteTask(task);
+                                try {
+                                  ref
+                                      .read(taskListViewModelProvider.notifier)
+                                      .deleteTask(task);
+                                } catch (e) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                        content:
+                                            Text('Error al eliminar tarea.')),
+                                  );
+                                  return;
+                                }
                               }
                             },
                             itemBuilder: (context) => [

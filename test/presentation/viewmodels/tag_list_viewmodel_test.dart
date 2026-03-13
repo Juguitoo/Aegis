@@ -1,4 +1,3 @@
-import 'package:drift/drift.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -56,12 +55,20 @@ void main() {
     });
 
     test('addTag debe llamar a insertTag del repositorio', () async {
-      final companion = const TagsCompanion(name: Value('Llamada'));
       when(() => mockRepository.insertTag(any())).thenAnswer((_) async => 3);
 
-      await container.read(tagListViewModelProvider.notifier).addTag(companion);
+      await container
+          .read(tagListViewModelProvider.notifier)
+          .addTag('Llamada', '#10B981', 'Etiqueta para llamadas telefónicas');
 
-      verify(() => mockRepository.insertTag(companion)).called(1);
+      final captured =
+          verify(() => mockRepository.insertTag(captureAny())).captured;
+      final capturedCompanion = captured.first as TagsCompanion;
+
+      expect(capturedCompanion.name.value, 'Llamada');
+      expect(capturedCompanion.colorHex.value, '#10B981');
+      expect(capturedCompanion.description.value,
+          'Etiqueta para llamadas telefónicas');
     });
 
     test('updateTag debe llamar a updateTag del repositorio', () async {

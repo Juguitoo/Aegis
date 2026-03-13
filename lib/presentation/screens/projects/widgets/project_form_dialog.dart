@@ -1,7 +1,6 @@
 import 'package:aegis/core/utils/color_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:drift/drift.dart' as drift;
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import '../../../../data/local/database/app_database.dart';
 import '../../../viewmodels/project_list_viewmodel.dart';
@@ -254,11 +253,18 @@ class _ProjectFormDialogState extends ConsumerState<ProjectFormDialog> {
           children: [
             Expanded(
               child: ElevatedButton(
-                onPressed: () {
-                  if (isEditing) {
-                    ref
-                        .read(projectListViewModelProvider.notifier)
-                        .deleteProject(widget.existingProject!);
+                onPressed: () async {
+                  try {
+                    if (isEditing) {
+                      ref
+                          .read(projectListViewModelProvider.notifier)
+                          .deleteProject(widget.existingProject!);
+                    }
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                          content: Text('Error al eliminar el proyecto')),
+                    );
                   }
                   Navigator.pop(context);
                 },
@@ -274,39 +280,45 @@ class _ProjectFormDialogState extends ConsumerState<ProjectFormDialog> {
             ),
             Expanded(
               child: ElevatedButton(
-                onPressed: () {
-                  if (nameController.text.trim().isNotEmpty) {
-                    final hexToSave = ColorUtils.colorToHex(selectedColor);
-                    final description = descriptionController.text.trim();
+                onPressed: () async {
+                  try {
+                    if (nameController.text.trim().isNotEmpty) {
+                      final hexToSave = ColorUtils.colorToHex(selectedColor);
+                      final description = descriptionController.text.trim();
 
-                    if (isEditing) {
-                      final updatedProject = Project(
-                        id: widget.existingProject!.id,
-                        name: nameController.text.trim(),
-                        colorHex: hexToSave,
-                        description: description,
-                      );
-                      ref
-                          .read(projectListViewModelProvider.notifier)
-                          .updateProject(updatedProject);
+                      if (isEditing) {
+                        final updatedProject = Project(
+                          id: widget.existingProject!.id,
+                          name: nameController.text.trim(),
+                          colorHex: hexToSave,
+                          description: description,
+                        );
+                        ref
+                            .read(projectListViewModelProvider.notifier)
+                            .updateProject(updatedProject);
+                      } else {
+                        ref
+                            .read(projectListViewModelProvider.notifier)
+                            .addProject(
+                              nameController.text.trim(),
+                              hexToSave,
+                              description,
+                            );
+                      }
+                      Navigator.pop(context);
                     } else {
-                      ref
-                          .read(projectListViewModelProvider.notifier)
-                          .addProject(
-                            ProjectsCompanion.insert(
-                              name: nameController.text.trim(),
-                              colorHex: drift.Value(hexToSave),
-                              description: drift.Value(description),
-                            ),
-                          );
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content:
+                                Text('El nombre del proyecto es obligatorio')),
+                      );
                     }
-                    Navigator.pop(context);
-                  } else {
+                  } catch (e) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                          content:
-                              Text('El nombre del proyecto es obligatorio')),
+                          content: Text('Error al guardar el proyecto')),
                     );
+                    return;
                   }
                 },
                 style: ElevatedButton.styleFrom(

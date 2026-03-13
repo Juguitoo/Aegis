@@ -1,4 +1,3 @@
-import 'package:drift/drift.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -57,15 +56,20 @@ void main() {
     });
 
     test('addProject debe llamar a insertProject del repositorio', () async {
-      final companion = const ProjectsCompanion(name: Value('Gimnasio'));
       when(() => mockRepository.insertProject(any()))
           .thenAnswer((_) async => 3);
 
       await container
           .read(projectListViewModelProvider.notifier)
-          .addProject(companion);
+          .addProject('Gimnasio', '#FF0000', 'Proyecto para el gimnasio');
 
-      verify(() => mockRepository.insertProject(companion)).called(1);
+      final captured =
+          verify(() => mockRepository.insertProject(captureAny())).captured;
+      final capturedCompanion = captured.first as ProjectsCompanion;
+
+      expect(capturedCompanion.name.value, 'Gimnasio');
+      expect(capturedCompanion.colorHex.value, '#FF0000');
+      expect(capturedCompanion.description.value, 'Proyecto para el gimnasio');
     });
 
     test('updateProject debe llamar a updateProject del repositorio', () async {

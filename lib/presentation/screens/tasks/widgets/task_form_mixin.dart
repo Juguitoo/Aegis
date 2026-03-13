@@ -25,6 +25,19 @@ mixin TaskFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
     _loadInitialData();
   }
 
+  void _showSnackBar(String message, {bool isError = false}) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor:
+            isError ? const Color(0xFFDC2626) : const Color(0xFF10B981),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      ),
+    );
+  }
+
   void _ensureEmptyItem() {
     if (currentChecklist.isEmpty || currentChecklist.last.title.isNotEmpty) {
       currentChecklist.add(TaskChecklistItem(title: ''));
@@ -44,29 +57,35 @@ mixin TaskFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
       selectedProjectId = task.projectId;
       selectedPriority = task.priority;
 
-      final tags = await ref
-          .read(taskListViewModelProvider.notifier)
-          .getTagsForTask(task.id);
-      final subtasks =
-          await ref.read(taskRepositoryProvider).getSubtasksForTask(task.id);
+      try {
+        final tags = await ref
+            .read(taskListViewModelProvider.notifier)
+            .getTagsForTask(task.id);
+        final subtasks =
+            await ref.read(taskRepositoryProvider).getSubtasksForTask(task.id);
 
+        if (mounted) {
+          setState(() {
+            selectedTagIds = tags;
+            currentChecklist = subtasks
+                .map((st) => TaskChecklistItem(
+                      id: st.id,
+                      title: st.title,
+                      isCompleted: st.isCompleted,
+                    ))
+                .toList();
+            _ensureEmptyItem();
+          });
+        }
+      } catch (e) {
+        _showSnackBar('Error al cargar los datos de la tarea', isError: true);
+      }
+    } else {
       if (mounted) {
         setState(() {
-          selectedTagIds = tags;
-          currentChecklist = subtasks
-              .map((st) => TaskChecklistItem(
-                    id: st.id,
-                    title: st.title,
-                    isCompleted: st.isCompleted,
-                  ))
-              .toList();
           _ensureEmptyItem();
         });
       }
-    } else if (mounted) {
-      setState(() {
-        _ensureEmptyItem();
-      });
     }
   }
 
@@ -84,13 +103,6 @@ mixin TaskFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
     }
   }
 
-  void addChecklistItem(String title) {
-    if (title.trim().isEmpty) return;
-    setState(() {
-      currentChecklist.add(TaskChecklistItem(title: title.trim()));
-    });
-  }
-
   void toggleChecklistItem(int index) {
     final item = currentChecklist[index];
     setState(() {
@@ -98,6 +110,7 @@ mixin TaskFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
         id: item.id,
         title: item.title,
         isCompleted: !item.isCompleted,
+        localId: item.localId,
       );
     });
   }
@@ -110,13 +123,13 @@ mixin TaskFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
   }
 
   void updateChecklistItem(int index, String newTitle) {
-    if (newTitle.trim().isEmpty) return;
     final item = currentChecklist[index];
     setState(() {
       currentChecklist[index] = TaskChecklistItem(
         id: item.id,
-        title: newTitle.trim(),
+        title: newTitle,
         isCompleted: item.isCompleted,
+        localId: item.localId,
       );
       _ensureEmptyItem();
     });
@@ -134,7 +147,10 @@ mixin TaskFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
   }
 
   Future<void> saveTask() async {
-    if (titleController.text.trim().isEmpty) return;
+    if (titleController.text.trim().isEmpty) {
+      _showSnackBar('El título no puede estar vacío', isError: true);
+      return;
+    }
 
     final durationText = estimatedDurationController.text.trim();
     final duration =
@@ -143,25 +159,36 @@ mixin TaskFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
     final validChecklist =
         currentChecklist.where((item) => item.title.trim().isNotEmpty).toList();
 
-    await ref.read(taskListViewModelProvider.notifier).addTask(
-          title: titleController.text.trim(),
-          description: descriptionController.text.trim(),
-          estimatedDuration: duration,
-          dueDate: selectedDueDate,
-          projectId: selectedProjectId,
-          priority: selectedPriority,
-          tagIds: selectedTagIds,
-          checklist: validChecklist,
-          notes: notesController.text.trim().isEmpty
-              ? null
-              : notesController.text.trim(),
-        );
+    try {
+      await ref.read(taskListViewModelProvider.notifier).addTask(
+            title: titleController.text.trim(),
+            description: descriptionController.text.trim(),
+            notes: notesController.text.trim().isEmpty
+                ? null
+                : notesController.text.trim(),
+            estimatedDuration: duration,
+            dueDate: selectedDueDate,
+            projectId: selectedProjectId,
+            priority: selectedPriority,
+            tagIds: selectedTagIds,
+            checklist: validChecklist,
+          );
 
-    if (mounted) Navigator.of(context).pop();
+      if (mounted) {
+        Navigator.of(context).pop();
+        _showSnackBar('Tarea creada correctamente');
+      }
+    } catch (e) {
+      _showSnackBar('Error al crear la tarea. Inténtalo de nuevo.',
+          isError: true);
+    }
   }
 
   Future<void> updateTask() async {
-    if (titleController.text.trim().isEmpty || initialTask == null) return;
+    if (titleController.text.trim().isEmpty || initialTask == null) {
+      _showSnackBar('El título no puede estar vacío', isError: true);
+      return;
+    }
 
     final durationText = estimatedDurationController.text.trim();
     final duration =
@@ -170,29 +197,47 @@ mixin TaskFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
     final updatedTask = initialTask!.copyWith(
       title: titleController.text.trim(),
       description: Value(descriptionController.text.trim()),
+      notes: Value(notesController.text.trim()),
       estimatedDuration: Value(duration),
       dueDate: Value(selectedDueDate),
       projectId: Value(selectedProjectId),
       priority: selectedPriority,
-      notes: Value(notesController.text.trim()),
     );
 
     final validChecklist =
         currentChecklist.where((item) => item.title.trim().isNotEmpty).toList();
 
-    await ref.read(taskListViewModelProvider.notifier).updateTask(
-          task: updatedTask,
-          tagIds: selectedTagIds,
-          checklist: validChecklist,
-        );
+    try {
+      await ref.read(taskListViewModelProvider.notifier).updateTask(
+            task: updatedTask,
+            tagIds: selectedTagIds,
+            checklist: validChecklist,
+          );
 
-    if (mounted) Navigator.of(context).pop();
+      if (mounted) {
+        Navigator.of(context).pop();
+        _showSnackBar('Tarea actualizada correctamente');
+      }
+    } catch (e) {
+      _showSnackBar('Error al actualizar la tarea. Inténtalo de nuevo.',
+          isError: true);
+    }
   }
 
   Future<void> deleteTask() async {
     if (initialTask == null) return;
-    await ref.read(taskListViewModelProvider.notifier).deleteTask(initialTask!);
-    if (mounted) Navigator.of(context).pop();
+
+    try {
+      await ref
+          .read(taskListViewModelProvider.notifier)
+          .deleteTask(initialTask!);
+      if (mounted) {
+        Navigator.of(context).pop();
+        _showSnackBar('Tarea eliminada');
+      }
+    } catch (e) {
+      _showSnackBar('Error al eliminar la tarea', isError: true);
+    }
   }
 
   void clearTask() {

@@ -221,15 +221,31 @@ class _TaskListScreenMobileState extends ConsumerState<TaskListScreenMobile> {
                       final task = tasks[index];
                       return TaskCard(
                         task: task,
-                        onToggle: () {
-                          ref
-                              .read(taskListViewModelProvider.notifier)
-                              .toggleTaskCompletion(task);
+                        onToggle: () async {
+                          try {
+                            ref
+                                .read(taskListViewModelProvider.notifier)
+                                .toggleTaskCompletion(task);
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                  content: Text('Error al actualizar tarea.')),
+                            );
+                          }
                         },
                         onTap: () => _openTaskForm(task),
-                        onDelete: () => ref
-                            .read(taskListViewModelProvider.notifier)
-                            .deleteTask(task),
+                        onDelete: () async {
+                          try {
+                            ref
+                                .read(taskListViewModelProvider.notifier)
+                                .deleteTask(task);
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                  content: Text('Error al eliminar tarea.')),
+                            );
+                          }
+                        },
                       );
                     },
                   ),
