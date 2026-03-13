@@ -13,7 +13,6 @@ void main() {
   late ProjectRepository projectRepo;
 
   setUp(() {
-    // AQUÍ ESTÁ EL TRUCO PARA LOS TESTS: Encendemos el borrado en cascada (Foreign Keys)
     db = AppDatabase.forTesting(NativeDatabase.memory(
       setup: (db) {
         db.execute('PRAGMA foreign_keys = ON;');
@@ -46,7 +45,6 @@ void main() {
       var taskTags = await taskRepo.getTagIdsForTask(taskId);
       expect(taskTags.length, 1);
 
-      // Filtramos por ID para no chocar con las etiquetas del Seed
       final tag = await (db.select(db.tags)..where((t) => t.id.equals(tagId)))
           .getSingle();
       await tagRepo.deleteTag(tag);
@@ -97,7 +95,6 @@ void main() {
           .getSingle();
       expect(task.projectId, projectId);
 
-      // Filtramos por ID para no chocar con los proyectos del Seed
       final project = await (db.select(db.projects)
             ..where((p) => p.id.equals(projectId)))
           .getSingle();
@@ -114,7 +111,7 @@ void main() {
         'Debe guardar una tarea junto con sus subtareas en una sola transacción',
         () async {
       final taskId = await taskRepo.insertTask(
-        const TasksCompanion(title: Value('Comprar la compra')),
+        const TasksCompanion(title: Value('Hacer la compra')),
         subtasks: [
           const SubtasksCompanion(title: Value('Leche'), position: Value(0)),
           const SubtasksCompanion(title: Value('Huevos'), position: Value(1)),
