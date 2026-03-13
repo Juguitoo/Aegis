@@ -9,8 +9,8 @@ import 'package:aegis/presentation/screens/projects/widgets/manage_projects_bott
 import 'package:aegis/presentation/screens/tags/widgets/manage_tags_bottom_sheet.dart';
 import 'package:aegis/presentation/screens/tags/widgets/tag_multi_selector.dart';
 
-class FilterControls extends ConsumerWidget {
-  const FilterControls({super.key});
+class DesktopFilterControls extends ConsumerWidget {
+  const DesktopFilterControls({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -39,45 +39,19 @@ class FilterControls extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // 1. FILA DE BÚSQUEDA Y BOTÓN DE AJUSTES
         Row(
-          children: [
+          children: const [
             Expanded(
-              child: Container(
-                height: 48,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: const Color(0xFFF1F5F9)),
-                ),
-                child: const Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        decoration: InputDecoration(
-                          hintText: 'Buscar tarea...',
-                          hintStyle: TextStyle(color: Color(0xFF94A3B8)),
-                          border: InputBorder.none,
-                        ),
-                      ),
-                    ),
-                    Icon(Icons.search, color: Color(0xFF6366F1)),
-                  ],
-                ),
-              ),
+              child: _DesktopSearchBar(),
             ),
-            const SizedBox(width: 12),
-            const FilterIconButton(),
+            SizedBox(width: 12),
+            FilterIconButton(),
           ],
         ),
         const SizedBox(height: 16),
-
-        // 2. TOOLBAR: FILTROS ACTIVOS (Izquierda) + BOTONES DE ACCIÓN (Derecha)
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Contenedor de Píldoras
             Expanded(
               child: Wrap(
                 spacing: 8,
@@ -127,8 +101,6 @@ class FilterControls extends ConsumerWidget {
                         ],
                       ),
                     ),
-
-                  // Píldoras de Etiquetas Activas
                   if (selectedTagIds.isNotEmpty)
                     ...tagsAsync.maybeWhen(
                       data: (allTags) {
@@ -185,8 +157,6 @@ class FilterControls extends ConsumerWidget {
                 ],
               ),
             ),
-
-            // Botones de Acción
             const _ActionButtonsRow(),
           ],
         ),
@@ -434,7 +404,6 @@ class TaskFiltersDialog extends ConsumerWidget {
                   fontWeight: FontWeight.w600, color: Color(0xFF64748B)),
             ),
             const SizedBox(height: 8),
-            // AQUÍ INYECTAMOS EL SELECTOR MULTIPLE PARA FILTROS
             TagMultiSelector(
               initialSelectedIds: selectedTagIds,
               onTagsChanged: (newTags) {
@@ -448,8 +417,7 @@ class TaskFiltersDialog extends ConsumerWidget {
         TextButton(
           onPressed: () {
             ref.read(projectFilterProvider.notifier).state = null;
-            ref.read(tagFilterProvider.notifier).state =
-                []; // Limpia también las etiquetas
+            ref.read(tagFilterProvider.notifier).state = [];
           },
           child: const Text('Limpiar filtros',
               style: TextStyle(color: Color(0xFF64748B))),
@@ -465,6 +433,60 @@ class TaskFiltersDialog extends ConsumerWidget {
           child: const Text('Aplicar y Cerrar'),
         ),
       ],
+    );
+  }
+}
+
+class _DesktopSearchBar extends ConsumerStatefulWidget {
+  const _DesktopSearchBar();
+
+  @override
+  ConsumerState<_DesktopSearchBar> createState() => _DesktopSearchBarState();
+}
+
+class _DesktopSearchBarState extends ConsumerState<_DesktopSearchBar> {
+  final TextEditingController _controller = TextEditingController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _search() {
+    ref.read(searchQueryProvider.notifier).state = _controller.text;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 48,
+      padding: const EdgeInsets.only(left: 16, right: 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFFF1F5F9)),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: _controller,
+              textInputAction: TextInputAction.search,
+              onSubmitted: (_) => _search(),
+              decoration: const InputDecoration(
+                hintText: 'Buscar tarea...',
+                hintStyle: TextStyle(color: Color(0xFF94A3B8)),
+                border: InputBorder.none,
+              ),
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.search, color: Color(0xFF6366F1)),
+            onPressed: _search,
+          ),
+        ],
+      ),
     );
   }
 }

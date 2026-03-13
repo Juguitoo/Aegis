@@ -24,6 +24,7 @@ class TaskChecklistItem {
 
 final projectFilterProvider = StateProvider<int?>((ref) => null);
 final tagFilterProvider = StateProvider<List<int>>((ref) => []);
+final searchQueryProvider = StateProvider<String>((ref) => '');
 
 class TaskListViewModel extends StreamNotifier<List<Task>> {
   TaskRepository get _repository => ref.read(taskRepositoryProvider);
@@ -32,6 +33,7 @@ class TaskListViewModel extends StreamNotifier<List<Task>> {
   Stream<List<Task>> build() {
     final selectedProjectId = ref.watch(projectFilterProvider);
     final selectedTagIds = ref.watch(tagFilterProvider);
+    final searchQuery = ref.watch(searchQueryProvider);
 
     return ref
         .watch(taskRepositoryProvider)
@@ -44,6 +46,13 @@ class TaskListViewModel extends StreamNotifier<List<Task>> {
       } else if (selectedProjectId != null) {
         filteredTasks =
             tasks.where((t) => t.projectId == selectedProjectId).toList();
+      }
+
+      if (searchQuery.isNotEmpty) {
+        final query = searchQuery.toLowerCase();
+        filteredTasks = filteredTasks
+            .where((t) => t.title.toLowerCase().contains(query))
+            .toList();
       }
 
       if (selectedTagIds.isNotEmpty) {

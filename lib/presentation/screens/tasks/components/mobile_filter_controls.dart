@@ -40,36 +40,8 @@ class MobileFilterControls extends ConsumerWidget {
         children: [
           Row(
             children: [
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  height: 48,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(24),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withAlpha(7),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: const Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          decoration: InputDecoration(
-                            hintText: 'Buscar tarea...',
-                            hintStyle: TextStyle(color: Color(0xFF94A3B8)),
-                            border: InputBorder.none,
-                          ),
-                        ),
-                      ),
-                      Icon(Icons.search, color: Color(0xFF6366F1)),
-                    ],
-                  ),
-                ),
+              const Expanded(
+                child: _MobileSearchBar(),
               ),
               const SizedBox(width: 12),
               GestureDetector(
@@ -101,8 +73,6 @@ class MobileFilterControls extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: 16),
-
-          // Fila de píldoras activas (Horizontal en móvil)
           if (activeProjectName != null || selectedTagIds.isNotEmpty)
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
@@ -204,7 +174,6 @@ class MobileFilterControls extends ConsumerWidget {
                 ],
               ),
             ),
-
           const SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             padding: EdgeInsets.only(bottom: 8),
@@ -354,8 +323,7 @@ class MobileTaskFiltersBottomSheet extends ConsumerWidget {
                 child: TextButton(
                   onPressed: () {
                     ref.read(projectFilterProvider.notifier).state = null;
-                    ref.read(tagFilterProvider.notifier).state =
-                        []; // Limpia etiquetas
+                    ref.read(tagFilterProvider.notifier).state = [];
                     Navigator.pop(context);
                   },
                   child: const Text('Limpiar',
@@ -405,6 +373,66 @@ class _FilterChip extends StatelessWidget {
           fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
           fontSize: 13,
         ),
+      ),
+    );
+  }
+}
+
+class _MobileSearchBar extends ConsumerStatefulWidget {
+  const _MobileSearchBar();
+
+  @override
+  ConsumerState<_MobileSearchBar> createState() => _MobileSearchBarState();
+}
+
+class _MobileSearchBarState extends ConsumerState<_MobileSearchBar> {
+  final TextEditingController _controller = TextEditingController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _search() {
+    ref.read(searchQueryProvider.notifier).state = _controller.text;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.only(left: 16, right: 8),
+      height: 48,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(7),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: _controller,
+              textInputAction: TextInputAction.search,
+              onSubmitted: (_) => _search(),
+              decoration: const InputDecoration(
+                hintText: 'Buscar tarea...',
+                hintStyle: TextStyle(color: Color(0xFF94A3B8)),
+                border: InputBorder.none,
+              ),
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.search, color: Color(0xFF6366F1)),
+            onPressed: _search,
+          ),
+        ],
       ),
     );
   }

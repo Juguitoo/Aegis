@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:aegis/presentation/screens/main_desktop_layout.dart';
 
 import 'components/task_table_view.dart';
-import 'components/filter_controls.dart';
+import 'components/desktop_filter_controls.dart';
 import 'components/desktop_widgets_sidebar.dart';
 
 class TaskListScreenDesktop extends StatelessWidget {
@@ -35,7 +35,7 @@ class TaskListScreenDesktop extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: const [
-                        FilterControls(),
+                        DesktopFilterControls(),
                         SizedBox(height: 16),
                         Expanded(child: TaskTableView()),
                       ],
