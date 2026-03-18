@@ -1,4 +1,5 @@
 import 'package:aegis/data/repositories/project_repository.dart';
+import 'package:aegis/data/repositories/settings_repository.dart';
 import 'package:aegis/data/repositories/tag_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/repositories/task_repository.dart';
@@ -17,4 +18,9 @@ final projectRepositoryProvider = Provider<ProjectRepository>((ref) {
 final tagRepositoryProvider = Provider<TagRepository>((ref) {
   final database = ref.watch(databaseProvider);
   return TagRepository(database);
+});
+
+final settingsRepositoryProvider = Provider<SettingsRepository>((ref) {
+  final database = ref.watch(databaseProvider);
+  return SettingsRepository(database);
 });

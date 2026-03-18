@@ -1507,6 +1507,279 @@ class SubtasksCompanion extends UpdateCompanion<Subtask> {
   }
 }
 
+class $SettingsTable extends Settings with TableInfo<$SettingsTable, Setting> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $SettingsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+      'id', aliasedName, false,
+      hasAutoIncrement: true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+  static const VerificationMeta _pomodoroDurationMeta =
+      const VerificationMeta('pomodoroDuration');
+  @override
+  late final GeneratedColumn<int> pomodoroDuration = GeneratedColumn<int>(
+      'pomodoro_duration', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(25));
+  static const VerificationMeta _shortBreakDurationMeta =
+      const VerificationMeta('shortBreakDuration');
+  @override
+  late final GeneratedColumn<int> shortBreakDuration = GeneratedColumn<int>(
+      'short_break_duration', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(5));
+  static const VerificationMeta _longBreakDurationMeta =
+      const VerificationMeta('longBreakDuration');
+  @override
+  late final GeneratedColumn<int> longBreakDuration = GeneratedColumn<int>(
+      'long_break_duration', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(15));
+  @override
+  List<GeneratedColumn> get $columns =>
+      [id, pomodoroDuration, shortBreakDuration, longBreakDuration];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'settings';
+  @override
+  VerificationContext validateIntegrity(Insertable<Setting> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('pomodoro_duration')) {
+      context.handle(
+          _pomodoroDurationMeta,
+          pomodoroDuration.isAcceptableOrUnknown(
+              data['pomodoro_duration']!, _pomodoroDurationMeta));
+    }
+    if (data.containsKey('short_break_duration')) {
+      context.handle(
+          _shortBreakDurationMeta,
+          shortBreakDuration.isAcceptableOrUnknown(
+              data['short_break_duration']!, _shortBreakDurationMeta));
+    }
+    if (data.containsKey('long_break_duration')) {
+      context.handle(
+          _longBreakDurationMeta,
+          longBreakDuration.isAcceptableOrUnknown(
+              data['long_break_duration']!, _longBreakDurationMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Setting map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Setting(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+      pomodoroDuration: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}pomodoro_duration'])!,
+      shortBreakDuration: attachedDatabase.typeMapping.read(
+          DriftSqlType.int, data['${effectivePrefix}short_break_duration'])!,
+      longBreakDuration: attachedDatabase.typeMapping.read(
+          DriftSqlType.int, data['${effectivePrefix}long_break_duration'])!,
+    );
+  }
+
+  @override
+  $SettingsTable createAlias(String alias) {
+    return $SettingsTable(attachedDatabase, alias);
+  }
+}
+
+class Setting extends DataClass implements Insertable<Setting> {
+  final int id;
+  final int pomodoroDuration;
+  final int shortBreakDuration;
+  final int longBreakDuration;
+  const Setting(
+      {required this.id,
+      required this.pomodoroDuration,
+      required this.shortBreakDuration,
+      required this.longBreakDuration});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['pomodoro_duration'] = Variable<int>(pomodoroDuration);
+    map['short_break_duration'] = Variable<int>(shortBreakDuration);
+    map['long_break_duration'] = Variable<int>(longBreakDuration);
+    return map;
+  }
+
+  SettingsCompanion toCompanion(bool nullToAbsent) {
+    return SettingsCompanion(
+      id: Value(id),
+      pomodoroDuration: Value(pomodoroDuration),
+      shortBreakDuration: Value(shortBreakDuration),
+      longBreakDuration: Value(longBreakDuration),
+    );
+  }
+
+  factory Setting.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Setting(
+      id: serializer.fromJson<int>(json['id']),
+      pomodoroDuration: serializer.fromJson<int>(json['pomodoroDuration']),
+      shortBreakDuration: serializer.fromJson<int>(json['shortBreakDuration']),
+      longBreakDuration: serializer.fromJson<int>(json['longBreakDuration']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'pomodoroDuration': serializer.toJson<int>(pomodoroDuration),
+      'shortBreakDuration': serializer.toJson<int>(shortBreakDuration),
+      'longBreakDuration': serializer.toJson<int>(longBreakDuration),
+    };
+  }
+
+  Setting copyWith(
+          {int? id,
+          int? pomodoroDuration,
+          int? shortBreakDuration,
+          int? longBreakDuration}) =>
+      Setting(
+        id: id ?? this.id,
+        pomodoroDuration: pomodoroDuration ?? this.pomodoroDuration,
+        shortBreakDuration: shortBreakDuration ?? this.shortBreakDuration,
+        longBreakDuration: longBreakDuration ?? this.longBreakDuration,
+      );
+  Setting copyWithCompanion(SettingsCompanion data) {
+    return Setting(
+      id: data.id.present ? data.id.value : this.id,
+      pomodoroDuration: data.pomodoroDuration.present
+          ? data.pomodoroDuration.value
+          : this.pomodoroDuration,
+      shortBreakDuration: data.shortBreakDuration.present
+          ? data.shortBreakDuration.value
+          : this.shortBreakDuration,
+      longBreakDuration: data.longBreakDuration.present
+          ? data.longBreakDuration.value
+          : this.longBreakDuration,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Setting(')
+          ..write('id: $id, ')
+          ..write('pomodoroDuration: $pomodoroDuration, ')
+          ..write('shortBreakDuration: $shortBreakDuration, ')
+          ..write('longBreakDuration: $longBreakDuration')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, pomodoroDuration, shortBreakDuration, longBreakDuration);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Setting &&
+          other.id == this.id &&
+          other.pomodoroDuration == this.pomodoroDuration &&
+          other.shortBreakDuration == this.shortBreakDuration &&
+          other.longBreakDuration == this.longBreakDuration);
+}
+
+class SettingsCompanion extends UpdateCompanion<Setting> {
+  final Value<int> id;
+  final Value<int> pomodoroDuration;
+  final Value<int> shortBreakDuration;
+  final Value<int> longBreakDuration;
+  const SettingsCompanion({
+    this.id = const Value.absent(),
+    this.pomodoroDuration = const Value.absent(),
+    this.shortBreakDuration = const Value.absent(),
+    this.longBreakDuration = const Value.absent(),
+  });
+  SettingsCompanion.insert({
+    this.id = const Value.absent(),
+    this.pomodoroDuration = const Value.absent(),
+    this.shortBreakDuration = const Value.absent(),
+    this.longBreakDuration = const Value.absent(),
+  });
+  static Insertable<Setting> custom({
+    Expression<int>? id,
+    Expression<int>? pomodoroDuration,
+    Expression<int>? shortBreakDuration,
+    Expression<int>? longBreakDuration,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (pomodoroDuration != null) 'pomodoro_duration': pomodoroDuration,
+      if (shortBreakDuration != null)
+        'short_break_duration': shortBreakDuration,
+      if (longBreakDuration != null) 'long_break_duration': longBreakDuration,
+    });
+  }
+
+  SettingsCompanion copyWith(
+      {Value<int>? id,
+      Value<int>? pomodoroDuration,
+      Value<int>? shortBreakDuration,
+      Value<int>? longBreakDuration}) {
+    return SettingsCompanion(
+      id: id ?? this.id,
+      pomodoroDuration: pomodoroDuration ?? this.pomodoroDuration,
+      shortBreakDuration: shortBreakDuration ?? this.shortBreakDuration,
+      longBreakDuration: longBreakDuration ?? this.longBreakDuration,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (pomodoroDuration.present) {
+      map['pomodoro_duration'] = Variable<int>(pomodoroDuration.value);
+    }
+    if (shortBreakDuration.present) {
+      map['short_break_duration'] = Variable<int>(shortBreakDuration.value);
+    }
+    if (longBreakDuration.present) {
+      map['long_break_duration'] = Variable<int>(longBreakDuration.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SettingsCompanion(')
+          ..write('id: $id, ')
+          ..write('pomodoroDuration: $pomodoroDuration, ')
+          ..write('shortBreakDuration: $shortBreakDuration, ')
+          ..write('longBreakDuration: $longBreakDuration')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -1515,12 +1788,13 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $TagsTable tags = $TagsTable(this);
   late final $TaskTagsTable taskTags = $TaskTagsTable(this);
   late final $SubtasksTable subtasks = $SubtasksTable(this);
+  late final $SettingsTable settings = $SettingsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities =>
-      [projects, tasks, tags, taskTags, subtasks];
+      [projects, tasks, tags, taskTags, subtasks, settings];
 }
 
 typedef $$ProjectsTableCreateCompanionBuilder = ProjectsCompanion Function({
@@ -3001,6 +3275,156 @@ typedef $$SubtasksTableProcessedTableManager = ProcessedTableManager<
     (Subtask, $$SubtasksTableReferences),
     Subtask,
     PrefetchHooks Function({bool taskId})>;
+typedef $$SettingsTableCreateCompanionBuilder = SettingsCompanion Function({
+  Value<int> id,
+  Value<int> pomodoroDuration,
+  Value<int> shortBreakDuration,
+  Value<int> longBreakDuration,
+});
+typedef $$SettingsTableUpdateCompanionBuilder = SettingsCompanion Function({
+  Value<int> id,
+  Value<int> pomodoroDuration,
+  Value<int> shortBreakDuration,
+  Value<int> longBreakDuration,
+});
+
+class $$SettingsTableFilterComposer
+    extends Composer<_$AppDatabase, $SettingsTable> {
+  $$SettingsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get pomodoroDuration => $composableBuilder(
+      column: $table.pomodoroDuration,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get shortBreakDuration => $composableBuilder(
+      column: $table.shortBreakDuration,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get longBreakDuration => $composableBuilder(
+      column: $table.longBreakDuration,
+      builder: (column) => ColumnFilters(column));
+}
+
+class $$SettingsTableOrderingComposer
+    extends Composer<_$AppDatabase, $SettingsTable> {
+  $$SettingsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get pomodoroDuration => $composableBuilder(
+      column: $table.pomodoroDuration,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get shortBreakDuration => $composableBuilder(
+      column: $table.shortBreakDuration,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get longBreakDuration => $composableBuilder(
+      column: $table.longBreakDuration,
+      builder: (column) => ColumnOrderings(column));
+}
+
+class $$SettingsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $SettingsTable> {
+  $$SettingsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get pomodoroDuration => $composableBuilder(
+      column: $table.pomodoroDuration, builder: (column) => column);
+
+  GeneratedColumn<int> get shortBreakDuration => $composableBuilder(
+      column: $table.shortBreakDuration, builder: (column) => column);
+
+  GeneratedColumn<int> get longBreakDuration => $composableBuilder(
+      column: $table.longBreakDuration, builder: (column) => column);
+}
+
+class $$SettingsTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $SettingsTable,
+    Setting,
+    $$SettingsTableFilterComposer,
+    $$SettingsTableOrderingComposer,
+    $$SettingsTableAnnotationComposer,
+    $$SettingsTableCreateCompanionBuilder,
+    $$SettingsTableUpdateCompanionBuilder,
+    (Setting, BaseReferences<_$AppDatabase, $SettingsTable, Setting>),
+    Setting,
+    PrefetchHooks Function()> {
+  $$SettingsTableTableManager(_$AppDatabase db, $SettingsTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$SettingsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$SettingsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$SettingsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<int> pomodoroDuration = const Value.absent(),
+            Value<int> shortBreakDuration = const Value.absent(),
+            Value<int> longBreakDuration = const Value.absent(),
+          }) =>
+              SettingsCompanion(
+            id: id,
+            pomodoroDuration: pomodoroDuration,
+            shortBreakDuration: shortBreakDuration,
+            longBreakDuration: longBreakDuration,
+          ),
+          createCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<int> pomodoroDuration = const Value.absent(),
+            Value<int> shortBreakDuration = const Value.absent(),
+            Value<int> longBreakDuration = const Value.absent(),
+          }) =>
+              SettingsCompanion.insert(
+            id: id,
+            pomodoroDuration: pomodoroDuration,
+            shortBreakDuration: shortBreakDuration,
+            longBreakDuration: longBreakDuration,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$SettingsTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $SettingsTable,
+    Setting,
+    $$SettingsTableFilterComposer,
+    $$SettingsTableOrderingComposer,
+    $$SettingsTableAnnotationComposer,
+    $$SettingsTableCreateCompanionBuilder,
+    $$SettingsTableUpdateCompanionBuilder,
+    (Setting, BaseReferences<_$AppDatabase, $SettingsTable, Setting>),
+    Setting,
+    PrefetchHooks Function()>;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -3014,4 +3438,6 @@ class $AppDatabaseManager {
       $$TaskTagsTableTableManager(_db, _db.taskTags);
   $$SubtasksTableTableManager get subtasks =>
       $$SubtasksTableTableManager(_db, _db.subtasks);
+  $$SettingsTableTableManager get settings =>
+      $$SettingsTableTableManager(_db, _db.settings);
 }

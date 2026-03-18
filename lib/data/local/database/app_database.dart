@@ -48,7 +48,16 @@ class Subtasks extends Table {
   IntColumn get position => integer().withDefault(const Constant(0))();
 }
 
-@DriftDatabase(tables: [Tasks, Projects, Tags, TaskTags, Subtasks])
+class Settings extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get pomodoroDuration => integer().withDefault(const Constant(25))();
+  IntColumn get shortBreakDuration =>
+      integer().withDefault(const Constant(5))();
+  IntColumn get longBreakDuration =>
+      integer().withDefault(const Constant(15))();
+}
+
+@DriftDatabase(tables: [Tasks, Projects, Tags, TaskTags, Subtasks, Settings])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
   AppDatabase.forTesting(super.e);
