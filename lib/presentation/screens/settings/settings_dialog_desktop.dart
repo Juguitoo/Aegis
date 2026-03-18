@@ -3,15 +3,15 @@ import 'package:aegis/presentation/viewmodels/settings_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class SettingsDialog extends ConsumerStatefulWidget {
+class SettingsDialogDesktop extends ConsumerStatefulWidget {
   final Setting? currentSettings;
-  const SettingsDialog({super.key, this.currentSettings});
+  const SettingsDialogDesktop({super.key, this.currentSettings});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _SettingsDialogState();
 }
 
-class _SettingsDialogState extends ConsumerState<SettingsDialog> {
+class _SettingsDialogState extends ConsumerState<SettingsDialogDesktop> {
   late double _pomodoro;
   late double _shortBreak;
   late double _longBreak;
@@ -76,9 +76,9 @@ class _SettingsDialogState extends ConsumerState<SettingsDialog> {
         ElevatedButton(
           onPressed: () {
             ref.read(settingsViewModelProvider.notifier).upsertSettings(
-                  _pomodoro.toInt(),
-                  _shortBreak.toInt(),
-                  _longBreak.toInt(),
+                  pomodoroDuration: _pomodoro.toInt(),
+                  shortBreakDuration: _shortBreak.toInt(),
+                  longBreakDuration: _longBreak.toInt(),
                 );
             Navigator.pop(context);
           },

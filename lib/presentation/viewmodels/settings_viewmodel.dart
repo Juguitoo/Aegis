@@ -13,7 +13,9 @@ class SettingsViewmodel extends StreamNotifier<Setting?> {
   }
 
   Future<void> upsertSettings(
-      int? pomodoroDuration, int? shortBreakDuration, int? longBreakDuration) {
+      {int? pomodoroDuration,
+      int? shortBreakDuration,
+      int? longBreakDuration}) {
     final settings = SettingsCompanion(
       pomodoroDuration: pomodoroDuration != null
           ? Value(pomodoroDuration)

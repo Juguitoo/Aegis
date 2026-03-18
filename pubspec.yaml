@@ -49,9 +49,10 @@ dependencies:
   window_manager: ^0.5.1
   flutter_speed_dial: ^7.0.0
   flutter_colorpicker: ^1.1.0
+  installed_apps: ^2.1.1
+  package_info_plus: ^9.0.0
 
   # Apps instaladas
-  device_apps: ^2.2.0
 
 dev_dependencies:
   flutter_test:

@@ -1,3 +1,4 @@
+import 'package:drift/drift.dart';
 import 'package:aegis/data/local/database/app_database.dart';
 
 class BlacklistRepository {
@@ -5,21 +6,25 @@ class BlacklistRepository {
 
   BlacklistRepository(this._db);
 
-  Future<List<BlacklistedApp>> getAllBlacklistedApps() {
-    return _db.select(_db.blacklistedApps).get();
+  Stream<List<String>> watchBlacklistedPackages() {
+    return _db.select(_db.blacklistedApps).watch().map((rows) {
+      return rows.map((row) => row.packageName).toList();
+    });
   }
 
-  Stream<List<BlacklistedApp>> watchAllBlacklistedApps() {
-    return _db.select(_db.blacklistedApps).watch();
+  Future<int> addAppToBlacklist(String packageName, String appName) {
+    return _db.into(_db.blacklistedApps).insert(
+          BlacklistedAppsCompanion.insert(
+            packageName: packageName,
+            appName: appName,
+          ),
+          mode: InsertMode.insertOrIgnore,
+        );
   }
 
-  Future<int> insertBlacklistedApp(BlacklistedAppsCompanion app) {
-    return _db.into(_db.blacklistedApps).insert(app);
-  }
-
-  Future<int> deleteBlacklistedApp(String packageName) {
+  Future<int> removeAppFromBlacklist(String packageName) {
     return (_db.delete(_db.blacklistedApps)
-          ..where((b) => b.packageName.equals(packageName)))
+          ..where((t) => t.packageName.equals(packageName)))
         .go();
   }
 }

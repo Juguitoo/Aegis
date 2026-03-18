@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:aegis/presentation/screens/settings/settings_dialog.dart';
+import 'package:aegis/presentation/screens/settings/settings_dialog_desktop.dart';
 import 'package:aegis/presentation/viewmodels/settings_viewmodel.dart';
 
 class MainDesktopLayout extends ConsumerWidget {
@@ -63,7 +63,7 @@ class _SideNavigationRail extends StatelessWidget {
               showDialog(
                 context: context,
                 builder: (context) =>
-                    SettingsDialog(currentSettings: currentSettings),
+                    SettingsDialogDesktop(currentSettings: currentSettings),
               );
             },
           ),
