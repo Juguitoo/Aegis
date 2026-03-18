@@ -1,3 +1,4 @@
+import 'package:aegis/data/repositories/blacklist_repository.dart';
 import 'package:aegis/data/repositories/project_repository.dart';
 import 'package:aegis/data/repositories/settings_repository.dart';
 import 'package:aegis/data/repositories/tag_repository.dart';
@@ -23,4 +24,9 @@ final tagRepositoryProvider = Provider<TagRepository>((ref) {
 final settingsRepositoryProvider = Provider<SettingsRepository>((ref) {
   final database = ref.watch(databaseProvider);
   return SettingsRepository(database);
+});
+
+final blacklistRepositoryProvider = Provider<BlacklistRepository>((ref) {
+  final database = ref.watch(databaseProvider);
+  return BlacklistRepository(database);
 });

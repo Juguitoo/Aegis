@@ -1780,6 +1780,206 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
   }
 }
 
+class $BlacklistedAppsTable extends BlacklistedApps
+    with TableInfo<$BlacklistedAppsTable, BlacklistedApp> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $BlacklistedAppsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _packageNameMeta =
+      const VerificationMeta('packageName');
+  @override
+  late final GeneratedColumn<String> packageName = GeneratedColumn<String>(
+      'package_name', aliasedName, false,
+      additionalChecks: GeneratedColumn.checkTextLength(),
+      type: DriftSqlType.string,
+      requiredDuringInsert: true);
+  static const VerificationMeta _appNameMeta =
+      const VerificationMeta('appName');
+  @override
+  late final GeneratedColumn<String> appName = GeneratedColumn<String>(
+      'app_name', aliasedName, false,
+      additionalChecks: GeneratedColumn.checkTextLength(),
+      type: DriftSqlType.string,
+      requiredDuringInsert: true);
+  @override
+  List<GeneratedColumn> get $columns => [packageName, appName];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'blacklisted_apps';
+  @override
+  VerificationContext validateIntegrity(Insertable<BlacklistedApp> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('package_name')) {
+      context.handle(
+          _packageNameMeta,
+          packageName.isAcceptableOrUnknown(
+              data['package_name']!, _packageNameMeta));
+    } else if (isInserting) {
+      context.missing(_packageNameMeta);
+    }
+    if (data.containsKey('app_name')) {
+      context.handle(_appNameMeta,
+          appName.isAcceptableOrUnknown(data['app_name']!, _appNameMeta));
+    } else if (isInserting) {
+      context.missing(_appNameMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {packageName};
+  @override
+  BlacklistedApp map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return BlacklistedApp(
+      packageName: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}package_name'])!,
+      appName: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}app_name'])!,
+    );
+  }
+
+  @override
+  $BlacklistedAppsTable createAlias(String alias) {
+    return $BlacklistedAppsTable(attachedDatabase, alias);
+  }
+}
+
+class BlacklistedApp extends DataClass implements Insertable<BlacklistedApp> {
+  final String packageName;
+  final String appName;
+  const BlacklistedApp({required this.packageName, required this.appName});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['package_name'] = Variable<String>(packageName);
+    map['app_name'] = Variable<String>(appName);
+    return map;
+  }
+
+  BlacklistedAppsCompanion toCompanion(bool nullToAbsent) {
+    return BlacklistedAppsCompanion(
+      packageName: Value(packageName),
+      appName: Value(appName),
+    );
+  }
+
+  factory BlacklistedApp.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return BlacklistedApp(
+      packageName: serializer.fromJson<String>(json['packageName']),
+      appName: serializer.fromJson<String>(json['appName']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'packageName': serializer.toJson<String>(packageName),
+      'appName': serializer.toJson<String>(appName),
+    };
+  }
+
+  BlacklistedApp copyWith({String? packageName, String? appName}) =>
+      BlacklistedApp(
+        packageName: packageName ?? this.packageName,
+        appName: appName ?? this.appName,
+      );
+  BlacklistedApp copyWithCompanion(BlacklistedAppsCompanion data) {
+    return BlacklistedApp(
+      packageName:
+          data.packageName.present ? data.packageName.value : this.packageName,
+      appName: data.appName.present ? data.appName.value : this.appName,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BlacklistedApp(')
+          ..write('packageName: $packageName, ')
+          ..write('appName: $appName')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(packageName, appName);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is BlacklistedApp &&
+          other.packageName == this.packageName &&
+          other.appName == this.appName);
+}
+
+class BlacklistedAppsCompanion extends UpdateCompanion<BlacklistedApp> {
+  final Value<String> packageName;
+  final Value<String> appName;
+  final Value<int> rowid;
+  const BlacklistedAppsCompanion({
+    this.packageName = const Value.absent(),
+    this.appName = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  BlacklistedAppsCompanion.insert({
+    required String packageName,
+    required String appName,
+    this.rowid = const Value.absent(),
+  })  : packageName = Value(packageName),
+        appName = Value(appName);
+  static Insertable<BlacklistedApp> custom({
+    Expression<String>? packageName,
+    Expression<String>? appName,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (packageName != null) 'package_name': packageName,
+      if (appName != null) 'app_name': appName,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  BlacklistedAppsCompanion copyWith(
+      {Value<String>? packageName, Value<String>? appName, Value<int>? rowid}) {
+    return BlacklistedAppsCompanion(
+      packageName: packageName ?? this.packageName,
+      appName: appName ?? this.appName,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (packageName.present) {
+      map['package_name'] = Variable<String>(packageName.value);
+    }
+    if (appName.present) {
+      map['app_name'] = Variable<String>(appName.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BlacklistedAppsCompanion(')
+          ..write('packageName: $packageName, ')
+          ..write('appName: $appName, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -1789,12 +1989,14 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $TaskTagsTable taskTags = $TaskTagsTable(this);
   late final $SubtasksTable subtasks = $SubtasksTable(this);
   late final $SettingsTable settings = $SettingsTable(this);
+  late final $BlacklistedAppsTable blacklistedApps =
+      $BlacklistedAppsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities =>
-      [projects, tasks, tags, taskTags, subtasks, settings];
+      [projects, tasks, tags, taskTags, subtasks, settings, blacklistedApps];
 }
 
 typedef $$ProjectsTableCreateCompanionBuilder = ProjectsCompanion Function({
@@ -3425,6 +3627,135 @@ typedef $$SettingsTableProcessedTableManager = ProcessedTableManager<
     (Setting, BaseReferences<_$AppDatabase, $SettingsTable, Setting>),
     Setting,
     PrefetchHooks Function()>;
+typedef $$BlacklistedAppsTableCreateCompanionBuilder = BlacklistedAppsCompanion
+    Function({
+  required String packageName,
+  required String appName,
+  Value<int> rowid,
+});
+typedef $$BlacklistedAppsTableUpdateCompanionBuilder = BlacklistedAppsCompanion
+    Function({
+  Value<String> packageName,
+  Value<String> appName,
+  Value<int> rowid,
+});
+
+class $$BlacklistedAppsTableFilterComposer
+    extends Composer<_$AppDatabase, $BlacklistedAppsTable> {
+  $$BlacklistedAppsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get packageName => $composableBuilder(
+      column: $table.packageName, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get appName => $composableBuilder(
+      column: $table.appName, builder: (column) => ColumnFilters(column));
+}
+
+class $$BlacklistedAppsTableOrderingComposer
+    extends Composer<_$AppDatabase, $BlacklistedAppsTable> {
+  $$BlacklistedAppsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get packageName => $composableBuilder(
+      column: $table.packageName, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get appName => $composableBuilder(
+      column: $table.appName, builder: (column) => ColumnOrderings(column));
+}
+
+class $$BlacklistedAppsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $BlacklistedAppsTable> {
+  $$BlacklistedAppsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get packageName => $composableBuilder(
+      column: $table.packageName, builder: (column) => column);
+
+  GeneratedColumn<String> get appName =>
+      $composableBuilder(column: $table.appName, builder: (column) => column);
+}
+
+class $$BlacklistedAppsTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $BlacklistedAppsTable,
+    BlacklistedApp,
+    $$BlacklistedAppsTableFilterComposer,
+    $$BlacklistedAppsTableOrderingComposer,
+    $$BlacklistedAppsTableAnnotationComposer,
+    $$BlacklistedAppsTableCreateCompanionBuilder,
+    $$BlacklistedAppsTableUpdateCompanionBuilder,
+    (
+      BlacklistedApp,
+      BaseReferences<_$AppDatabase, $BlacklistedAppsTable, BlacklistedApp>
+    ),
+    BlacklistedApp,
+    PrefetchHooks Function()> {
+  $$BlacklistedAppsTableTableManager(
+      _$AppDatabase db, $BlacklistedAppsTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$BlacklistedAppsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$BlacklistedAppsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$BlacklistedAppsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<String> packageName = const Value.absent(),
+            Value<String> appName = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              BlacklistedAppsCompanion(
+            packageName: packageName,
+            appName: appName,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required String packageName,
+            required String appName,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              BlacklistedAppsCompanion.insert(
+            packageName: packageName,
+            appName: appName,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$BlacklistedAppsTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $BlacklistedAppsTable,
+    BlacklistedApp,
+    $$BlacklistedAppsTableFilterComposer,
+    $$BlacklistedAppsTableOrderingComposer,
+    $$BlacklistedAppsTableAnnotationComposer,
+    $$BlacklistedAppsTableCreateCompanionBuilder,
+    $$BlacklistedAppsTableUpdateCompanionBuilder,
+    (
+      BlacklistedApp,
+      BaseReferences<_$AppDatabase, $BlacklistedAppsTable, BlacklistedApp>
+    ),
+    BlacklistedApp,
+    PrefetchHooks Function()>;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -3440,4 +3771,6 @@ class $AppDatabaseManager {
       $$SubtasksTableTableManager(_db, _db.subtasks);
   $$SettingsTableTableManager get settings =>
       $$SettingsTableTableManager(_db, _db.settings);
+  $$BlacklistedAppsTableTableManager get blacklistedApps =>
+      $$BlacklistedAppsTableTableManager(_db, _db.blacklistedApps);
 }

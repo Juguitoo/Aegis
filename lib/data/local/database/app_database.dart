@@ -57,7 +57,23 @@ class Settings extends Table {
       integer().withDefault(const Constant(15))();
 }
 
-@DriftDatabase(tables: [Tasks, Projects, Tags, TaskTags, Subtasks, Settings])
+class BlacklistedApps extends Table {
+  TextColumn get packageName => text().withLength()();
+  TextColumn get appName => text().withLength()();
+
+  @override
+  Set<Column> get primaryKey => {packageName};
+}
+
+@DriftDatabase(tables: [
+  Tasks,
+  Projects,
+  Tags,
+  TaskTags,
+  Subtasks,
+  Settings,
+  BlacklistedApps
+])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
   AppDatabase.forTesting(super.e);
