@@ -31,7 +31,7 @@ class _ManageTagsBottomSheetState extends ConsumerState<ManageTagsBottomSheet> {
         maxHeight: screenHeight * 0.7,
       ),
       padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom,
+        bottom: MediaQuery.of(context).viewInsets.bottom + 24,
       ),
       decoration: const BoxDecoration(
         color: Colors.white,
