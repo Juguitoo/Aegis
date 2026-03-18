@@ -1,9 +1,11 @@
 import 'package:aegis/presentation/screens/main_mobile_layout.dart';
 import 'package:aegis/presentation/screens/projects/widgets/manage_projects_bottom_sheet.dart';
+import 'package:aegis/presentation/screens/settings/settings_dialog.dart';
 import 'package:aegis/presentation/screens/tags/widgets/manage_tags_bottom_sheet.dart';
 import 'package:aegis/presentation/screens/projects/widgets/project_form_dialog.dart';
 import 'package:aegis/presentation/screens/tags/widgets/tag_form_dialog.dart';
 import 'package:aegis/presentation/screens/tasks/widgets/task_form_mobile.dart';
+import 'package:aegis/presentation/viewmodels/settings_viewmodel.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import '../../../data/local/database/app_database.dart';
 import '../../viewmodels/task_list_viewmodel.dart';
@@ -45,6 +47,7 @@ class _TaskListScreenMobileState extends ConsumerState<TaskListScreenMobile> {
   @override
   Widget build(BuildContext context) {
     final tasksAsync = ref.watch(taskListViewModelProvider);
+    final settingsAsync = ref.watch(settingsViewModelProvider);
 
     return MainMobileLayout(
       currentIndex: 2,
@@ -130,7 +133,14 @@ class _TaskListScreenMobileState extends ConsumerState<TaskListScreenMobile> {
             padding: const EdgeInsets.only(right: 8.0),
             child: IconButton(
               icon: const Icon(Icons.settings, color: Color(0xFF1E293B)),
-              onPressed: () {},
+              onPressed: () {
+                final currentSettings = settingsAsync.value;
+                showDialog(
+                  context: context,
+                  builder: (context) =>
+                      SettingsDialog(currentSettings: currentSettings),
+                );
+              },
             ),
           ),
         ],

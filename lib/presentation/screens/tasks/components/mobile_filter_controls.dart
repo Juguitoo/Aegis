@@ -174,18 +174,6 @@ class MobileFilterControls extends ConsumerWidget {
                 ],
               ),
             ),
-          const SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            padding: EdgeInsets.only(bottom: 8),
-            child: Row(
-              children: [
-                _FilterChip(label: 'Todo', isSelected: true),
-                _FilterChip(label: 'Completas', isSelected: false),
-                _FilterChip(label: 'Pendientes', isSelected: false),
-                _FilterChip(label: 'Hoy', isSelected: false),
-              ],
-            ),
-          ),
         ],
       ),
     );
@@ -346,33 +334,6 @@ class MobileTaskFiltersBottomSheet extends ConsumerWidget {
             ],
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _FilterChip extends StatelessWidget {
-  final String label;
-  final bool isSelected;
-
-  const _FilterChip({required this.label, required this.isSelected});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(right: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: isSelected ? const Color(0xFF6366F1) : const Color(0xFFF1F5F9),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: isSelected ? Colors.white : const Color(0xFF475569),
-          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-          fontSize: 13,
-        ),
       ),
     );
   }
