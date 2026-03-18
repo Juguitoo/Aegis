@@ -66,6 +66,16 @@ dev_dependencies:
   custom_lint: ^0.8.1 # Actualizado para soportar el nuevo analyzer
   riverpod_lint: ^3.1.0
   mocktail: ^1.0.4
+  flutter_launcher_icons: ^0.13.1
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: false
+  image_path: "assets/icon/app_icon.png"
+  windows:
+    generate: true
+    image_path: "assets/icon/app_icon.png"
+    icon_size: 48
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
