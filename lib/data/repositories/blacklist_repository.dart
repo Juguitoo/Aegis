@@ -6,6 +6,11 @@ class BlacklistRepository {
 
   BlacklistRepository(this._db);
 
+  Future<List<String>> getBlacklistedPackages() async {
+    final rows = await _db.select(_db.blacklistedApps).get();
+    return rows.map((row) => row.packageName).toList();
+  }
+
   Stream<List<String>> watchBlacklistedPackages() {
     return _db.select(_db.blacklistedApps).watch().map((rows) {
       return rows.map((row) => row.packageName).toList();
