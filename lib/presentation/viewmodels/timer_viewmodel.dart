@@ -1,10 +1,12 @@
 import 'dart:async';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'timer_state.dart';
+import 'timer/timer_state.dart';
 import 'package:aegis/data/local/database/app_database.dart';
 import 'package:aegis/presentation/viewmodels/settings_viewmodel.dart';
 
 class TimerViewmodel extends Notifier<TimerState> {
+  final AudioPlayer _audioPlayer = AudioPlayer();
   Timer? _timer;
 
   AsyncValue<Setting?> get _settingsValue =>
@@ -38,6 +40,7 @@ class TimerViewmodel extends Notifier<TimerState> {
         remainingSeconds: state.remainingSeconds - 1,
       );
     } else {
+      _playSound();
       _handleSessionComplete();
     }
   }
@@ -108,6 +111,17 @@ class TimerViewmodel extends Notifier<TimerState> {
       mode: TimerMode.focus,
       status: TimerStatus.idle,
     );
+  }
+
+  void add5Minutes() {
+    state = state.copyWith(
+      remainingSeconds: state.remainingSeconds + 300,
+      initialSeconds: state.initialSeconds + 300,
+    );
+  }
+
+  Future<void> _playSound() async {
+    await _audioPlayer.play(AssetSource('audio/ding.mp3'));
   }
 }
 

@@ -1,4 +1,5 @@
 import 'package:aegis/presentation/screens/tasks/task_list_screen_mobile.dart';
+import 'package:aegis/presentation/screens/timer/timer_screen_mobile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
@@ -21,7 +22,7 @@ class MainMobileLayout extends ConsumerWidget {
 
     final screens = [
       const Center(child: Text('Pantalla Calendario')),
-      const Center(child: Text('Pantalla Temporizador')),
+      const TimerScreenMobile(),
       const TaskListScreenMobile(),
       const Center(child: Text('Pantalla Estadísticas')),
       const Center(child: Text('Pantalla Diario')),
