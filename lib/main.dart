@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:ui';
-import 'package:aegis/presentation/screens/tasks/task_list_screen.dart';
+import 'package:aegis/presentation/screens/main_desktop_layout.dart';
+import 'package:aegis/presentation/screens/main_mobile_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -66,7 +67,15 @@ class AegisApp extends ConsumerWidget {
         useMaterial3: true,
       ),
       themeMode: ThemeMode.light,
-      home: const TaskListScreen(),
+      home: LayoutBuilder(
+        builder: (context, constraints) {
+          if (constraints.maxWidth < 800) {
+            return const MainMobileLayout();
+          } else {
+            return const MainDesktopLayout();
+          }
+        },
+      ),
     );
   }
 }

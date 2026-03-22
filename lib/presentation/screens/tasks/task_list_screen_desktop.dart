@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:aegis/presentation/screens/main_desktop_layout.dart';
 
 import 'components/task_table_view.dart';
 import 'components/desktop_filter_controls.dart';
@@ -10,8 +9,9 @@ class TaskListScreenDesktop extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MainDesktopLayout(
-      child: Padding(
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: Padding(
         padding: const EdgeInsets.all(32.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

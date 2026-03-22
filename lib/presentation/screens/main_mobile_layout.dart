@@ -1,25 +1,35 @@
+import 'package:aegis/presentation/screens/tasks/task_list_screen_mobile.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 
-class MainMobileLayout extends StatelessWidget {
-  final Widget child;
-  final int currentIndex;
+final navigationIndexProvider = StateProvider<int>((ref) => 2);
+
+class MainMobileLayout extends ConsumerWidget {
   final Widget? floatingActionButton;
   final PreferredSizeWidget? appBar;
 
-  const MainMobileLayout(
-      {super.key,
-      required this.child,
-      this.currentIndex = 1,
-      this.floatingActionButton,
-      this.appBar});
+  const MainMobileLayout({
+    super.key,
+    this.floatingActionButton,
+    this.appBar,
+  });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final currentIndex = ref.watch(navigationIndexProvider);
+
+    final screens = [
+      const Center(child: Text('Pantalla Calendario')),
+      const Center(child: Text('Pantalla Temporizador')),
+      const TaskListScreenMobile(),
+      const Center(child: Text('Pantalla Estadísticas')),
+      const Center(child: Text('Pantalla Diario')),
+    ];
+
     return Scaffold(
         backgroundColor: const Color(0xFFF8FAFC),
-        appBar: appBar,
-        body: SafeArea(child: child),
-        floatingActionButton: floatingActionButton,
+        body: SafeArea(child: screens[currentIndex]),
         bottomNavigationBar: Container(
             decoration: BoxDecoration(
               boxShadow: [
@@ -32,7 +42,9 @@ class MainMobileLayout extends StatelessWidget {
             ),
             child: BottomNavigationBar(
               currentIndex: currentIndex,
-              onTap: (index) {},
+              onTap: (index) {
+                ref.read(navigationIndexProvider.notifier).state = index;
+              },
               type: BottomNavigationBarType.fixed,
               backgroundColor: Colors.white,
               selectedItemColor: const Color(0xFF6366F1),

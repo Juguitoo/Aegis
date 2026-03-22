@@ -1,4 +1,3 @@
-import 'package:aegis/presentation/screens/main_mobile_layout.dart';
 import 'package:aegis/presentation/screens/projects/widgets/manage_projects_bottom_sheet.dart';
 import 'package:aegis/presentation/screens/settings/settings_screen_mobile.dart';
 import 'package:aegis/presentation/screens/tags/widgets/manage_tags_bottom_sheet.dart';
@@ -47,8 +46,8 @@ class _TaskListScreenMobileState extends ConsumerState<TaskListScreenMobile> {
   Widget build(BuildContext context) {
     final tasksAsync = ref.watch(taskListViewModelProvider);
 
-    return MainMobileLayout(
-      currentIndex: 2,
+    return Scaffold(
+      backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
         titleSpacing: 0,
         title: const Padding(
@@ -187,7 +186,7 @@ class _TaskListScreenMobileState extends ConsumerState<TaskListScreenMobile> {
           ),
         ],
       ),
-      child: Column(
+      body: Column(
         children: [
           const Divider(color: Color(0xFFE2E8F0)),
           const _HabitsSectionPlaceholder(),
@@ -235,7 +234,7 @@ class _TaskListScreenMobileState extends ConsumerState<TaskListScreenMobile> {
                                 .toggleTaskCompletion(task);
                           } catch (e) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
+                              const SnackBar(
                                   content: Text('Error al actualizar tarea.')),
                             );
                           }
@@ -248,7 +247,7 @@ class _TaskListScreenMobileState extends ConsumerState<TaskListScreenMobile> {
                                 .deleteTask(task);
                           } catch (e) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
+                              const SnackBar(
                                   content: Text('Error al eliminar tarea.')),
                             );
                           }

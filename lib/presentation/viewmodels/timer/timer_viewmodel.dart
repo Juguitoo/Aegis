@@ -110,3 +110,7 @@ class TimerViewmodel extends Notifier<TimerState> {
     );
   }
 }
+
+final timerViewModelProvider = NotifierProvider<TimerViewmodel, TimerState>(
+  () => TimerViewmodel(),
+);

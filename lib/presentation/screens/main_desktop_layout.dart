@@ -1,22 +1,32 @@
+import 'package:aegis/presentation/screens/tasks/task_list_screen_desktop.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:aegis/presentation/screens/settings/settings_dialog_desktop.dart';
 import 'package:aegis/presentation/viewmodels/settings_viewmodel.dart';
+import 'package:aegis/presentation/screens/main_mobile_layout.dart';
 
 class MainDesktopLayout extends ConsumerWidget {
-  final Widget child;
-
-  const MainDesktopLayout({super.key, required this.child});
+  const MainDesktopLayout({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final currentIndex = ref.watch(navigationIndexProvider);
+
+    final screens = [
+      const Center(child: Text('Pantalla Calendario (Escritorio)')),
+      const Center(child: Text('Pantalla Temporizador (Escritorio)')),
+      const TaskListScreenDesktop(),
+      const Center(child: Text('Pantalla Estadísticas (Escritorio)')),
+      const Center(child: Text('Pantalla Diario (Escritorio)')),
+    ];
+
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
       body: Row(
         children: [
-          _SideNavigationRail(ref: ref),
+          _SideNavigationRail(ref: ref, currentIndex: currentIndex),
           Expanded(
-            child: child,
+            child: screens[currentIndex],
           ),
         ],
       ),
@@ -26,8 +36,12 @@ class MainDesktopLayout extends ConsumerWidget {
 
 class _SideNavigationRail extends StatelessWidget {
   final WidgetRef ref;
+  final int currentIndex;
 
-  const _SideNavigationRail({required this.ref});
+  const _SideNavigationRail({
+    required this.ref,
+    required this.currentIndex,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -48,11 +62,31 @@ class _SideNavigationRail extends StatelessWidget {
             child: const Icon(Icons.flash_on, color: Colors.white),
           ),
           const SizedBox(height: 48),
-          const _NavIcon(icon: Icons.calendar_today, isSelected: false),
-          const _NavIcon(icon: Icons.check_box, isSelected: true),
-          const _NavIcon(icon: Icons.timer_outlined, isSelected: false),
-          const _NavIcon(icon: Icons.bar_chart, isSelected: false),
-          const _NavIcon(icon: Icons.menu_book, isSelected: false),
+          _NavIcon(
+            icon: Icons.calendar_today,
+            isSelected: currentIndex == 0,
+            onTap: () => ref.read(navigationIndexProvider.notifier).state = 0,
+          ),
+          _NavIcon(
+            icon: Icons.timer_outlined,
+            isSelected: currentIndex == 1,
+            onTap: () => ref.read(navigationIndexProvider.notifier).state = 1,
+          ),
+          _NavIcon(
+            icon: Icons.check_box,
+            isSelected: currentIndex == 2,
+            onTap: () => ref.read(navigationIndexProvider.notifier).state = 2,
+          ),
+          _NavIcon(
+            icon: Icons.bar_chart,
+            isSelected: currentIndex == 3,
+            onTap: () => ref.read(navigationIndexProvider.notifier).state = 3,
+          ),
+          _NavIcon(
+            icon: Icons.menu_book,
+            isSelected: currentIndex == 4,
+            onTap: () => ref.read(navigationIndexProvider.notifier).state = 4,
+          ),
           const Spacer(),
           const _NavIcon(icon: Icons.dark_mode_outlined, isSelected: false),
           _NavIcon(
