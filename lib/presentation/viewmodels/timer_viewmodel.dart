@@ -1,21 +1,27 @@
 import 'dart:async';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'timer_state.dart';
 import 'package:aegis/data/local/database/app_database.dart';
 import 'package:aegis/presentation/viewmodels/settings_viewmodel.dart';
 
-class TimerViewmodel extends Notifier<TimerState> {
+class TimerViewmodel extends Notifier<TimerState> with WidgetsBindingObserver {
   final AudioPlayer _audioPlayer = AudioPlayer();
   Timer? _timer;
+  DateTime? _pausedTime;
 
   AsyncValue<Setting?> get _settingsValue =>
       ref.watch(settingsViewModelProvider);
 
   @override
   TimerState build() {
+    WidgetsBinding.instance.addObserver(this);
+
     ref.onDispose(() {
+      WidgetsBinding.instance.removeObserver(this);
       _timer?.cancel();
+      _audioPlayer.dispose();
     });
 
     final settings = _settingsValue.value;
@@ -34,12 +40,38 @@ class TimerViewmodel extends Notifier<TimerState> {
     }
   }
 
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState appState) {
+    if (appState == AppLifecycleState.paused &&
+        state.status == TimerStatus.running) {
+      _pausedTime = DateTime.now();
+    } else if (appState == AppLifecycleState.resumed) {
+      if (_pausedTime != null && state.status == TimerStatus.running) {
+        final elapsedSeconds =
+            DateTime.now().difference(_pausedTime!).inSeconds;
+        _pausedTime = null;
+
+        final newRemaining = state.remainingSeconds - elapsedSeconds;
+
+        if (newRemaining <= 0) {
+          _timer?.cancel();
+          state = state.copyWith(remainingSeconds: 0);
+          _playSound();
+          _handleSessionComplete();
+        } else {
+          state = state.copyWith(remainingSeconds: newRemaining);
+        }
+      }
+    }
+  }
+
   void _onTick() {
     if (state.remainingSeconds > 0) {
       state = state.copyWith(
         remainingSeconds: state.remainingSeconds - 1,
       );
     } else {
+      _timer?.cancel();
       _playSound();
       _handleSessionComplete();
     }
@@ -80,13 +112,15 @@ class TimerViewmodel extends Notifier<TimerState> {
       mode: newMode,
       status: TimerStatus.running,
     );
+
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) => _onTick());
   }
 
   void start() {
     if (state.status == TimerStatus.running) return;
 
     state = state.copyWith(status: TimerStatus.running);
-
+    _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       _onTick();
     });
@@ -94,12 +128,14 @@ class TimerViewmodel extends Notifier<TimerState> {
 
   void pause() {
     _timer?.cancel();
+    _pausedTime = null;
     state = state.copyWith(status: TimerStatus.paused);
   }
 
   void reset() {
     _timer?.cancel();
     _timer = null;
+    _pausedTime = null;
 
     final settings = _settingsValue.value;
     final int resetSeconds = (settings?.pomodoroDuration ?? 25) * 60;
