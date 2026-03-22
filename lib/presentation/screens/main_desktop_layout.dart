@@ -1,4 +1,5 @@
 import 'package:aegis/presentation/screens/tasks/task_list_screen_desktop.dart';
+import 'package:aegis/presentation/screens/timer/timer_screen_desktop.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:aegis/presentation/screens/settings/settings_dialog_desktop.dart';
@@ -14,7 +15,7 @@ class MainDesktopLayout extends ConsumerWidget {
 
     final screens = [
       const Center(child: Text('Pantalla Calendario (Escritorio)')),
-      const Center(child: Text('Pantalla Temporizador (Escritorio)')),
+      const TimerScreenDesktop(),
       const TaskListScreenDesktop(),
       const Center(child: Text('Pantalla Estadísticas (Escritorio)')),
       const Center(child: Text('Pantalla Diario (Escritorio)')),
@@ -108,7 +109,7 @@ class _SideNavigationRail extends StatelessWidget {
   }
 }
 
-class _NavIcon extends StatelessWidget {
+class _NavIcon extends StatefulWidget {
   final IconData icon;
   final bool isSelected;
   final VoidCallback? onTap;
@@ -120,23 +121,44 @@ class _NavIcon extends StatelessWidget {
   });
 
   @override
+  State<_NavIcon> createState() => _NavIconState();
+}
+
+class _NavIconState extends State<_NavIcon> {
+  bool _isHovered = false;
+
+  @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Container(
-          margin: const EdgeInsets.symmetric(vertical: 12),
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: isSelected ? const Color(0xFFEEF2FF) : Colors.transparent,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Icon(
-            icon,
-            color:
-                isSelected ? const Color(0xFF6366F1) : const Color(0xFF94A3B8),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: MouseRegion(
+        onEnter: (_) => setState(() => _isHovered = true),
+        onExit: (_) => setState(() => _isHovered = false),
+        cursor: widget.onTap != null
+            ? SystemMouseCursors.click
+            : SystemMouseCursors.basic,
+        child: GestureDetector(
+          onTap: widget.onTap,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 150),
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: widget.isSelected
+                  ? const Color(0xFFEEF2FF)
+                  : _isHovered
+                      ? const Color(0xFFF1F5F9)
+                      : Colors.white,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(
+              widget.icon,
+              color: widget.isSelected
+                  ? const Color(0xFF6366F1)
+                  : _isHovered
+                      ? const Color(0xFF64748B)
+                      : const Color(0xFF94A3B8),
+            ),
           ),
         ),
       ),

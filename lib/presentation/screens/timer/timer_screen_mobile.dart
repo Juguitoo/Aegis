@@ -1,5 +1,5 @@
 import 'package:aegis/presentation/screens/settings/settings_screen_mobile.dart';
-import 'package:aegis/presentation/viewmodels/timer/timer_state.dart';
+import 'package:aegis/presentation/viewmodels/timer_state.dart';
 import 'package:aegis/presentation/viewmodels/timer_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
