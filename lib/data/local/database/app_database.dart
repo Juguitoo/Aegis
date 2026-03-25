@@ -20,6 +20,7 @@ class Tasks extends Table {
   IntColumn get projectId => integer().nullable().references(Projects, #id)();
   IntColumn get priority => integer().withDefault(const Constant(0))();
   IntColumn get estimatedDuration => integer().nullable()();
+  IntColumn get actualDuration => integer().nullable()();
   DateTimeColumn get dueDate => dateTime().nullable()();
   BoolColumn get isCompleted => boolean().withDefault(const Constant(false))();
   TextColumn get notes => text().nullable()();
