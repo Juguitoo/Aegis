@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'package:aegis/core/providers/repository_providers.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'timer_state.dart';
@@ -17,6 +19,8 @@ class TimerViewmodel extends Notifier<TimerState> with WidgetsBindingObserver {
 
   AsyncValue<Setting?> get _settingsValue =>
       ref.watch(settingsViewModelProvider);
+
+  dynamic get _taskRepository => ref.read(taskRepositoryProvider);
 
   @override
   TimerState build() {
@@ -40,6 +44,7 @@ class TimerViewmodel extends Notifier<TimerState> with WidgetsBindingObserver {
         sessionsCompleted: 0,
         mode: TimerMode.focus,
         status: TimerStatus.idle,
+        assignedTask: null,
       );
     } else {
       return TimerState.initial();
@@ -84,6 +89,8 @@ class TimerViewmodel extends Notifier<TimerState> with WidgetsBindingObserver {
   }
 
   void _handleSessionComplete() {
+    _saveCurrentProgress();
+
     int newSessionsCompleted = state.sessionsCompleted;
     TimerMode newMode;
 
@@ -146,12 +153,13 @@ class TimerViewmodel extends Notifier<TimerState> with WidgetsBindingObserver {
     final settings = _settingsValue.value;
     final int resetSeconds = (settings?.pomodoroDuration ?? 25) * 60;
 
-    state = TimerState(
+    state = state.copyWith(
       remainingSeconds: resetSeconds,
       initialSeconds: resetSeconds,
       sessionsCompleted: 0,
       mode: TimerMode.focus,
       status: TimerStatus.idle,
+      assignedTask: state.assignedTask,
     );
   }
 
@@ -164,6 +172,65 @@ class TimerViewmodel extends Notifier<TimerState> with WidgetsBindingObserver {
 
   Future<void> _playSound() async {
     await _audioPlayer?.play(AssetSource('audio/ding.mp3'));
+  }
+
+  void assignTask(Task task) {
+    if (state.assignedTask?.id == task.id) return;
+
+    if (state.assignedTask != null) {
+      _saveCurrentProgress();
+    }
+
+    state = state.copyWith(assignedTask: task, clearTask: false);
+    reset();
+  }
+
+  void clearAssignedTask() {
+    state = state.copyWith(clearTask: true);
+  }
+
+  void _saveCurrentProgress() {
+    if (state.mode == TimerMode.focus && state.assignedTask != null) {
+      final int secondsInvested = state.initialSeconds - state.remainingSeconds;
+
+      if (secondsInvested > 0) {
+        final task = state.assignedTask!;
+        final updatedDuration = (task.actualDuration ?? 0) + secondsInvested;
+
+        final updatedTask =
+            task.copyWith(actualDuration: Value(updatedDuration));
+
+        _taskRepository.updateTaskBasic(updatedTask);
+        state = state.copyWith(assignedTask: updatedTask);
+      }
+    }
+  }
+
+  void completeAssignedTask() {
+    if (state.assignedTask != null) {
+      _saveCurrentProgress();
+      final task = state.assignedTask!;
+      final updatedTask = task.copyWith(isCompleted: true);
+      _taskRepository.updateTaskBasic(updatedTask);
+      state = state.copyWith(assignedTask: updatedTask);
+    }
+
+    _timer?.cancel();
+    _timer = null;
+    _pausedTime = null;
+
+    final settings = _settingsValue.value;
+    final int resetSeconds = (settings?.pomodoroDuration ?? 25) * 60;
+
+    state = state.copyWith(
+      remainingSeconds: resetSeconds,
+      initialSeconds: resetSeconds,
+      sessionsCompleted: 0,
+      mode: TimerMode.focus,
+      status: TimerStatus.idle,
+      assignedTask: null,
+      clearTask: true,
+    );
   }
 }
 

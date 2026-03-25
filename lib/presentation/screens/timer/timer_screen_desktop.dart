@@ -1,3 +1,4 @@
+import 'package:aegis/presentation/screens/timer/components/tasks_panel_desktop.dart';
 import 'package:aegis/presentation/viewmodels/timer_state.dart';
 import 'package:aegis/presentation/viewmodels/timer_viewmodel.dart';
 import 'package:flutter/material.dart';
@@ -61,7 +62,7 @@ class TimerScreenDesktop extends ConsumerWidget {
                   ),
                   Expanded(
                     flex: 2,
-                    child: _buildRightPanelPlaceholder(),
+                    child: TasksPanelDesktop(),
                   ),
                 ],
               ),
@@ -129,8 +130,8 @@ class TimerScreenDesktop extends ConsumerWidget {
         Text(
           _formatTime(remainingSeconds),
           style: const TextStyle(
-            fontSize: 110,
-            fontWeight: FontWeight.w900,
+            fontSize: 100,
+            fontWeight: FontWeight.bold,
             color: Color(0xFF0F172A),
           ),
         ),
@@ -209,42 +210,6 @@ class TimerScreenDesktop extends ConsumerWidget {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildRightPanelPlaceholder() {
-    return Container(
-      margin: const EdgeInsets.only(top: 24, bottom: 24, right: 32),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 24,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.construction_rounded,
-                size: 64, color: Color(0xFFCBD5E1)),
-            SizedBox(height: 16),
-            Text(
-              "Panel de tareas\n(En desarrollo)",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Color(0xFF94A3B8),
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 

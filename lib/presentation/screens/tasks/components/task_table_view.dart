@@ -243,7 +243,7 @@ class TaskRow extends ConsumerWidget {
                                         return Padding(
                                           padding:
                                               const EdgeInsets.only(right: 8.0),
-                                          child: _TagPill(
+                                          child: TagPill(
                                             label: tag.name,
                                             backgroundColor:
                                                 tagColor.withAlpha(20),
@@ -353,12 +353,13 @@ class TaskRow extends ConsumerWidget {
   }
 }
 
-class _TagPill extends StatelessWidget {
+class TagPill extends StatelessWidget {
   final String label;
   final Color backgroundColor;
   final Color textColor;
 
-  const _TagPill({
+  const TagPill({
+    super.key,
     required this.label,
     required this.backgroundColor,
     required this.textColor,

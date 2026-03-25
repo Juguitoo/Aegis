@@ -1,3 +1,5 @@
+import 'package:aegis/data/local/database/app_database.dart';
+
 enum TimerMode { focus, shortBreak, longBreak }
 
 enum TimerStatus { idle, running, paused }
@@ -8,6 +10,7 @@ class TimerState {
   final int sessionsCompleted;
   final TimerMode mode;
   final TimerStatus status;
+  final Task? assignedTask;
 
   TimerState({
     required this.remainingSeconds,
@@ -15,6 +18,7 @@ class TimerState {
     required this.sessionsCompleted,
     required this.mode,
     required this.status,
+    this.assignedTask,
   });
 
   TimerState copyWith({
@@ -23,6 +27,8 @@ class TimerState {
     int? sessionsCompleted,
     TimerMode? mode,
     TimerStatus? status,
+    Task? assignedTask,
+    bool clearTask = false,
   }) {
     return TimerState(
       remainingSeconds: remainingSeconds ?? this.remainingSeconds,
@@ -30,6 +36,7 @@ class TimerState {
       sessionsCompleted: sessionsCompleted ?? this.sessionsCompleted,
       mode: mode ?? this.mode,
       status: status ?? this.status,
+      assignedTask: clearTask ? null : (assignedTask ?? this.assignedTask),
     );
   }
 
@@ -40,6 +47,7 @@ class TimerState {
       sessionsCompleted: 0,
       mode: TimerMode.focus,
       status: TimerStatus.idle,
+      assignedTask: null,
     );
   }
 }
