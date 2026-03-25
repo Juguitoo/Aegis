@@ -89,6 +89,7 @@ class TaskListViewModel extends StreamNotifier<List<Task>> {
       title: Value(title),
       description: Value(description ?? ''),
       estimatedDuration: Value(estimatedDuration),
+      actualDuration: const Value(0),
       dueDate: Value(dueDate),
       projectId: Value(projectId),
       priority: Value(priority),

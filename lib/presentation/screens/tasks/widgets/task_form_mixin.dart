@@ -51,7 +51,8 @@ mixin TaskFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
       descriptionController.text = task.description ?? '';
       notesController.text = task.notes ?? '';
       if (task.estimatedDuration != null) {
-        estimatedDurationController.text = task.estimatedDuration.toString();
+        estimatedDurationController.text =
+            (task.estimatedDuration! ~/ 60).toString();
       }
       selectedDueDate = task.dueDate;
       selectedProjectId = task.projectId;
@@ -154,7 +155,7 @@ mixin TaskFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
 
     final durationText = estimatedDurationController.text.trim();
     final duration =
-        durationText.isNotEmpty ? int.tryParse(durationText) : null;
+        durationText.isNotEmpty ? int.tryParse(durationText)! * 60 : null;
 
     final validChecklist =
         currentChecklist.where((item) => item.title.trim().isNotEmpty).toList();
@@ -192,7 +193,7 @@ mixin TaskFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
 
     final durationText = estimatedDurationController.text.trim();
     final duration =
-        durationText.isNotEmpty ? int.tryParse(durationText) : null;
+        durationText.isNotEmpty ? int.tryParse(durationText)! * 60 : null;
 
     final updatedTask = initialTask!.copyWith(
       title: titleController.text.trim(),

@@ -4,6 +4,7 @@ import 'package:aegis/presentation/screens/tasks/widgets/task_form_mixin.dart';
 import 'package:aegis/presentation/viewmodels/project_list_viewmodel.dart';
 import 'package:aegis/presentation/viewmodels/task_list_viewmodel.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../tags/widgets/tag_multi_selector.dart';
 
@@ -244,6 +245,9 @@ class _TaskDetailsTab extends StatelessWidget {
                 child: TextField(
                   controller: estimatedDurationController,
                   keyboardType: TextInputType.number,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.digitsOnly,
+                  ],
                   decoration: InputDecoration(
                     labelText: 'Estimación (min)',
                     hintText: 'Ej: 30',
