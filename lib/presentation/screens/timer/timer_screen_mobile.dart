@@ -1,4 +1,6 @@
+import 'package:aegis/core/utils/format_utils.dart';
 import 'package:aegis/presentation/screens/settings/settings_screen_mobile.dart';
+import 'package:aegis/presentation/screens/timer/components/tasks_panel_mobile.dart';
 import 'package:aegis/presentation/viewmodels/timer_state.dart';
 import 'package:aegis/presentation/viewmodels/timer_viewmodel.dart';
 import 'package:flutter/material.dart';
@@ -43,9 +45,7 @@ class TimerScreenMobile extends ConsumerWidget {
               iconSize: 28,
               icon:
                   const Icon(Icons.self_improvement, color: Color(0xFF1E293B)),
-              onPressed: () {
-                // Navegar a modo inmersivo
-              },
+              onPressed: () {},
             ),
           ),
           Padding(
@@ -67,8 +67,13 @@ class TimerScreenMobile extends ConsumerWidget {
       body: SafeArea(
         child: Column(
           children: [
-            const Divider(color: Color(0xFFE2E8F0)),
-            const Spacer(),
+            const Divider(color: Color(0xFFE2E8F0), height: 1),
+            const Spacer(flex: 1),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: _buildDynamicModePlaceholder(),
+            ),
+            const Spacer(flex: 2),
             Stack(
               alignment: Alignment.center,
               children: [
@@ -82,7 +87,7 @@ class TimerScreenMobile extends ConsumerWidget {
                   animateFromLastPercent: true,
                 ),
                 Text(
-                  _formatTime(timerState.remainingSeconds),
+                  FormatUtils.formatTime(timerState.remainingSeconds),
                   style: const TextStyle(
                     fontSize: 64,
                     fontWeight: FontWeight.bold,
@@ -91,25 +96,65 @@ class TimerScreenMobile extends ConsumerWidget {
                 ),
               ],
             ),
-            const Spacer(),
+            const Spacer(flex: 2),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 24.0),
+              child: TasksPanelMobile(),
+            ),
+            const Spacer(flex: 2),
             _buildControls(ref, timerState),
-            const SizedBox(height: 40),
+            const Spacer(flex: 1),
           ],
         ),
       ),
     );
   }
 
-  String _formatTime(int totalSeconds) {
-    final minutes = (totalSeconds ~/ 60).toString().padLeft(2, '0');
-    final seconds = (totalSeconds % 60).toString().padLeft(2, '0');
-    return '$minutes:$seconds';
+  Widget _buildDynamicModePlaceholder() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(5),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: const Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Modo Dinámico IA",
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                    color: Color(0xFF1E293B)),
+              ),
+              Text(
+                "Ajuste inteligente de intervalos",
+                style: TextStyle(fontSize: 12, color: Color(0xFF94A3B8)),
+              ),
+            ],
+          ),
+          Icon(Icons.toggle_on, color: Color(0xFF6366F1), size: 40),
+        ],
+      ),
+    );
   }
 
   Widget _buildControls(WidgetRef ref, dynamic state) {
     final timerNotifier = ref.read(timerViewModelProvider.notifier);
-
     final isRunning = state.status == TimerStatus.running;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 48.0),
       child: Row(
