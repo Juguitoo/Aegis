@@ -1,3 +1,4 @@
+import 'package:aegis/core/utils/format_utils.dart';
 import 'package:aegis/presentation/screens/tasks/components/task_table_view.dart';
 import 'package:aegis/presentation/viewmodels/task_list_viewmodel.dart';
 import 'package:aegis/presentation/viewmodels/timer_state.dart';
@@ -121,7 +122,7 @@ class _TasksPanelDesktopState extends ConsumerState<TasksPanelDesktop> {
     final int currentTotalSeconds = (task.actualDuration ?? 0) + liveSeconds;
 
     final String timeString =
-        '${_formatDuration(currentTotalSeconds)} / ${_formatDuration(task.estimatedDuration ?? 0)}';
+        '${FormatUtils.formatDuration(currentTotalSeconds)} / ${FormatUtils.formatDuration(task.estimatedDuration ?? 0)}';
 
     final tagIdsAsync = ref.watch(taskTagsProvider(task.id));
     final allTagsAsync = ref.watch(tagListViewModelProvider);
@@ -288,7 +289,7 @@ class _TasksPanelDesktopState extends ConsumerState<TasksPanelDesktop> {
                                     size: 14, color: Colors.grey),
                                 const SizedBox(width: 6),
                                 Text(
-                                  'Fecha: ${_formatDate(task.dueDate)}',
+                                  'Fecha: ${FormatUtils.formatDate(task.dueDate)}',
                                   style: const TextStyle(
                                       fontSize: 13, color: Colors.black87),
                                 ),
@@ -423,7 +424,7 @@ class _TasksPanelDesktopState extends ConsumerState<TasksPanelDesktop> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              _formatDuration(task.estimatedDuration ?? 0),
+              FormatUtils.formatDuration(task.estimatedDuration ?? 0),
               style: const TextStyle(color: Colors.grey, fontSize: 13),
             ),
             const SizedBox(width: 4),
@@ -438,36 +439,5 @@ class _TasksPanelDesktopState extends ConsumerState<TasksPanelDesktop> {
         ),
       ),
     );
-  }
-
-  String _formatDate(DateTime? date) {
-    if (date == null) return 'Sin fecha';
-    final months = [
-      'Enero',
-      'Febrero',
-      'Marzo',
-      'Abril',
-      'Mayo',
-      'Junio',
-      'Julio',
-      'Agosto',
-      'Septiembre',
-      'Octubre',
-      'Noviembre',
-      'Diciembre'
-    ];
-    return '${date.day.toString().padLeft(2, '0')} de ${months[date.month - 1]} de ${date.year}';
-  }
-
-  String _formatDuration(int totalSeconds) {
-    if (totalSeconds == 0) return "0m";
-    final int hours = totalSeconds ~/ 3600;
-    final int minutes = (totalSeconds % 3600) ~/ 60;
-
-    if (hours > 0) {
-      return '${hours}h ${minutes}m';
-    } else {
-      return '${minutes}m';
-    }
   }
 }

@@ -1,3 +1,4 @@
+import 'package:aegis/core/utils/format_utils.dart';
 import 'package:aegis/presentation/screens/timer/components/tasks_panel_desktop.dart';
 import 'package:aegis/presentation/viewmodels/timer_state.dart';
 import 'package:aegis/presentation/viewmodels/timer_viewmodel.dart';
@@ -128,7 +129,7 @@ class TimerScreenDesktop extends ConsumerWidget {
           animateFromLastPercent: true,
         ),
         Text(
-          _formatTime(remainingSeconds),
+          FormatUtils.formatTime(remainingSeconds),
           style: const TextStyle(
             fontSize: 100,
             fontWeight: FontWeight.bold,
@@ -211,11 +212,5 @@ class TimerScreenDesktop extends ConsumerWidget {
         ),
       ],
     );
-  }
-
-  String _formatTime(int totalSeconds) {
-    final minutes = (totalSeconds ~/ 60).toString().padLeft(2, '0');
-    final seconds = (totalSeconds % 60).toString().padLeft(2, '0');
-    return '$minutes:$seconds';
   }
 }
