@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:aegis/core/providers/repository_providers.dart';
+import 'package:aegis/core/utils/adaptive_interval_calculator.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
@@ -16,16 +17,19 @@ class TimerViewmodel extends Notifier<TimerState> with WidgetsBindingObserver {
   AudioPlayer? _audioPlayer;
   Timer? _timer;
   DateTime? _pausedTime;
+  DateTime? _manualPauseTime;
 
   AsyncValue<Setting?> get _settingsValue =>
       ref.watch(settingsViewModelProvider);
 
   dynamic get _taskRepository => ref.read(taskRepositoryProvider);
+  dynamic get _sessionRepository => ref.read(sessionRepositoryProvider);
+  AdaptiveIntervalCalculator get _calculator =>
+      ref.read(adaptiveCalculatorProvider);
 
   @override
   TimerState build() {
     _audioPlayer = ref.read(audioPlayerProvider);
-
     WidgetsBinding.instance.addObserver(this);
 
     ref.onDispose(() {
@@ -45,6 +49,12 @@ class TimerViewmodel extends Notifier<TimerState> with WidgetsBindingObserver {
         mode: TimerMode.focus,
         status: TimerStatus.idle,
         assignedTask: null,
+        isDynamicModeActive: false,
+        pauseCount: 0,
+        totalPauseDuration: 0,
+        addedTime: 0,
+        blocklistAttempts: 0,
+        pendingSuggestion: null,
       );
     } else {
       return TimerState.initial();
@@ -88,8 +98,26 @@ class TimerViewmodel extends Notifier<TimerState> with WidgetsBindingObserver {
     }
   }
 
-  void _handleSessionComplete() {
+  void _saveSessionRecord() {
+    final int actualSeconds = state.initialSeconds - state.remainingSeconds;
+
+    if (actualSeconds > 0) {
+      final session = FocusSessionsCompanion(
+        mode: Value(state.mode.toString()),
+        actualSeconds: Value(actualSeconds),
+        pauseCount: Value(state.pauseCount),
+        pauseDuration: Value(state.totalPauseDuration),
+        extraTimeAdded: Value(state.addedTime),
+        blocklistAttempts: Value(state.blocklistAttempts),
+        createdAt: Value(DateTime.now()),
+      );
+      _sessionRepository.insertSession(session);
+    }
+  }
+
+  Future<void> _handleSessionComplete() async {
     _saveCurrentProgress();
+    _saveSessionRecord();
 
     int newSessionsCompleted = state.sessionsCompleted;
     TimerMode newMode;
@@ -104,35 +132,111 @@ class TimerViewmodel extends Notifier<TimerState> with WidgetsBindingObserver {
     }
 
     final settings = _settingsValue.value;
-    int newSeconds;
+    int baseSeconds;
 
     switch (newMode) {
       case TimerMode.focus:
-        newSeconds = (settings?.pomodoroDuration ?? 25) * 60;
+        baseSeconds = (settings?.pomodoroDuration ?? 25) * 60;
         break;
       case TimerMode.shortBreak:
-        newSeconds = (settings?.shortBreakDuration ?? 5) * 60;
+        baseSeconds = (settings?.shortBreakDuration ?? 5) * 60;
         break;
       case TimerMode.longBreak:
-        newSeconds = (settings?.longBreakDuration ?? 15) * 60;
+        baseSeconds = (settings?.longBreakDuration ?? 15) * 60;
         break;
     }
 
+    if (state.isDynamicModeActive) {
+      final recentSessions = await _sessionRepository.getLast30FocusSessions();
+      final interruptions = state.pauseCount + state.blocklistAttempts;
+      final isCompleted = state.assignedTask?.isCompleted ?? false;
+
+      final suggestion = _calculator.calculateNextInterval(
+        currentMode: state.mode,
+        standardNextMode: newMode,
+        baseSeconds: baseSeconds,
+        recentSessions: recentSessions,
+        currentSessionInterruptions: interruptions,
+        isTaskCompleted: isCompleted,
+      );
+
+      if (suggestion != null) {
+        state = state.copyWith(
+          status: TimerStatus.idle,
+          sessionsCompleted: newSessionsCompleted,
+          pauseCount: 0,
+          totalPauseDuration: 0,
+          addedTime: 0,
+          blocklistAttempts: 0,
+          pendingSuggestion: suggestion,
+        );
+        return;
+      }
+    }
+
     state = state.copyWith(
-      remainingSeconds: newSeconds,
-      initialSeconds: newSeconds,
+      remainingSeconds: baseSeconds,
+      initialSeconds: baseSeconds,
       sessionsCompleted: newSessionsCompleted,
       mode: newMode,
       status: TimerStatus.running,
+      pauseCount: 0,
+      totalPauseDuration: 0,
+      addedTime: 0,
+      blocklistAttempts: 0,
     );
 
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) => _onTick());
+  }
+
+  void acceptSuggestion() {
+    final suggestion = state.pendingSuggestion;
+    if (suggestion == null) return;
+
+    state = state.copyWith(
+      mode: suggestion.suggestedMode,
+      remainingSeconds: suggestion.suggestedDurationSeconds,
+      initialSeconds: suggestion.suggestedDurationSeconds,
+      status: TimerStatus.running,
+      pendingSuggestion: null,
+      clearSuggestion: true,
+    );
+
+    _timer?.cancel();
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) => _onTick());
+  }
+
+  void rejectSuggestion() {
+    final suggestion = state.pendingSuggestion;
+    if (suggestion == null) return;
+
+    state = state.copyWith(
+      mode: suggestion.fallbackMode,
+      remainingSeconds: suggestion.fallbackDurationSeconds,
+      initialSeconds: suggestion.fallbackDurationSeconds,
+      status: TimerStatus.running,
+      pendingSuggestion: null,
+      clearSuggestion: true,
+    );
+
+    _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) => _onTick());
   }
 
   void start() {
     if (state.status == TimerStatus.running) return;
 
-    state = state.copyWith(status: TimerStatus.running);
+    int extraPause = 0;
+    if (_manualPauseTime != null) {
+      extraPause = DateTime.now().difference(_manualPauseTime!).inSeconds;
+      _manualPauseTime = null;
+    }
+
+    state = state.copyWith(
+      status: TimerStatus.running,
+      totalPauseDuration: state.totalPauseDuration + extraPause,
+    );
+
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       _onTick();
@@ -142,13 +246,20 @@ class TimerViewmodel extends Notifier<TimerState> with WidgetsBindingObserver {
   void pause() {
     _timer?.cancel();
     _pausedTime = null;
-    state = state.copyWith(status: TimerStatus.paused);
+    _manualPauseTime = DateTime.now();
+
+    state = state.copyWith(
+      status: TimerStatus.paused,
+      pauseCount: state.pauseCount + 1,
+    );
   }
 
   void reset() {
+    _saveSessionRecord();
     _timer?.cancel();
     _timer = null;
     _pausedTime = null;
+    _manualPauseTime = null;
 
     final settings = _settingsValue.value;
     final int resetSeconds = (settings?.pomodoroDuration ?? 25) * 60;
@@ -160,6 +271,12 @@ class TimerViewmodel extends Notifier<TimerState> with WidgetsBindingObserver {
       mode: TimerMode.focus,
       status: TimerStatus.idle,
       assignedTask: state.assignedTask,
+      pauseCount: 0,
+      totalPauseDuration: 0,
+      addedTime: 0,
+      blocklistAttempts: 0,
+      pendingSuggestion: null,
+      clearSuggestion: true,
     );
   }
 
@@ -167,7 +284,18 @@ class TimerViewmodel extends Notifier<TimerState> with WidgetsBindingObserver {
     state = state.copyWith(
       remainingSeconds: state.remainingSeconds + 300,
       initialSeconds: state.initialSeconds + 300,
+      addedTime: state.addedTime + 300,
     );
+  }
+
+  void toggleDynamicMode() {
+    state = state.copyWith(isDynamicModeActive: !state.isDynamicModeActive);
+  }
+
+  void registerBlocklistAttempt() {
+    if (state.status == TimerStatus.running) {
+      state = state.copyWith(blocklistAttempts: state.blocklistAttempts + 1);
+    }
   }
 
   Future<void> _playSound() async {
@@ -209,6 +337,8 @@ class TimerViewmodel extends Notifier<TimerState> with WidgetsBindingObserver {
   void completeAssignedTask() {
     if (state.assignedTask != null) {
       _saveCurrentProgress();
+      _saveSessionRecord();
+
       final task = state.assignedTask!;
       final updatedTask = task.copyWith(isCompleted: true);
       _taskRepository.updateTaskBasic(updatedTask);
@@ -218,6 +348,7 @@ class TimerViewmodel extends Notifier<TimerState> with WidgetsBindingObserver {
     _timer?.cancel();
     _timer = null;
     _pausedTime = null;
+    _manualPauseTime = null;
 
     final settings = _settingsValue.value;
     final int resetSeconds = (settings?.pomodoroDuration ?? 25) * 60;
@@ -230,6 +361,12 @@ class TimerViewmodel extends Notifier<TimerState> with WidgetsBindingObserver {
       status: TimerStatus.idle,
       assignedTask: null,
       clearTask: true,
+      pauseCount: 0,
+      totalPauseDuration: 0,
+      addedTime: 0,
+      blocklistAttempts: 0,
+      pendingSuggestion: null,
+      clearSuggestion: true,
     );
   }
 }

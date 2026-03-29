@@ -2024,6 +2024,442 @@ class BlacklistedAppsCompanion extends UpdateCompanion<BlacklistedApp> {
   }
 }
 
+class $FocusSessionsTable extends FocusSessions
+    with TableInfo<$FocusSessionsTable, FocusSession> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $FocusSessionsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+      'id', aliasedName, false,
+      hasAutoIncrement: true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+  static const VerificationMeta _modeMeta = const VerificationMeta('mode');
+  @override
+  late final GeneratedColumn<String> mode = GeneratedColumn<String>(
+      'mode', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _actualSecondsMeta =
+      const VerificationMeta('actualSeconds');
+  @override
+  late final GeneratedColumn<int> actualSeconds = GeneratedColumn<int>(
+      'actual_seconds', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _pauseCountMeta =
+      const VerificationMeta('pauseCount');
+  @override
+  late final GeneratedColumn<int> pauseCount = GeneratedColumn<int>(
+      'pause_count', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _pauseDurationMeta =
+      const VerificationMeta('pauseDuration');
+  @override
+  late final GeneratedColumn<int> pauseDuration = GeneratedColumn<int>(
+      'pause_duration', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _extraTimeAddedMeta =
+      const VerificationMeta('extraTimeAdded');
+  @override
+  late final GeneratedColumn<int> extraTimeAdded = GeneratedColumn<int>(
+      'extra_time_added', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _blocklistAttemptsMeta =
+      const VerificationMeta('blocklistAttempts');
+  @override
+  late final GeneratedColumn<int> blocklistAttempts = GeneratedColumn<int>(
+      'blocklist_attempts', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _createdAtMeta =
+      const VerificationMeta('createdAt');
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+      'created_at', aliasedName, false,
+      type: DriftSqlType.dateTime,
+      requiredDuringInsert: false,
+      defaultValue: currentDateAndTime);
+  @override
+  List<GeneratedColumn> get $columns => [
+        id,
+        mode,
+        actualSeconds,
+        pauseCount,
+        pauseDuration,
+        extraTimeAdded,
+        blocklistAttempts,
+        createdAt
+      ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'focus_sessions';
+  @override
+  VerificationContext validateIntegrity(Insertable<FocusSession> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('mode')) {
+      context.handle(
+          _modeMeta, mode.isAcceptableOrUnknown(data['mode']!, _modeMeta));
+    } else if (isInserting) {
+      context.missing(_modeMeta);
+    }
+    if (data.containsKey('actual_seconds')) {
+      context.handle(
+          _actualSecondsMeta,
+          actualSeconds.isAcceptableOrUnknown(
+              data['actual_seconds']!, _actualSecondsMeta));
+    } else if (isInserting) {
+      context.missing(_actualSecondsMeta);
+    }
+    if (data.containsKey('pause_count')) {
+      context.handle(
+          _pauseCountMeta,
+          pauseCount.isAcceptableOrUnknown(
+              data['pause_count']!, _pauseCountMeta));
+    } else if (isInserting) {
+      context.missing(_pauseCountMeta);
+    }
+    if (data.containsKey('pause_duration')) {
+      context.handle(
+          _pauseDurationMeta,
+          pauseDuration.isAcceptableOrUnknown(
+              data['pause_duration']!, _pauseDurationMeta));
+    } else if (isInserting) {
+      context.missing(_pauseDurationMeta);
+    }
+    if (data.containsKey('extra_time_added')) {
+      context.handle(
+          _extraTimeAddedMeta,
+          extraTimeAdded.isAcceptableOrUnknown(
+              data['extra_time_added']!, _extraTimeAddedMeta));
+    } else if (isInserting) {
+      context.missing(_extraTimeAddedMeta);
+    }
+    if (data.containsKey('blocklist_attempts')) {
+      context.handle(
+          _blocklistAttemptsMeta,
+          blocklistAttempts.isAcceptableOrUnknown(
+              data['blocklist_attempts']!, _blocklistAttemptsMeta));
+    } else if (isInserting) {
+      context.missing(_blocklistAttemptsMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(_createdAtMeta,
+          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  FocusSession map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return FocusSession(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+      mode: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}mode'])!,
+      actualSeconds: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}actual_seconds'])!,
+      pauseCount: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}pause_count'])!,
+      pauseDuration: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}pause_duration'])!,
+      extraTimeAdded: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}extra_time_added'])!,
+      blocklistAttempts: attachedDatabase.typeMapping.read(
+          DriftSqlType.int, data['${effectivePrefix}blocklist_attempts'])!,
+      createdAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
+    );
+  }
+
+  @override
+  $FocusSessionsTable createAlias(String alias) {
+    return $FocusSessionsTable(attachedDatabase, alias);
+  }
+}
+
+class FocusSession extends DataClass implements Insertable<FocusSession> {
+  final int id;
+  final String mode;
+  final int actualSeconds;
+  final int pauseCount;
+  final int pauseDuration;
+  final int extraTimeAdded;
+  final int blocklistAttempts;
+  final DateTime createdAt;
+  const FocusSession(
+      {required this.id,
+      required this.mode,
+      required this.actualSeconds,
+      required this.pauseCount,
+      required this.pauseDuration,
+      required this.extraTimeAdded,
+      required this.blocklistAttempts,
+      required this.createdAt});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['mode'] = Variable<String>(mode);
+    map['actual_seconds'] = Variable<int>(actualSeconds);
+    map['pause_count'] = Variable<int>(pauseCount);
+    map['pause_duration'] = Variable<int>(pauseDuration);
+    map['extra_time_added'] = Variable<int>(extraTimeAdded);
+    map['blocklist_attempts'] = Variable<int>(blocklistAttempts);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  FocusSessionsCompanion toCompanion(bool nullToAbsent) {
+    return FocusSessionsCompanion(
+      id: Value(id),
+      mode: Value(mode),
+      actualSeconds: Value(actualSeconds),
+      pauseCount: Value(pauseCount),
+      pauseDuration: Value(pauseDuration),
+      extraTimeAdded: Value(extraTimeAdded),
+      blocklistAttempts: Value(blocklistAttempts),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory FocusSession.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return FocusSession(
+      id: serializer.fromJson<int>(json['id']),
+      mode: serializer.fromJson<String>(json['mode']),
+      actualSeconds: serializer.fromJson<int>(json['actualSeconds']),
+      pauseCount: serializer.fromJson<int>(json['pauseCount']),
+      pauseDuration: serializer.fromJson<int>(json['pauseDuration']),
+      extraTimeAdded: serializer.fromJson<int>(json['extraTimeAdded']),
+      blocklistAttempts: serializer.fromJson<int>(json['blocklistAttempts']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'mode': serializer.toJson<String>(mode),
+      'actualSeconds': serializer.toJson<int>(actualSeconds),
+      'pauseCount': serializer.toJson<int>(pauseCount),
+      'pauseDuration': serializer.toJson<int>(pauseDuration),
+      'extraTimeAdded': serializer.toJson<int>(extraTimeAdded),
+      'blocklistAttempts': serializer.toJson<int>(blocklistAttempts),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  FocusSession copyWith(
+          {int? id,
+          String? mode,
+          int? actualSeconds,
+          int? pauseCount,
+          int? pauseDuration,
+          int? extraTimeAdded,
+          int? blocklistAttempts,
+          DateTime? createdAt}) =>
+      FocusSession(
+        id: id ?? this.id,
+        mode: mode ?? this.mode,
+        actualSeconds: actualSeconds ?? this.actualSeconds,
+        pauseCount: pauseCount ?? this.pauseCount,
+        pauseDuration: pauseDuration ?? this.pauseDuration,
+        extraTimeAdded: extraTimeAdded ?? this.extraTimeAdded,
+        blocklistAttempts: blocklistAttempts ?? this.blocklistAttempts,
+        createdAt: createdAt ?? this.createdAt,
+      );
+  FocusSession copyWithCompanion(FocusSessionsCompanion data) {
+    return FocusSession(
+      id: data.id.present ? data.id.value : this.id,
+      mode: data.mode.present ? data.mode.value : this.mode,
+      actualSeconds: data.actualSeconds.present
+          ? data.actualSeconds.value
+          : this.actualSeconds,
+      pauseCount:
+          data.pauseCount.present ? data.pauseCount.value : this.pauseCount,
+      pauseDuration: data.pauseDuration.present
+          ? data.pauseDuration.value
+          : this.pauseDuration,
+      extraTimeAdded: data.extraTimeAdded.present
+          ? data.extraTimeAdded.value
+          : this.extraTimeAdded,
+      blocklistAttempts: data.blocklistAttempts.present
+          ? data.blocklistAttempts.value
+          : this.blocklistAttempts,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FocusSession(')
+          ..write('id: $id, ')
+          ..write('mode: $mode, ')
+          ..write('actualSeconds: $actualSeconds, ')
+          ..write('pauseCount: $pauseCount, ')
+          ..write('pauseDuration: $pauseDuration, ')
+          ..write('extraTimeAdded: $extraTimeAdded, ')
+          ..write('blocklistAttempts: $blocklistAttempts, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, mode, actualSeconds, pauseCount,
+      pauseDuration, extraTimeAdded, blocklistAttempts, createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is FocusSession &&
+          other.id == this.id &&
+          other.mode == this.mode &&
+          other.actualSeconds == this.actualSeconds &&
+          other.pauseCount == this.pauseCount &&
+          other.pauseDuration == this.pauseDuration &&
+          other.extraTimeAdded == this.extraTimeAdded &&
+          other.blocklistAttempts == this.blocklistAttempts &&
+          other.createdAt == this.createdAt);
+}
+
+class FocusSessionsCompanion extends UpdateCompanion<FocusSession> {
+  final Value<int> id;
+  final Value<String> mode;
+  final Value<int> actualSeconds;
+  final Value<int> pauseCount;
+  final Value<int> pauseDuration;
+  final Value<int> extraTimeAdded;
+  final Value<int> blocklistAttempts;
+  final Value<DateTime> createdAt;
+  const FocusSessionsCompanion({
+    this.id = const Value.absent(),
+    this.mode = const Value.absent(),
+    this.actualSeconds = const Value.absent(),
+    this.pauseCount = const Value.absent(),
+    this.pauseDuration = const Value.absent(),
+    this.extraTimeAdded = const Value.absent(),
+    this.blocklistAttempts = const Value.absent(),
+    this.createdAt = const Value.absent(),
+  });
+  FocusSessionsCompanion.insert({
+    this.id = const Value.absent(),
+    required String mode,
+    required int actualSeconds,
+    required int pauseCount,
+    required int pauseDuration,
+    required int extraTimeAdded,
+    required int blocklistAttempts,
+    this.createdAt = const Value.absent(),
+  })  : mode = Value(mode),
+        actualSeconds = Value(actualSeconds),
+        pauseCount = Value(pauseCount),
+        pauseDuration = Value(pauseDuration),
+        extraTimeAdded = Value(extraTimeAdded),
+        blocklistAttempts = Value(blocklistAttempts);
+  static Insertable<FocusSession> custom({
+    Expression<int>? id,
+    Expression<String>? mode,
+    Expression<int>? actualSeconds,
+    Expression<int>? pauseCount,
+    Expression<int>? pauseDuration,
+    Expression<int>? extraTimeAdded,
+    Expression<int>? blocklistAttempts,
+    Expression<DateTime>? createdAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (mode != null) 'mode': mode,
+      if (actualSeconds != null) 'actual_seconds': actualSeconds,
+      if (pauseCount != null) 'pause_count': pauseCount,
+      if (pauseDuration != null) 'pause_duration': pauseDuration,
+      if (extraTimeAdded != null) 'extra_time_added': extraTimeAdded,
+      if (blocklistAttempts != null) 'blocklist_attempts': blocklistAttempts,
+      if (createdAt != null) 'created_at': createdAt,
+    });
+  }
+
+  FocusSessionsCompanion copyWith(
+      {Value<int>? id,
+      Value<String>? mode,
+      Value<int>? actualSeconds,
+      Value<int>? pauseCount,
+      Value<int>? pauseDuration,
+      Value<int>? extraTimeAdded,
+      Value<int>? blocklistAttempts,
+      Value<DateTime>? createdAt}) {
+    return FocusSessionsCompanion(
+      id: id ?? this.id,
+      mode: mode ?? this.mode,
+      actualSeconds: actualSeconds ?? this.actualSeconds,
+      pauseCount: pauseCount ?? this.pauseCount,
+      pauseDuration: pauseDuration ?? this.pauseDuration,
+      extraTimeAdded: extraTimeAdded ?? this.extraTimeAdded,
+      blocklistAttempts: blocklistAttempts ?? this.blocklistAttempts,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (mode.present) {
+      map['mode'] = Variable<String>(mode.value);
+    }
+    if (actualSeconds.present) {
+      map['actual_seconds'] = Variable<int>(actualSeconds.value);
+    }
+    if (pauseCount.present) {
+      map['pause_count'] = Variable<int>(pauseCount.value);
+    }
+    if (pauseDuration.present) {
+      map['pause_duration'] = Variable<int>(pauseDuration.value);
+    }
+    if (extraTimeAdded.present) {
+      map['extra_time_added'] = Variable<int>(extraTimeAdded.value);
+    }
+    if (blocklistAttempts.present) {
+      map['blocklist_attempts'] = Variable<int>(blocklistAttempts.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FocusSessionsCompanion(')
+          ..write('id: $id, ')
+          ..write('mode: $mode, ')
+          ..write('actualSeconds: $actualSeconds, ')
+          ..write('pauseCount: $pauseCount, ')
+          ..write('pauseDuration: $pauseDuration, ')
+          ..write('extraTimeAdded: $extraTimeAdded, ')
+          ..write('blocklistAttempts: $blocklistAttempts, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -2035,12 +2471,21 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $SettingsTable settings = $SettingsTable(this);
   late final $BlacklistedAppsTable blacklistedApps =
       $BlacklistedAppsTable(this);
+  late final $FocusSessionsTable focusSessions = $FocusSessionsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
-  List<DatabaseSchemaEntity> get allSchemaEntities =>
-      [projects, tasks, tags, taskTags, subtasks, settings, blacklistedApps];
+  List<DatabaseSchemaEntity> get allSchemaEntities => [
+        projects,
+        tasks,
+        tags,
+        taskTags,
+        subtasks,
+        settings,
+        blacklistedApps,
+        focusSessions
+      ];
 }
 
 typedef $$ProjectsTableCreateCompanionBuilder = ProjectsCompanion Function({
@@ -3817,6 +4262,224 @@ typedef $$BlacklistedAppsTableProcessedTableManager = ProcessedTableManager<
     ),
     BlacklistedApp,
     PrefetchHooks Function()>;
+typedef $$FocusSessionsTableCreateCompanionBuilder = FocusSessionsCompanion
+    Function({
+  Value<int> id,
+  required String mode,
+  required int actualSeconds,
+  required int pauseCount,
+  required int pauseDuration,
+  required int extraTimeAdded,
+  required int blocklistAttempts,
+  Value<DateTime> createdAt,
+});
+typedef $$FocusSessionsTableUpdateCompanionBuilder = FocusSessionsCompanion
+    Function({
+  Value<int> id,
+  Value<String> mode,
+  Value<int> actualSeconds,
+  Value<int> pauseCount,
+  Value<int> pauseDuration,
+  Value<int> extraTimeAdded,
+  Value<int> blocklistAttempts,
+  Value<DateTime> createdAt,
+});
+
+class $$FocusSessionsTableFilterComposer
+    extends Composer<_$AppDatabase, $FocusSessionsTable> {
+  $$FocusSessionsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get mode => $composableBuilder(
+      column: $table.mode, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get actualSeconds => $composableBuilder(
+      column: $table.actualSeconds, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get pauseCount => $composableBuilder(
+      column: $table.pauseCount, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get pauseDuration => $composableBuilder(
+      column: $table.pauseDuration, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get extraTimeAdded => $composableBuilder(
+      column: $table.extraTimeAdded,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get blocklistAttempts => $composableBuilder(
+      column: $table.blocklistAttempts,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnFilters(column));
+}
+
+class $$FocusSessionsTableOrderingComposer
+    extends Composer<_$AppDatabase, $FocusSessionsTable> {
+  $$FocusSessionsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get mode => $composableBuilder(
+      column: $table.mode, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get actualSeconds => $composableBuilder(
+      column: $table.actualSeconds,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get pauseCount => $composableBuilder(
+      column: $table.pauseCount, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get pauseDuration => $composableBuilder(
+      column: $table.pauseDuration,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get extraTimeAdded => $composableBuilder(
+      column: $table.extraTimeAdded,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get blocklistAttempts => $composableBuilder(
+      column: $table.blocklistAttempts,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+}
+
+class $$FocusSessionsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $FocusSessionsTable> {
+  $$FocusSessionsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get mode =>
+      $composableBuilder(column: $table.mode, builder: (column) => column);
+
+  GeneratedColumn<int> get actualSeconds => $composableBuilder(
+      column: $table.actualSeconds, builder: (column) => column);
+
+  GeneratedColumn<int> get pauseCount => $composableBuilder(
+      column: $table.pauseCount, builder: (column) => column);
+
+  GeneratedColumn<int> get pauseDuration => $composableBuilder(
+      column: $table.pauseDuration, builder: (column) => column);
+
+  GeneratedColumn<int> get extraTimeAdded => $composableBuilder(
+      column: $table.extraTimeAdded, builder: (column) => column);
+
+  GeneratedColumn<int> get blocklistAttempts => $composableBuilder(
+      column: $table.blocklistAttempts, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+}
+
+class $$FocusSessionsTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $FocusSessionsTable,
+    FocusSession,
+    $$FocusSessionsTableFilterComposer,
+    $$FocusSessionsTableOrderingComposer,
+    $$FocusSessionsTableAnnotationComposer,
+    $$FocusSessionsTableCreateCompanionBuilder,
+    $$FocusSessionsTableUpdateCompanionBuilder,
+    (
+      FocusSession,
+      BaseReferences<_$AppDatabase, $FocusSessionsTable, FocusSession>
+    ),
+    FocusSession,
+    PrefetchHooks Function()> {
+  $$FocusSessionsTableTableManager(_$AppDatabase db, $FocusSessionsTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$FocusSessionsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$FocusSessionsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$FocusSessionsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<String> mode = const Value.absent(),
+            Value<int> actualSeconds = const Value.absent(),
+            Value<int> pauseCount = const Value.absent(),
+            Value<int> pauseDuration = const Value.absent(),
+            Value<int> extraTimeAdded = const Value.absent(),
+            Value<int> blocklistAttempts = const Value.absent(),
+            Value<DateTime> createdAt = const Value.absent(),
+          }) =>
+              FocusSessionsCompanion(
+            id: id,
+            mode: mode,
+            actualSeconds: actualSeconds,
+            pauseCount: pauseCount,
+            pauseDuration: pauseDuration,
+            extraTimeAdded: extraTimeAdded,
+            blocklistAttempts: blocklistAttempts,
+            createdAt: createdAt,
+          ),
+          createCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            required String mode,
+            required int actualSeconds,
+            required int pauseCount,
+            required int pauseDuration,
+            required int extraTimeAdded,
+            required int blocklistAttempts,
+            Value<DateTime> createdAt = const Value.absent(),
+          }) =>
+              FocusSessionsCompanion.insert(
+            id: id,
+            mode: mode,
+            actualSeconds: actualSeconds,
+            pauseCount: pauseCount,
+            pauseDuration: pauseDuration,
+            extraTimeAdded: extraTimeAdded,
+            blocklistAttempts: blocklistAttempts,
+            createdAt: createdAt,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$FocusSessionsTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $FocusSessionsTable,
+    FocusSession,
+    $$FocusSessionsTableFilterComposer,
+    $$FocusSessionsTableOrderingComposer,
+    $$FocusSessionsTableAnnotationComposer,
+    $$FocusSessionsTableCreateCompanionBuilder,
+    $$FocusSessionsTableUpdateCompanionBuilder,
+    (
+      FocusSession,
+      BaseReferences<_$AppDatabase, $FocusSessionsTable, FocusSession>
+    ),
+    FocusSession,
+    PrefetchHooks Function()>;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -3834,4 +4497,6 @@ class $AppDatabaseManager {
       $$SettingsTableTableManager(_db, _db.settings);
   $$BlacklistedAppsTableTableManager get blacklistedApps =>
       $$BlacklistedAppsTableTableManager(_db, _db.blacklistedApps);
+  $$FocusSessionsTableTableManager get focusSessions =>
+      $$FocusSessionsTableTableManager(_db, _db.focusSessions);
 }

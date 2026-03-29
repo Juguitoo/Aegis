@@ -1,5 +1,6 @@
 import 'package:aegis/data/repositories/blacklist_repository.dart';
 import 'package:aegis/data/repositories/project_repository.dart';
+import 'package:aegis/data/repositories/sessions_repository.dart';
 import 'package:aegis/data/repositories/settings_repository.dart';
 import 'package:aegis/data/repositories/tag_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -29,4 +30,9 @@ final settingsRepositoryProvider = Provider<SettingsRepository>((ref) {
 final blacklistRepositoryProvider = Provider<BlacklistRepository>((ref) {
   final database = ref.watch(databaseProvider);
   return BlacklistRepository(database);
+});
+
+final sessionRepositoryProvider = Provider<SessionRepository>((ref) {
+  final database = ref.watch(databaseProvider);
+  return SessionRepository(database);
 });

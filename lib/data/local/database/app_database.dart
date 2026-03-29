@@ -66,6 +66,18 @@ class BlacklistedApps extends Table {
   Set<Column> get primaryKey => {packageName};
 }
 
+@DataClassName('FocusSession')
+class FocusSessions extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get mode => text()();
+  IntColumn get actualSeconds => integer()();
+  IntColumn get pauseCount => integer()();
+  IntColumn get pauseDuration => integer()();
+  IntColumn get extraTimeAdded => integer()();
+  IntColumn get blocklistAttempts => integer()();
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+}
+
 @DriftDatabase(tables: [
   Tasks,
   Projects,
@@ -73,7 +85,8 @@ class BlacklistedApps extends Table {
   TaskTags,
   Subtasks,
   Settings,
-  BlacklistedApps
+  BlacklistedApps,
+  FocusSessions,
 ])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
