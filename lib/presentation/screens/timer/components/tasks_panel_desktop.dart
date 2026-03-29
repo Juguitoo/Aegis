@@ -1,4 +1,3 @@
-import 'package:aegis/core/utils/format_utils.dart';
 import 'package:aegis/presentation/screens/tasks/components/task_table_view.dart';
 import 'package:aegis/presentation/viewmodels/task_list_viewmodel.dart';
 import 'package:aegis/presentation/viewmodels/timer_state.dart';
@@ -19,6 +18,9 @@ class TasksPanelDesktop extends ConsumerStatefulWidget {
 
 class _TasksPanelDesktopState extends ConsumerState<TasksPanelDesktop> {
   bool _isExpanded = false;
+
+  Stream<List<Subtask>>? _subtasksStream;
+  int? _currentTaskId;
 
   @override
   Widget build(BuildContext context) {
@@ -111,6 +113,12 @@ class _TasksPanelDesktopState extends ConsumerState<TasksPanelDesktop> {
   }
 
   Widget _buildCurrentTaskCard(Task task, WidgetRef ref) {
+    if (_currentTaskId != task.id) {
+      _currentTaskId = task.id;
+      _subtasksStream =
+          ref.read(taskRepositoryProvider).watchSubtasksForTask(task.id);
+    }
+
     final timerState = ref.watch(timerViewModelProvider);
 
     int liveSeconds = 0;
@@ -122,7 +130,7 @@ class _TasksPanelDesktopState extends ConsumerState<TasksPanelDesktop> {
     final int currentTotalSeconds = (task.actualDuration ?? 0) + liveSeconds;
 
     final String timeString =
-        '${FormatUtils.formatDuration(currentTotalSeconds)} / ${FormatUtils.formatDuration(task.estimatedDuration ?? 0)}';
+        '${_formatDuration(currentTotalSeconds)} / ${_formatDuration(task.estimatedDuration ?? 0)}';
 
     final tagIdsAsync = ref.watch(taskTagsProvider(task.id));
     final allTagsAsync = ref.watch(tagListViewModelProvider);
@@ -142,66 +150,57 @@ class _TasksPanelDesktopState extends ConsumerState<TasksPanelDesktop> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          IntrinsicHeight(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          task.title,
-                          style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                              color: Color(0xFF1E293B)),
-                        ),
-                        const SizedBox(height: 12),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: tagIdsAsync.when(
-                                data: (tagIds) => allTagsAsync.when(
-                                  data: (allTags) {
-                                    final taskTags = allTags
-                                        .where((t) => tagIds.contains(t.id))
-                                        .toList();
-                                    if (taskTags.isEmpty) {
-                                      return const SizedBox.shrink();
-                                    }
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        task.title,
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: Color(0xFF1E293B)),
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: tagIdsAsync.when(
+                              data: (tagIds) => allTagsAsync.when(
+                                data: (allTags) {
+                                  final taskTags = allTags
+                                      .where((t) => tagIds.contains(t.id))
+                                      .toList();
+                                  if (taskTags.isEmpty) {
+                                    return const SizedBox.shrink();
+                                  }
 
-                                    return SingleChildScrollView(
-                                      scrollDirection: Axis.horizontal,
-                                      child: Row(
-                                        children: taskTags.map((tag) {
-                                          final tagColor =
-                                              ColorUtils.parseColor(
-                                                  tag.colorHex);
-                                          return Padding(
-                                            padding: const EdgeInsets.only(
-                                                right: 6.0),
-                                            child: TagPill(
-                                              label: tag.name.toUpperCase(),
-                                              backgroundColor:
-                                                  tagColor.withAlpha(20),
-                                              textColor: tagColor,
-                                            ),
-                                          );
-                                        }).toList(),
-                                      ),
-                                    );
-                                  },
-                                  loading: () => const SizedBox(
-                                      height: 16,
-                                      width: 16,
-                                      child: CircularProgressIndicator(
-                                          strokeWidth: 2)),
-                                  error: (_, __) => const SizedBox.shrink(),
-                                ),
+                                  return SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    child: Row(
+                                      children: taskTags.map((tag) {
+                                        final tagColor =
+                                            ColorUtils.parseColor(tag.colorHex);
+                                        return Padding(
+                                          padding:
+                                              const EdgeInsets.only(right: 6.0),
+                                          child: TagPill(
+                                            label: tag.name.toUpperCase(),
+                                            backgroundColor:
+                                                tagColor.withAlpha(20),
+                                            textColor: tagColor,
+                                          ),
+                                        );
+                                      }).toList(),
+                                    ),
+                                  );
+                                },
                                 loading: () => const SizedBox(
                                     height: 16,
                                     width: 16,
@@ -209,66 +208,78 @@ class _TasksPanelDesktopState extends ConsumerState<TasksPanelDesktop> {
                                         strokeWidth: 2)),
                                 error: (_, __) => const SizedBox.shrink(),
                               ),
+                              loading: () => const SizedBox(
+                                  height: 16,
+                                  width: 16,
+                                  child: CircularProgressIndicator(
+                                      strokeWidth: 2)),
+                              error: (_, __) => const SizedBox.shrink(),
                             ),
-                            const SizedBox(width: 8),
-                            Text(timeString,
-                                style: const TextStyle(
-                                    color: Color(0xFF64748B),
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w500)),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                Container(
-                  width: 1,
-                  color: const Color(0xFFF1F5F9),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Tooltip(
-                        message: 'Completar tarea',
-                        child: InkWell(
-                          onTap: () {
-                            ref
-                                .read(timerViewModelProvider.notifier)
-                                .completeAssignedTask();
-                          },
-                          borderRadius: BorderRadius.circular(50),
-                          child: const Padding(
-                            padding: EdgeInsets.all(4.0),
-                            child: Icon(Icons.check_circle_outline,
-                                color: Colors.green, size: 24),
                           ),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      InkWell(
-                        onTap: () {
-                          setState(() {
-                            _isExpanded = !_isExpanded;
-                          });
-                        },
-                        borderRadius: BorderRadius.circular(50),
-                        child: Padding(
-                          padding: const EdgeInsets.all(4.0),
-                          child: Icon(
-                            _isExpanded ? Icons.expand_less : Icons.expand_more,
-                            color: const Color(0xFF64748B),
-                            size: 24,
+                          const SizedBox(width: 8),
+                          Text(
+                            timeString,
+                            style: const TextStyle(
+                              color: Color(0xFF64748B),
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                              fontFeatures: [FontFeature.tabularFigures()],
+                            ),
                           ),
-                        ),
+                        ],
                       ),
                     ],
                   ),
                 ),
-              ],
-            ),
+              ),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+                decoration: const BoxDecoration(
+                  border: Border(
+                    left: BorderSide(color: Color(0xFFF1F5F9), width: 1),
+                  ),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Tooltip(
+                      message: 'Completar tarea',
+                      child: InkWell(
+                        onTap: () {
+                          ref
+                              .read(timerViewModelProvider.notifier)
+                              .completeAssignedTask();
+                        },
+                        borderRadius: BorderRadius.circular(50),
+                        child: const Padding(
+                          padding: EdgeInsets.all(4.0),
+                          child: Icon(Icons.check_circle_outline,
+                              color: Colors.green, size: 24),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    InkWell(
+                      onTap: () {
+                        setState(() {
+                          _isExpanded = !_isExpanded;
+                        });
+                      },
+                      borderRadius: BorderRadius.circular(50),
+                      child: Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: Icon(
+                          _isExpanded ? Icons.expand_less : Icons.expand_more,
+                          color: const Color(0xFF64748B),
+                          size: 24,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
           AnimatedSize(
             duration: const Duration(milliseconds: 300),
@@ -289,7 +300,7 @@ class _TasksPanelDesktopState extends ConsumerState<TasksPanelDesktop> {
                                     size: 14, color: Colors.grey),
                                 const SizedBox(width: 6),
                                 Text(
-                                  'Fecha: ${FormatUtils.formatDate(task.dueDate)}',
+                                  'Fecha: ${_formatDate(task.dueDate)}',
                                   style: const TextStyle(
                                       fontSize: 13, color: Colors.black87),
                                 ),
@@ -329,9 +340,7 @@ class _TasksPanelDesktopState extends ConsumerState<TasksPanelDesktop> {
                                     fontWeight: FontWeight.bold, fontSize: 13)),
                             const SizedBox(height: 8),
                             StreamBuilder<List<Subtask>>(
-                              stream: ref
-                                  .read(taskRepositoryProvider)
-                                  .watchSubtasksForTask(task.id),
+                              stream: _subtasksStream,
                               builder: (context, snapshot) {
                                 if (snapshot.connectionState ==
                                     ConnectionState.waiting) {
@@ -424,7 +433,7 @@ class _TasksPanelDesktopState extends ConsumerState<TasksPanelDesktop> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              FormatUtils.formatDuration(task.estimatedDuration ?? 0),
+              _formatDuration(task.estimatedDuration ?? 0),
               style: const TextStyle(color: Colors.grey, fontSize: 13),
             ),
             const SizedBox(width: 4),
@@ -439,5 +448,39 @@ class _TasksPanelDesktopState extends ConsumerState<TasksPanelDesktop> {
         ),
       ),
     );
+  }
+
+  String _formatDate(DateTime? date) {
+    if (date == null) return 'Sin fecha';
+    final months = [
+      'Enero',
+      'Febrero',
+      'Marzo',
+      'Abril',
+      'Mayo',
+      'Junio',
+      'Julio',
+      'Agosto',
+      'Septiembre',
+      'Octubre',
+      'Noviembre',
+      'Diciembre'
+    ];
+    return '${date.day.toString().padLeft(2, '0')} de ${months[date.month - 1]} de ${date.year}';
+  }
+
+  String _formatDuration(int totalSeconds) {
+    if (totalSeconds == 0) return "0s";
+    final int hours = totalSeconds ~/ 3600;
+    final int minutes = (totalSeconds % 3600) ~/ 60;
+    final int seconds = totalSeconds % 60;
+
+    if (hours > 0) {
+      return '${hours}h ${minutes}m';
+    } else if (minutes > 0) {
+      return '${minutes}m ${seconds}s';
+    } else {
+      return '${seconds}s';
+    }
   }
 }

@@ -9,10 +9,6 @@ import 'timer_state.dart';
 import 'package:aegis/data/local/database/app_database.dart';
 import 'package:aegis/presentation/viewmodels/settings_viewmodel.dart';
 
-final audioPlayerProvider = Provider<AudioPlayer?>((ref) {
-  return AudioPlayer();
-});
-
 class TimerViewmodel extends Notifier<TimerState> with WidgetsBindingObserver {
   AudioPlayer? _audioPlayer;
   Timer? _timer;
@@ -29,7 +25,9 @@ class TimerViewmodel extends Notifier<TimerState> with WidgetsBindingObserver {
 
   @override
   TimerState build() {
-    _audioPlayer = ref.read(audioPlayerProvider);
+    _audioPlayer = AudioPlayer();
+    _audioPlayer?.setReleaseMode(ReleaseMode.stop);
+
     WidgetsBinding.instance.addObserver(this);
 
     ref.onDispose(() {
@@ -157,6 +155,7 @@ class TimerViewmodel extends Notifier<TimerState> with WidgetsBindingObserver {
         baseSeconds: baseSeconds,
         recentSessions: recentSessions,
         currentSessionInterruptions: interruptions,
+        currentSessionPauseDuration: state.totalPauseDuration,
         isTaskCompleted: isCompleted,
       );
 
@@ -299,7 +298,10 @@ class TimerViewmodel extends Notifier<TimerState> with WidgetsBindingObserver {
   }
 
   Future<void> _playSound() async {
-    await _audioPlayer?.play(AssetSource('audio/ding.mp3'));
+    try {
+      await _audioPlayer?.stop();
+      await _audioPlayer?.play(AssetSource('audio/ding.mp3'));
+    } catch (e) {}
   }
 
   void assignTask(Task task) {

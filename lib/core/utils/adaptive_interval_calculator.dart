@@ -27,6 +27,7 @@ class AdaptiveIntervalCalculator {
     required int baseSeconds,
     required List<FocusSession> recentSessions,
     required int currentSessionInterruptions,
+    required int currentSessionPauseDuration,
     required bool isTaskCompleted,
   }) {
     final now = DateTime.now();
@@ -46,6 +47,7 @@ class AdaptiveIntervalCalculator {
 
     if (currentMode == TimerMode.focus && standardNextMode != TimerMode.focus) {
       if (currentSessionInterruptions == 0 &&
+          currentSessionPauseDuration == 0 &&
           !isTaskCompleted &&
           fatigueIndex < 0.6) {
         return SuggestionResult(
@@ -59,12 +61,15 @@ class AdaptiveIntervalCalculator {
         );
       }
 
-      if (currentSessionInterruptions > 2) {
+      if (currentSessionInterruptions > 2 || currentSessionPauseDuration > 60) {
+        final int extraPenaltySeconds =
+            (3 * 60) + (currentSessionPauseDuration ~/ 2);
+
         return SuggestionResult(
           suggestedMode: TimerMode.shortBreak,
-          suggestedDurationSeconds: baseSeconds + (3 * 60),
+          suggestedDurationSeconds: baseSeconds + extraPenaltySeconds,
           reason:
-              "Hemos detectado varias distracciones. Tómate un respiro extra para despejar la mente.",
+              "Hemos detectado distracciones o pausas largas. Te hemos añadido un descanso proporcional para que despejes la mente.",
           fallbackMode: standardNextMode,
           fallbackDurationSeconds: baseSeconds,
         );

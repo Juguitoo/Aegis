@@ -12,6 +12,106 @@ class TimerScreenMobile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    ref.listen<TimerState>(timerViewModelProvider, (previous, next) {
+      if (previous?.pendingSuggestion == null &&
+          next.pendingSuggestion != null) {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) {
+            final suggestion = next.pendingSuggestion!;
+            return Dialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(24)),
+              backgroundColor: Colors.white,
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Row(
+                      children: [
+                        Icon(Icons.psychology,
+                            color: Color(0xFF6366F1), size: 28),
+                        SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            'Ajuste Dinámico',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF0F172A),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      suggestion.reason,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Color(0xFF475569),
+                        height: 1.5,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                            ref
+                                .read(timerViewModelProvider.notifier)
+                                .rejectSuggestion();
+                          },
+                          child: const Text(
+                            'Omitir',
+                            style: TextStyle(
+                              color: Color(0xFF94A3B8),
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF6366F1),
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 12),
+                            elevation: 0,
+                          ),
+                          onPressed: () {
+                            Navigator.pop(context);
+                            ref
+                                .read(timerViewModelProvider.notifier)
+                                .acceptSuggestion();
+                          },
+                          child: const Text(
+                            'Aceptar',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      }
+    });
+
     final timerState = ref.watch(timerViewModelProvider);
 
     final double percent = timerState.initialSeconds > 0
@@ -71,7 +171,7 @@ class TimerScreenMobile extends ConsumerWidget {
             const Spacer(flex: 1),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
-              child: _buildDynamicModePlaceholder(),
+              child: _buildDynamicModePanel(ref, timerState),
             ),
             const Spacer(flex: 2),
             Stack(
@@ -110,7 +210,7 @@ class TimerScreenMobile extends ConsumerWidget {
     );
   }
 
-  Widget _buildDynamicModePlaceholder() {
+  Widget _buildDynamicModePanel(WidgetRef ref, TimerState state) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
@@ -126,14 +226,14 @@ class TimerScreenMobile extends ConsumerWidget {
           ),
         ],
       ),
-      child: const Row(
+      child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Column(
+          const Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "Modo Dinámico IA",
+                "Modo Dinámico",
                 style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 15,
@@ -145,7 +245,55 @@ class TimerScreenMobile extends ConsumerWidget {
               ),
             ],
           ),
-          Icon(Icons.toggle_on, color: Color(0xFF6366F1), size: 40),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            spacing: 8,
+            children: [
+              IconButton(
+                icon: Icon(
+                  Icons.info_outline,
+                  size: 24,
+                  color: Color(0xFF94A3B8),
+                ),
+                onPressed: () {
+                  showDialog(
+                    context: ref.context,
+                    builder: (context) {
+                      return AlertDialog(
+                        title: const Text("Modo Dinámico"),
+                        content: const Text(
+                          "Cuando el Modo Dinámico está activado, el temporizador puede sugerirte ajustes personalizados basados en tu rendimiento, estado actual e interrupciones. Esto te ayuda a mantener un equilibrio óptimo entre concentración y descanso.",
+                          style:
+                              TextStyle(fontSize: 14, color: Color(0xFF475569)),
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: const Text(
+                              "Cerrar",
+                              style: TextStyle(
+                                  color: Color(0xFF1E293B),
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                },
+              ),
+              Switch(
+                value: state.isDynamicModeActive,
+                onChanged: (value) {
+                  ref.read(timerViewModelProvider.notifier).toggleDynamicMode();
+                },
+                activeThumbColor: const Color(0xFF6366F1),
+                activeTrackColor: const Color(0xFF6366F1).withAlpha(50),
+                inactiveThumbColor: Colors.white,
+                inactiveTrackColor: const Color(0xFFE2E8F0),
+              ),
+            ],
+          )
         ],
       ),
     );
