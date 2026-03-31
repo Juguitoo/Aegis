@@ -9,6 +9,12 @@ import 'timer_state.dart';
 import 'package:aegis/data/local/database/app_database.dart';
 import 'package:aegis/presentation/viewmodels/settings_viewmodel.dart';
 
+final audioPlayerProvider = Provider.autoDispose<AudioPlayer?>((ref) {
+  final player = AudioPlayer();
+  ref.onDispose(() => player.dispose());
+  return player;
+});
+
 class TimerViewmodel extends Notifier<TimerState> with WidgetsBindingObserver {
   AudioPlayer? _audioPlayer;
   Timer? _timer;
@@ -25,7 +31,7 @@ class TimerViewmodel extends Notifier<TimerState> with WidgetsBindingObserver {
 
   @override
   TimerState build() {
-    _audioPlayer = AudioPlayer();
+    _audioPlayer = ref.watch(audioPlayerProvider);
     _audioPlayer?.setReleaseMode(ReleaseMode.stop);
 
     WidgetsBinding.instance.addObserver(this);
@@ -33,7 +39,6 @@ class TimerViewmodel extends Notifier<TimerState> with WidgetsBindingObserver {
     ref.onDispose(() {
       WidgetsBinding.instance.removeObserver(this);
       _timer?.cancel();
-      _audioPlayer?.dispose();
     });
 
     final settings = _settingsValue.value;

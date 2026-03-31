@@ -26,8 +26,3 @@ class SessionRepository {
         .get();
   }
 }
-
-final sessionRepositoryProvider = Provider<SessionRepository>((ref) {
-  final db = ref.read(appDatabaseProvider);
-  return SessionRepository(db);
-});
