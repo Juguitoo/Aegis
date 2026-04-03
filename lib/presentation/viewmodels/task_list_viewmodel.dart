@@ -85,8 +85,8 @@ class TaskListViewModel extends StreamNotifier<List<Task>> {
     List<TaskChecklistItem> checklist = const [],
     String? notes,
   }) {
-    final taskCompanion = TasksCompanion(
-      title: Value(title),
+    final taskCompanion = TasksCompanion.insert(
+      title: title,
       description: Value(description ?? ''),
       estimatedDuration: Value(estimatedDuration),
       actualDuration: const Value(0),
@@ -94,6 +94,7 @@ class TaskListViewModel extends StreamNotifier<List<Task>> {
       projectId: Value(projectId),
       priority: Value(priority),
       notes: Value(notes ?? ''),
+      isCompleted: const Value(false),
     );
 
     final subtasksCompanions = checklist.asMap().entries.map((entry) {

@@ -144,7 +144,7 @@ class AppDatabase extends _$AppDatabase {
 LazyDatabase _openConnection() {
   return LazyDatabase(() async {
     final dbFolder = await getApplicationDocumentsDirectory();
-    final file = File(p.join(dbFolder.path, 'aegis_db.sqlite'));
+    final file = File(p.join(dbFolder.path, 'app_database_v2.sqlite'));
     return NativeDatabase(file);
   });
 }

@@ -154,8 +154,14 @@ mixin TaskFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
     }
 
     final durationText = estimatedDurationController.text.trim();
-    final duration =
-        durationText.isNotEmpty ? int.tryParse(durationText)! * 60 : null;
+    int? duration;
+
+    if (durationText.isNotEmpty) {
+      final parsedDuration = int.tryParse(durationText);
+      if (parsedDuration != null) {
+        duration = parsedDuration * 60;
+      }
+    }
 
     final validChecklist =
         currentChecklist.where((item) => item.title.trim().isNotEmpty).toList();
@@ -179,7 +185,9 @@ mixin TaskFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
         Navigator.of(context).pop();
         _showSnackBar('Tarea creada correctamente');
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
+      print('🔴 ERROR REAL AL GUARDAR TAREA: $e');
+      print('🔴 STACKTRACE: $stackTrace');
       _showSnackBar('Error al crear la tarea. Inténtalo de nuevo.',
           isError: true);
     }
@@ -192,8 +200,14 @@ mixin TaskFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
     }
 
     final durationText = estimatedDurationController.text.trim();
-    final duration =
-        durationText.isNotEmpty ? int.tryParse(durationText)! * 60 : null;
+    int? duration;
+
+    if (durationText.isNotEmpty) {
+      final parsedDuration = int.tryParse(durationText);
+      if (parsedDuration != null) {
+        duration = parsedDuration * 60;
+      }
+    }
 
     final updatedTask = initialTask!.copyWith(
       title: titleController.text.trim(),
@@ -219,8 +233,10 @@ mixin TaskFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
         Navigator.of(context).pop();
         _showSnackBar('Tarea actualizada correctamente');
       }
-    } catch (e) {
-      _showSnackBar('Error al actualizar la tarea. Inténtalo de nuevo.',
+    } catch (e, stackTrace) {
+      print('🔴 ERROR REAL AL GUARDAR TAREA: $e');
+      print('🔴 STACKTRACE: $stackTrace');
+      _showSnackBar('Error al crear la tarea. Inténtalo de nuevo.',
           isError: true);
     }
   }
