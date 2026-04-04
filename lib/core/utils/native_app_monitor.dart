@@ -1,0 +1,61 @@
+import 'dart:async';
+
+import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+class NativeAppMonitor {
+  static const MethodChannel _channel = MethodChannel('com.aegis.app/monitor');
+  Timer? _pollingTimer;
+  String? _currentForegroundApp;
+
+  final StreamController<String> _appStreamController =
+      StreamController<String>.broadcast();
+  Stream<String> get onAppChanged => _appStreamController.stream;
+
+  Future<bool> checkPermission() async {
+    try {
+      final bool granted = await _channel.invokeMethod('checkUsagePermission');
+      return granted;
+    } on PlatformException catch (_) {
+      return false;
+    }
+  }
+
+  Future<void> requestPermission() async {
+    try {
+      await _channel.invokeMethod('requestUsagePermission');
+    } on PlatformException catch (_) {}
+  }
+
+  void startMonitoring({Duration interval = const Duration(seconds: 2)}) {
+    if (_pollingTimer != null && _pollingTimer!.isActive) return;
+
+    _pollingTimer = Timer.periodic(interval, (timer) async {
+      try {
+        final String? packageName =
+            await _channel.invokeMethod('getForegroundApp');
+        if (packageName != null && packageName != _currentForegroundApp) {
+          _currentForegroundApp = packageName;
+          _appStreamController.add(packageName);
+        }
+      } on PlatformException catch (_) {}
+    });
+  }
+
+  void stopMonitoring() {
+    _pollingTimer?.cancel();
+    _pollingTimer = null;
+    _currentForegroundApp = null;
+  }
+
+  void dispose() {
+    stopMonitoring();
+    _appStreamController.close();
+  }
+}
+
+final nativeAppMonitorProvider = Provider<NativeAppMonitor>((ref) {
+  final monitor = NativeAppMonitor();
+  ref.onDispose(monitor.dispose);
+  return monitor;
+});
