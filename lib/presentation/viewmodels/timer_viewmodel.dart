@@ -1,10 +1,15 @@
 import 'dart:async';
 import 'package:aegis/core/providers/repository_providers.dart';
 import 'package:aegis/core/utils/adaptive_interval_calculator.dart';
+import 'package:aegis/core/utils/native_app_monitor.dart';
+import 'package:aegis/data/repositories/blacklist_repository.dart';
+import 'package:aegis/data/repositories/sessions_repository.dart';
+import 'package:aegis/data/repositories/task_repository.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'timer_state.dart';
 import 'package:aegis/data/local/database/app_database.dart';
 import 'package:aegis/presentation/viewmodels/settings_viewmodel.dart';
@@ -15,19 +20,20 @@ final audioPlayerProvider = Provider.autoDispose<AudioPlayer?>((ref) {
   return player;
 });
 
+final blockedAppTriggerProvider = StateProvider<String?>((ref) => null);
+
 class TimerViewmodel extends Notifier<TimerState> with WidgetsBindingObserver {
   AudioPlayer? _audioPlayer;
   Timer? _timer;
   DateTime? _pausedTime;
   DateTime? _manualPauseTime;
 
-  AsyncValue<Setting?> get _settingsValue =>
-      ref.watch(settingsViewModelProvider);
-
-  dynamic get _taskRepository => ref.read(taskRepositoryProvider);
-  dynamic get _sessionRepository => ref.read(sessionRepositoryProvider);
-  AdaptiveIntervalCalculator get _calculator =>
-      ref.read(adaptiveCalculatorProvider);
+  late final TaskRepository _taskRepository;
+  late final SessionRepository _sessionRepository;
+  late final AdaptiveIntervalCalculator _calculator;
+  late final NativeAppMonitor _monitor;
+  late final StreamSubscription<String> _appMonitorSubscription;
+  late final BlacklistRepository _blacklistRepository;
 
   @override
   TimerState build() {
@@ -36,12 +42,22 @@ class TimerViewmodel extends Notifier<TimerState> with WidgetsBindingObserver {
 
     WidgetsBinding.instance.addObserver(this);
 
+    _taskRepository = ref.read(taskRepositoryProvider);
+    _sessionRepository = ref.read(sessionRepositoryProvider);
+    _calculator = ref.read(adaptiveCalculatorProvider);
+    _monitor = ref.read(nativeAppMonitorProvider);
+    _blacklistRepository = ref.read(blacklistRepositoryProvider);
+    _appMonitorSubscription = _monitor.onAppChanged
+        .listen((packageName) => _handleForegroundAppChange(packageName));
+
     ref.onDispose(() {
       WidgetsBinding.instance.removeObserver(this);
+      _monitor.stopMonitoring();
+      _appMonitorSubscription.cancel();
       _timer?.cancel();
     });
 
-    final settings = _settingsValue.value;
+    final settings = ref.read(settingsViewModelProvider).value;
 
     if (settings != null) {
       final int initialSeconds = settings.pomodoroDuration * 60;
@@ -119,6 +135,7 @@ class TimerViewmodel extends Notifier<TimerState> with WidgetsBindingObserver {
   }
 
   Future<void> _handleSessionComplete() async {
+    _monitor.stopMonitoring();
     _saveCurrentProgress();
     _saveSessionRecord();
 
@@ -134,7 +151,7 @@ class TimerViewmodel extends Notifier<TimerState> with WidgetsBindingObserver {
       newMode = TimerMode.focus;
     }
 
-    final settings = _settingsValue.value;
+    final settings = ref.read(settingsViewModelProvider).value;
     int baseSeconds;
 
     switch (newMode) {
@@ -190,7 +207,22 @@ class TimerViewmodel extends Notifier<TimerState> with WidgetsBindingObserver {
       blocklistAttempts: 0,
     );
 
+    if (newMode == TimerMode.focus) {
+      _monitor.startMonitoring();
+    }
+
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) => _onTick());
+  }
+
+  Future<void> _handleForegroundAppChange(String packageName) async {
+    if (state.status == TimerStatus.running && state.mode == TimerMode.focus) {
+      final blacklistedApps =
+          await _blacklistRepository.getBlacklistedPackages();
+
+      if (blacklistedApps.contains(packageName)) {
+        ref.read(blockedAppTriggerProvider.notifier).state = packageName;
+      }
+    }
   }
 
   void acceptSuggestion() {
@@ -205,6 +237,10 @@ class TimerViewmodel extends Notifier<TimerState> with WidgetsBindingObserver {
       pendingSuggestion: null,
       clearSuggestion: true,
     );
+
+    if (suggestion.suggestedMode == TimerMode.focus) {
+      _monitor.startMonitoring();
+    }
 
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) => _onTick());
@@ -222,6 +258,10 @@ class TimerViewmodel extends Notifier<TimerState> with WidgetsBindingObserver {
       pendingSuggestion: null,
       clearSuggestion: true,
     );
+
+    if (suggestion.fallbackMode == TimerMode.focus) {
+      _monitor.startMonitoring();
+    }
 
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) => _onTick());
@@ -241,6 +281,10 @@ class TimerViewmodel extends Notifier<TimerState> with WidgetsBindingObserver {
       totalPauseDuration: state.totalPauseDuration + extraPause,
     );
 
+    if (state.mode == TimerMode.focus) {
+      _monitor.startMonitoring();
+    }
+
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       _onTick();
@@ -256,16 +300,21 @@ class TimerViewmodel extends Notifier<TimerState> with WidgetsBindingObserver {
       status: TimerStatus.paused,
       pauseCount: state.pauseCount + 1,
     );
+
+    if (state.mode == TimerMode.focus) {
+      _monitor.stopMonitoring();
+    }
   }
 
   void reset() {
+    _monitor.stopMonitoring();
     _saveSessionRecord();
     _timer?.cancel();
     _timer = null;
     _pausedTime = null;
     _manualPauseTime = null;
 
-    final settings = _settingsValue.value;
+    final settings = ref.read(settingsViewModelProvider).value;
     final int resetSeconds = (settings?.pomodoroDuration ?? 25) * 60;
 
     state = state.copyWith(
@@ -357,7 +406,7 @@ class TimerViewmodel extends Notifier<TimerState> with WidgetsBindingObserver {
     _pausedTime = null;
     _manualPauseTime = null;
 
-    final settings = _settingsValue.value;
+    final settings = ref.read(settingsViewModelProvider).value;
     final int resetSeconds = (settings?.pomodoroDuration ?? 25) * 60;
 
     state = state.copyWith(
