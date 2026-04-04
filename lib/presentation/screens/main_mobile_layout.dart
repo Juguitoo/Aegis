@@ -1,3 +1,4 @@
+import 'package:aegis/core/utils/native_app_monitor.dart';
 import 'package:aegis/presentation/screens/blocker/block_overlay_screen.dart';
 import 'package:aegis/presentation/screens/tasks/task_list_screen_mobile.dart';
 import 'package:aegis/presentation/screens/timer/timer_screen_mobile.dart';
@@ -23,23 +24,42 @@ class MainMobileLayout extends ConsumerStatefulWidget {
   ConsumerState<MainMobileLayout> createState() => _MainMobileLayoutState();
 }
 
-class _MainMobileLayoutState extends ConsumerState<MainMobileLayout> {
+class _MainMobileLayoutState extends ConsumerState<MainMobileLayout>
+    with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      checkAndPromptUsagePermission(context, ref);
+      checkAndPromptPermissions(context, ref);
     });
   }
 
   @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      checkAndPromptPermissions(context, ref);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    ref.listen(blockedAppTriggerProvider, (previous, next) {
+    ref.listen(blockedAppTriggerProvider, (previous, next) async {
       if (next != null) {
-        Navigator.push(
+        await ref.read(nativeAppMonitorProvider).bringToForeground();
+        await Future.delayed(const Duration(milliseconds: 100));
+        if (context.mounted) {
+          Navigator.push(
             context,
-            MaterialPageRoute(
-                builder: (context) => const BlockOverlayScreen()));
+            MaterialPageRoute(builder: (context) => const BlockOverlayScreen()),
+          );
+        }
         ref.read(blockedAppTriggerProvider.notifier).state = null;
       }
     });

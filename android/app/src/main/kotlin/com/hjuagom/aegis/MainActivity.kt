@@ -37,6 +37,15 @@ class MainActivity : FlutterActivity() {
                         result.success(true)
                     }
                 }
+                "checkOverlayPermission" -> {
+                    result.success(Settings.canDrawOverlays(this))
+                }
+                "requestOverlayPermission" -> {
+                    val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName"))
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    startActivity(intent)
+                    result.success(null)
+                }
                 "getForegroundApp" -> {
                     if (!hasUsageStatsPermission()) {
                         result.error("NO_PERMISSION", "Permiso de uso no concedido", null)
@@ -49,6 +58,20 @@ class MainActivity : FlutterActivity() {
                     } else {
                         result.error("UNAVAILABLE", "No foreground app detected", null)
                     }
+                }
+                "bringToForeground" -> {
+                    val intent = Intent(context, MainActivity::class.java).apply {
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+                        addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                        addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                    }
+                    startActivity(intent)
+                    result.success(null)
+                }
+                "sendToBackground" -> {
+                    moveTaskToBack(true)
+                    result.success(null)
                 }
                 else -> {
                     result.notImplemented()

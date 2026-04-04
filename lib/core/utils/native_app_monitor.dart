@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -12,7 +13,7 @@ class NativeAppMonitor {
       StreamController<String>.broadcast();
   Stream<String> get onAppChanged => _appStreamController.stream;
 
-  Future<bool> checkPermission() async {
+  Future<bool> checkUsagePermission() async {
     try {
       final bool granted = await _channel.invokeMethod('checkUsagePermission');
       return granted;
@@ -21,9 +22,39 @@ class NativeAppMonitor {
     }
   }
 
-  Future<void> requestPermission() async {
+  Future<void> requestUsagePermission() async {
     try {
       await _channel.invokeMethod('requestUsagePermission');
+    } on PlatformException catch (_) {}
+  }
+
+  Future<bool> checkOverlayPermission() async {
+    try {
+      final bool granted =
+          await _channel.invokeMethod('checkOverlayPermission');
+      return granted;
+    } on PlatformException catch (_) {
+      return false;
+    }
+  }
+
+  Future<void> requestOverlayPermission() async {
+    try {
+      await _channel.invokeMethod('requestOverlayPermission');
+    } on PlatformException catch (_) {}
+  }
+
+  Future<void> bringToForeground() async {
+    try {
+      await _channel.invokeMethod('bringToForeground');
+    } on PlatformException catch (e) {
+      debugPrint('Error bringing app to foreground: $e');
+    }
+  }
+
+  Future<void> sendToBackground() async {
+    try {
+      await _channel.invokeMethod('sendToBackground');
     } on PlatformException catch (_) {}
   }
 

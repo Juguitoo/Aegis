@@ -1,3 +1,4 @@
+import 'package:aegis/core/utils/native_app_monitor.dart';
 import 'package:aegis/presentation/viewmodels/timer_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -53,10 +54,13 @@ class BlockOverlayScreen extends ConsumerWidget {
                   ),
                   const SizedBox(width: 16),
                   OutlinedButton(
-                    onPressed: () => {
+                    onPressed: () async => {
                       timerViewmodel.registerBlocklistAttempt(),
                       timerViewmodel.pause(),
-                      Navigator.pop(context)
+                      Navigator.pop(context),
+                      await ref
+                          .read(nativeAppMonitorProvider)
+                          .sendToBackground(),
                     },
                     style: OutlinedButton.styleFrom(
                       foregroundColor: Colors.white70,
