@@ -6,6 +6,7 @@ import 'package:aegis/presentation/viewmodels/timer_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
+import 'package:aegis/presentation/screens/timer/immersive_timer_screen_mobile.dart';
 
 class TimerScreenMobile extends ConsumerWidget {
   const TimerScreenMobile({super.key});
@@ -145,7 +146,13 @@ class TimerScreenMobile extends ConsumerWidget {
               iconSize: 28,
               icon:
                   const Icon(Icons.self_improvement, color: Color(0xFF1E293B)),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const ImmersiveTimerScreenMobile()),
+                );
+              },
             ),
           ),
           Padding(

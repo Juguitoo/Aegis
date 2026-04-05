@@ -1,5 +1,6 @@
 import 'package:aegis/core/utils/format_utils.dart';
 import 'package:aegis/presentation/screens/timer/components/tasks_panel_desktop.dart';
+import 'package:aegis/presentation/screens/timer/immersive_timer_screen_desktop.dart';
 import 'package:aegis/presentation/viewmodels/timer_state.dart';
 import 'package:aegis/presentation/viewmodels/timer_viewmodel.dart';
 import 'package:flutter/material.dart';
@@ -128,13 +129,31 @@ class TimerScreenDesktop extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Temporizador',
-              style: TextStyle(
-                color: Color(0xFF0F172A),
-                fontWeight: FontWeight.bold,
-                fontSize: 32,
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Temporizador',
+                  style: TextStyle(
+                    color: Color(0xFF0F172A),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 32,
+                  ),
+                ),
+                IconButton(
+                  iconSize: 34,
+                  icon: const Icon(Icons.self_improvement,
+                      color: Color(0xFF1E293B)),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              const ImmersiveTimerScreenDesktop()),
+                    );
+                  },
+                ),
+              ],
             ),
             const Divider(height: 16, color: Color(0xFFE2E8F0)),
             const SizedBox(height: 16),
