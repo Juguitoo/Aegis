@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:aegis/presentation/screens/settings/timer_settings_mobile.dart';
 import 'package:aegis/presentation/screens/settings/manage_blacklist_screen.dart';
+import 'package:aegis/presentation/screens/settings/system_permissions_screen.dart';
 
-class SettingsScreenMobile extends StatelessWidget {
+class SettingsScreenMobile extends ConsumerWidget {
   const SettingsScreenMobile({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
@@ -49,6 +51,52 @@ class SettingsScreenMobile extends StatelessWidget {
               );
             },
           ),
+          const SizedBox(height: 12),
+          _SettingsTile(
+            icon: Icons.admin_panel_settings_outlined,
+            title: 'Permisos del Sistema',
+            subtitle: 'Gestiona los accesos necesarios para el escudo',
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const SystemPermissionsScreen()),
+              );
+            },
+          ),
+          const SizedBox(height: 12),
+          _SettingsTile(
+            icon: Icons.delete_outline,
+            title: 'Borrar Datos de Sesiones',
+            subtitle: 'Elimina todo el historial de concentración',
+            iconColor: Colors.redAccent,
+            onTap: () {
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('¿Borrar historial?'),
+                  content: const Text(
+                      'Esta acción eliminará todas las sesiones de concentración guardadas y no se puede deshacer.'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('Cancelar'),
+                    ),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.redAccent,
+                        foregroundColor: Colors.white,
+                      ),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Text('Borrar'),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
         ],
       ),
     );
@@ -60,12 +108,14 @@ class _SettingsTile extends StatelessWidget {
   final String title;
   final String subtitle;
   final VoidCallback onTap;
+  final Color? iconColor;
 
   const _SettingsTile({
     required this.icon,
     required this.title,
     required this.subtitle,
     required this.onTap,
+    this.iconColor,
   });
 
   @override
@@ -92,10 +142,13 @@ class _SettingsTile extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: const Color(0xFFEEF2FF),
+                color: iconColor != null
+                    ? iconColor!.withOpacity(0.1)
+                    : const Color(0xFFEEF2FF),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Icon(icon, color: const Color(0xFF6366F1), size: 24),
+              child: Icon(icon,
+                  color: iconColor ?? const Color(0xFF6366F1), size: 24),
             ),
             const SizedBox(width: 16),
             Expanded(

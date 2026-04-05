@@ -13,7 +13,7 @@ Future<void> checkAndPromptPermissions(
       context: context,
       title: 'Permiso Especial Requerido',
       content:
-          'Para que el modo concentración funcione y pueda detectar aplicaciones en la lista negra, Aegis necesita el permiso de "Acceso a datos de uso".\n\nAl continuar, serás redirigido a los ajustes del sistema. Por favor, busca Aegis en la lista y activa el interruptor.',
+          'Para que el modo concentración funcione y pueda detectar aplicaciones en la lista negra, Aegis necesita el permiso de "Acceso a datos de uso".\n\nAl continuar, serás redirigido a los ajustes del sistema. Por favor, busca Aegis en la lista y activa el interruptor.\n\nSe pueden gestionar los permisos en cualquier momento desde los ajustes del sistema o desde la sección de "Permisos del Sistema" en los ajustes de la aplicación.',
       onRequest: () => monitor.requestUsagePermission(),
     );
     return;
@@ -26,7 +26,7 @@ Future<void> checkAndPromptPermissions(
       context: context,
       title: 'Permiso de Superposición',
       content:
-          'Para poder protegerte de las distracciones, Aegis necesita mostrar su pantalla de advertencia por encima de otras aplicaciones.\n\nAl continuar, serás redirigido a los ajustes. Por favor, activa el interruptor para Aegis.',
+          'Para poder protegerte de las distracciones, Aegis necesita mostrar su pantalla de advertencia por encima de otras aplicaciones.\n\nAl continuar, serás redirigido a los ajustes. Por favor, activa el interruptor para Aegis.\n\nSe pueden gestionar los permisos en cualquier momento desde los ajustes del sistema o desde la sección de "Permisos del Sistema" en los ajustes de la aplicación.',
       onRequest: () => monitor.requestOverlayPermission(),
     );
   }

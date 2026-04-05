@@ -1,15 +1,19 @@
 import 'package:aegis/core/providers/repository_providers.dart';
 import 'package:aegis/data/local/database/app_database.dart';
+import 'package:aegis/data/repositories/sessions_repository.dart';
 import 'package:aegis/data/repositories/settings_repository.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class SettingsViewmodel extends StreamNotifier<Setting?> {
-  SettingsRepository get _repository => ref.read(settingsRepositoryProvider);
+  late final SettingsRepository _settingsRepository;
+  late final SessionRepository _sessionRepository;
 
   @override
   Stream<Setting?> build() {
-    return _repository.watchSettings();
+    _settingsRepository = ref.read(settingsRepositoryProvider);
+    _sessionRepository = ref.read(sessionRepositoryProvider);
+    return _settingsRepository.watchSettings();
   }
 
   Future<void> upsertSettings(
@@ -27,11 +31,15 @@ class SettingsViewmodel extends StreamNotifier<Setting?> {
           ? Value(longBreakDuration)
           : const Value.absent(),
     );
-    return _repository.upsertSettings(settings);
+    return _settingsRepository.upsertSettings(settings);
   }
 
   Future<void> deleteSettings() {
-    return _repository.deleteSettings();
+    return _settingsRepository.deleteSettings();
+  }
+
+  Future<void> deleteSessionData() {
+    return _sessionRepository.deleteAllSessions();
   }
 }
 

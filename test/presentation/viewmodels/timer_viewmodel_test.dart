@@ -94,6 +94,11 @@ class FakeSessionRepository implements SessionRepository {
   Future<List<FocusSession>> getLast30FocusSessions() async {
     return [];
   }
+
+  @override
+  Future<void> deleteAllSessions() async {
+    return;
+  }
 }
 
 void main() {

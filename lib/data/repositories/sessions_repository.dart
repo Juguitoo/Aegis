@@ -25,4 +25,8 @@ class SessionRepository {
           ..limit(30))
         .get();
   }
+
+  Future<void> deleteAllSessions() async {
+    await _db.delete(_db.focusSessions).go();
+  }
 }
