@@ -140,7 +140,7 @@ class _PermissionItem extends StatelessWidget {
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: isGranted
-                    ? Colors.green.withOpacity(0.1)
+                    ? Colors.green.withValues(alpha: 0.1)
                     : const Color(0xFFEEF2FF),
                 borderRadius: BorderRadius.circular(12),
               ),

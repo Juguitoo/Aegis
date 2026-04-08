@@ -355,7 +355,7 @@ class TimerViewmodel extends Notifier<TimerState> with WidgetsBindingObserver {
     try {
       await _audioPlayer?.stop();
       await _audioPlayer?.play(AssetSource('audio/ding.mp3'));
-    } catch (e) {}
+    } catch (_) {}
   }
 
   void assignTask(Task task) {

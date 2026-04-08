@@ -143,7 +143,7 @@ class _SettingsTile extends StatelessWidget {
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: iconColor != null
-                    ? iconColor!.withOpacity(0.1)
+                    ? iconColor!.withValues(alpha: 0.1)
                     : const Color(0xFFEEF2FF),
                 borderRadius: BorderRadius.circular(12),
               ),

@@ -186,8 +186,8 @@ mixin TaskFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
         _showSnackBar('Tarea creada correctamente');
       }
     } catch (e, stackTrace) {
-      print('🔴 ERROR REAL AL GUARDAR TAREA: $e');
-      print('🔴 STACKTRACE: $stackTrace');
+      debugPrint('🔴 ERROR REAL AL GUARDAR TAREA: $e');
+      debugPrint('🔴 STACKTRACE: $stackTrace');
       _showSnackBar('Error al crear la tarea. Inténtalo de nuevo.',
           isError: true);
     }
@@ -234,8 +234,8 @@ mixin TaskFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
         _showSnackBar('Tarea actualizada correctamente');
       }
     } catch (e, stackTrace) {
-      print('🔴 ERROR REAL AL GUARDAR TAREA: $e');
-      print('🔴 STACKTRACE: $stackTrace');
+      debugPrint('🔴 ERROR REAL AL GUARDAR TAREA: $e');
+      debugPrint('🔴 STACKTRACE: $stackTrace');
       _showSnackBar('Error al crear la tarea. Inténtalo de nuevo.',
           isError: true);
     }
