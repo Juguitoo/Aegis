@@ -6,10 +6,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:window_manager/window_manager.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 void main() async {
   // Asegura que el motor y el gestor de ventanas estén inicializados
   WidgetsFlutterBinding.ensureInitialized();
+
+  await initializeDateFormatting('es_ES', null);
 
   if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
     await windowManager.ensureInitialized();

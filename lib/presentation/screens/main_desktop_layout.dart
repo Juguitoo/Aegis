@@ -1,3 +1,4 @@
+import 'package:aegis/presentation/screens/diary/diary_screen_desktop.dart';
 import 'package:aegis/presentation/screens/tasks/task_list_screen_desktop.dart';
 import 'package:aegis/presentation/screens/timer/timer_screen_desktop.dart';
 import 'package:flutter/material.dart';
@@ -18,7 +19,7 @@ class MainDesktopLayout extends ConsumerWidget {
       const TimerScreenDesktop(),
       const TaskListScreenDesktop(),
       const Center(child: Text('Pantalla Estadísticas (Escritorio)')),
-      const Center(child: Text('Pantalla Diario (Escritorio)')),
+      const DiaryScreenDesktop(),
     ];
 
     return Scaffold(

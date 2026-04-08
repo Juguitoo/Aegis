@@ -140,18 +140,23 @@ class TimerScreenDesktop extends ConsumerWidget {
                     fontSize: 32,
                   ),
                 ),
-                IconButton(
-                  iconSize: 34,
-                  icon: const Icon(Icons.self_improvement,
-                      color: Color(0xFF1E293B)),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              const ImmersiveTimerScreenDesktop()),
-                    );
-                  },
+                MouseRegion(
+                  cursor: SystemMouseCursors.click, // <-- ¡Esto pone el dedito!
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                const ImmersiveTimerScreenDesktop()),
+                      );
+                    },
+                    child: const Icon(
+                      Icons.self_improvement,
+                      color: Color(0xFF1E293B),
+                      size: 34,
+                    ),
+                  ),
                 ),
               ],
             ),
