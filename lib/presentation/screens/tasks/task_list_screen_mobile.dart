@@ -188,12 +188,14 @@ class _TaskListScreenMobileState extends ConsumerState<TaskListScreenMobile> {
       ),
       body: Column(
         children: [
-          const Divider(color: Color(0xFFE2E8F0)),
+          const Divider(color: Color(0xFFE2E8F0), height: 1),
           const _HabitsSectionPlaceholder(),
-          const Divider(color: Color(0xFFE2E8F0)),
+          const SizedBox(height: 8),
+          const Divider(color: Color(0xFFE2E8F0), height: 1),
           Container(
             alignment: Alignment.centerLeft,
-            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+            margin:
+                const EdgeInsets.only(left: 16, right: 16, top: 8, bottom: 8),
             child: const Text(
               "Tareas",
               style: TextStyle(
@@ -276,7 +278,8 @@ class _HabitsSectionPlaceholder extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+          padding:
+              const EdgeInsets.only(left: 16, right: 16, top: 8, bottom: 8),
           child: const Text(
             "Hábitos",
             style: TextStyle(
@@ -287,7 +290,7 @@ class _HabitsSectionPlaceholder extends StatelessWidget {
           ),
         ),
         Container(
-          margin: const EdgeInsets.all(16),
+          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           padding: const EdgeInsets.all(16),
           height: 128,
           decoration: BoxDecoration(

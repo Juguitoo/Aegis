@@ -1,5 +1,6 @@
 import 'package:aegis/core/utils/native_app_monitor.dart';
 import 'package:aegis/presentation/screens/blocker/block_overlay_screen.dart';
+import 'package:aegis/presentation/screens/diary/diary_screen_mobile.dart';
 import 'package:aegis/presentation/screens/tasks/task_list_screen_mobile.dart';
 import 'package:aegis/presentation/screens/timer/timer_screen_mobile.dart';
 import 'package:aegis/presentation/viewmodels/timer_viewmodel.dart';
@@ -71,7 +72,7 @@ class _MainMobileLayoutState extends ConsumerState<MainMobileLayout>
       const TimerScreenMobile(),
       const TaskListScreenMobile(),
       const Center(child: Text('Pantalla Estadísticas')),
-      const Center(child: Text('Pantalla Diario')),
+      const DiaryScreenMobile(),
     ];
 
     return Scaffold(
