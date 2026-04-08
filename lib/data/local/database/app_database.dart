@@ -78,6 +78,12 @@ class FocusSessions extends Table {
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
 }
 
+class DiaryNote extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get content => text()();
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+}
+
 @DriftDatabase(tables: [
   Tasks,
   Projects,
@@ -87,6 +93,7 @@ class FocusSessions extends Table {
   Settings,
   BlacklistedApps,
   FocusSessions,
+  DiaryNote,
 ])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
