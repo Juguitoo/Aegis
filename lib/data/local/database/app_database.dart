@@ -105,6 +105,8 @@ class HabitEntries extends Table {
   BlacklistedApps,
   FocusSessions,
   DiaryNote,
+  Habits,
+  HabitEntries,
 ])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
