@@ -84,6 +84,17 @@ class DiaryNote extends Table {
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
 }
 
+class Habits extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get name => text()();
+}
+
+class HabitEntries extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get habitId => integer().references(Habits, #id)();
+  DateTimeColumn get date => dateTime()();
+}
+
 @DriftDatabase(tables: [
   Tasks,
   Projects,
