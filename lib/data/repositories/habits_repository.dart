@@ -34,18 +34,16 @@ class HabitsRepository {
         .insert(HabitsCompanion(name: Value(name)));
   }
 
-  Future<int> updateHabit(int habitId, String newName) async {
-    return await (_db.update(_db.habits)..where((h) => h.id.equals(habitId)))
+  Future<int> updateHabit(int id, String newName) async {
+    return await (_db.update(_db.habits)..where((h) => h.id.equals(id)))
         .write(HabitsCompanion(name: Value(newName)));
   }
 
-  Future<int> deleteHabit(int habitId) {
+  Future<int> deleteHabit(int id) {
     return _db.transaction(() async {
-      await (_db.delete(_db.habitEntries)
-            ..where((e) => e.habitId.equals(habitId)))
+      await (_db.delete(_db.habitEntries)..where((e) => e.habitId.equals(id)))
           .go();
-      return await (_db.delete(_db.habits)..where((h) => h.id.equals(habitId)))
-          .go();
+      return await (_db.delete(_db.habits)..where((h) => h.id.equals(id))).go();
     });
   }
 

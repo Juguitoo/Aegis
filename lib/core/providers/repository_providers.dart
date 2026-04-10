@@ -1,5 +1,6 @@
 import 'package:aegis/data/repositories/blacklist_repository.dart';
 import 'package:aegis/data/repositories/diary_repository.dart';
+import 'package:aegis/data/repositories/habits_repository.dart';
 import 'package:aegis/data/repositories/project_repository.dart';
 import 'package:aegis/data/repositories/sessions_repository.dart';
 import 'package:aegis/data/repositories/settings_repository.dart';
@@ -41,4 +42,9 @@ final sessionRepositoryProvider = Provider<SessionRepository>((ref) {
 final diaryRepositoryProvider = Provider<DiaryRepository>((ref) {
   final database = ref.watch(databaseProvider);
   return DiaryRepository(database);
+});
+
+final habitsRepositoryProvider = Provider<HabitsRepository>((ref) {
+  final database = ref.watch(databaseProvider);
+  return HabitsRepository(database);
 });
