@@ -3,6 +3,8 @@ import 'package:aegis/presentation/screens/settings/settings_screen_mobile.dart'
 import 'package:aegis/presentation/screens/tags/widgets/manage_tags_bottom_sheet.dart';
 import 'package:aegis/presentation/screens/projects/widgets/project_form_dialog.dart';
 import 'package:aegis/presentation/screens/tags/widgets/tag_form_dialog.dart';
+import 'package:aegis/presentation/screens/tasks/components/mobile_habits_section.dart';
+import 'package:aegis/presentation/screens/tasks/widgets/manage_habits_bottom_sheet.dart';
 import 'package:aegis/presentation/screens/tasks/widgets/task_form_mobile.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import '../../../data/local/database/app_database.dart';
@@ -90,6 +92,13 @@ class _TaskListScreenMobileState extends ConsumerState<TaskListScreenMobile> {
                     backgroundColor: Colors.transparent,
                     builder: (context) => const ManageTagsBottomSheet(),
                   );
+                } else if (value == 3) {
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                    builder: (context) => const ManageHabitsBottomSheet(),
+                  );
                 }
               },
               itemBuilder: (context) => [
@@ -119,6 +128,21 @@ class _TaskListScreenMobileState extends ConsumerState<TaskListScreenMobile> {
                           color: Color(0xFF64748B), size: 20),
                       SizedBox(width: 24),
                       Text('Gestionar etiquetas',
+                          style: TextStyle(color: Color(0xFF1E293B))),
+                    ],
+                  ),
+                ),
+                const PopupMenuItem(
+                  value: 3,
+                  height: 48,
+                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.auto_graph_outlined,
+                          color: Color(0xFF64748B), size: 20),
+                      SizedBox(width: 24),
+                      Text('Gestionar hábitos',
                           style: TextStyle(color: Color(0xFF1E293B))),
                     ],
                   ),
@@ -189,7 +213,7 @@ class _TaskListScreenMobileState extends ConsumerState<TaskListScreenMobile> {
       body: Column(
         children: [
           const Divider(color: Color(0xFFE2E8F0), height: 1),
-          const _HabitsSectionPlaceholder(),
+          const MobileHabitsSection(),
           const SizedBox(height: 8),
           const Divider(color: Color(0xFFE2E8F0), height: 1),
           Container(
@@ -265,56 +289,6 @@ class _TaskListScreenMobileState extends ConsumerState<TaskListScreenMobile> {
           ),
         ],
       ),
-    );
-  }
-}
-
-class _HabitsSectionPlaceholder extends StatelessWidget {
-  const _HabitsSectionPlaceholder();
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          padding:
-              const EdgeInsets.only(left: 16, right: 16, top: 8, bottom: 8),
-          child: const Text(
-            "Hábitos",
-            style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF1E293B)),
-            textAlign: TextAlign.left,
-          ),
-        ),
-        Container(
-          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          padding: const EdgeInsets.all(16),
-          height: 128,
-          decoration: BoxDecoration(
-            color: const Color(0xFFE0F2FE),
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: const Row(
-            children: [
-              Icon(Icons.auto_graph, color: Color(0xFF0284C7)),
-              SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  'Sección de hábitos (en desarrollo)',
-                  style: TextStyle(
-                    color: Color(0xFF0284C7),
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        )
-      ],
     );
   }
 }
