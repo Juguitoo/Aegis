@@ -32,7 +32,8 @@ class _ManageProjectsBottomSheetState
         maxHeight: screenHeight * 0.7,
       ),
       padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+        bottom: MediaQuery.of(context).viewInsets.bottom +
+            MediaQuery.of(context).padding.bottom,
       ),
       decoration: const BoxDecoration(
         color: Colors.white,
