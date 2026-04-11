@@ -1,3 +1,4 @@
+import 'package:aegis/presentation/screens/tasks/widgets/manage_habits_bottom_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:aegis/core/utils/color_utils.dart';
@@ -223,6 +224,14 @@ class _ActionButtonsRow extends StatelessWidget {
                   builder: (context) => const ManageTagsBottomSheet(),
                 );
               }
+              if (value == 3) {
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  backgroundColor: Colors.transparent,
+                  builder: (context) => const ManageHabitsBottomSheet(),
+                );
+              }
             },
             itemBuilder: (context) => [
               const PopupMenuItem(
@@ -245,6 +254,18 @@ class _ActionButtonsRow extends StatelessWidget {
                         color: Color(0xFF64748B), size: 20),
                     SizedBox(width: 12),
                     Text('Gestionar Etiquetas',
+                        style: TextStyle(color: Color(0xFF1E293B))),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: 3,
+                child: Row(
+                  children: [
+                    Icon(Icons.auto_graph_outlined,
+                        color: Color(0xFF64748B), size: 20),
+                    SizedBox(width: 12),
+                    Text('Gestionar Hábitos',
                         style: TextStyle(color: Color(0xFF1E293B))),
                   ],
                 ),
