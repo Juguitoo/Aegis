@@ -169,7 +169,7 @@ class TimerViewmodel extends Notifier<TimerState> with WidgetsBindingObserver {
     if (state.isDynamicModeActive) {
       final recentSessions = await _sessionRepository.getLast30FocusSessions();
       final interruptions = state.pauseCount + state.blocklistAttempts;
-      final isCompleted = state.assignedTask?.isCompleted ?? false;
+      final isCompleted = state.assignedTask?.completedAt != null;
 
       final suggestion = _calculator.calculateNextInterval(
         currentMode: state.mode,
@@ -396,7 +396,7 @@ class TimerViewmodel extends Notifier<TimerState> with WidgetsBindingObserver {
       _saveSessionRecord();
 
       final task = state.assignedTask!;
-      final updatedTask = task.copyWith(isCompleted: true);
+      final updatedTask = task.copyWith(completedAt: Value(DateTime.now()));
       _taskRepository.updateTaskBasic(updatedTask);
       state = state.copyWith(assignedTask: updatedTask);
     }

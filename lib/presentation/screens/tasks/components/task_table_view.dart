@@ -140,7 +140,7 @@ class TaskRow extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final bool isCompleted = task.isCompleted;
+    final bool isCompleted = task.completedAt != null;
 
     Color flagColor = Colors.transparent;
     if (task.priority == 3) {

@@ -22,7 +22,7 @@ class Tasks extends Table {
   IntColumn get estimatedDuration => integer().nullable()();
   IntColumn get actualDuration => integer().nullable()();
   DateTimeColumn get dueDate => dateTime().nullable()();
-  BoolColumn get isCompleted => boolean().withDefault(const Constant(false))();
+  DateTimeColumn get completedAt => dateTime().nullable()();
   TextColumn get notes => text().nullable()();
 }
 

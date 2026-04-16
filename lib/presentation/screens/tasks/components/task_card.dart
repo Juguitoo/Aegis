@@ -85,16 +85,16 @@ class TaskCard extends ConsumerWidget {
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
                                   border: Border.all(
-                                    color: task.isCompleted
+                                    color: task.completedAt != null
                                         ? const Color(0xFF94A3B8)
                                         : const Color(0xFFCBD5E1),
                                     width: 2,
                                   ),
-                                  color: task.isCompleted
+                                  color: task.completedAt != null
                                       ? const Color(0xFF94A3B8)
                                       : Colors.transparent,
                                 ),
-                                child: task.isCompleted
+                                child: task.completedAt != null
                                     ? const Icon(Icons.check,
                                         size: 16, color: Colors.white)
                                     : null,
@@ -118,10 +118,10 @@ class TaskCard extends ConsumerWidget {
                                           style: TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.w500,
-                                            color: task.isCompleted
+                                            color: task.completedAt != null
                                                 ? const Color(0xFF94A3B8)
                                                 : const Color(0xFF1E293B),
-                                            decoration: task.isCompleted
+                                            decoration: task.completedAt != null
                                                 ? TextDecoration.lineThrough
                                                 : null,
                                           ),

@@ -64,7 +64,7 @@ class TasksPanelMobile extends ConsumerWidget {
                             final otherTasks = tasks
                                 .where((t) =>
                                     t.id != assignedTask?.id &&
-                                    t.isCompleted == false)
+                                    t.completedAt == null)
                                 .toList();
 
                             if (otherTasks.isEmpty) {

@@ -55,7 +55,7 @@ class _TasksPanelDesktopState extends ConsumerState<TasksPanelDesktop> {
               data: (tasks) {
                 final otherTasks = tasks
                     .where((t) =>
-                        t.id != assignedTask?.id && t.isCompleted == false)
+                        t.id != assignedTask?.id && t.completedAt == null)
                     .toList();
 
                 if (otherTasks.isEmpty) {

@@ -94,7 +94,7 @@ class TaskListViewModel extends StreamNotifier<List<Task>> {
       projectId: Value(projectId),
       priority: Value(priority),
       notes: Value(notes ?? ''),
-      isCompleted: const Value(false),
+      completedAt: const Value(null),
     );
 
     final subtasksCompanions = checklist.asMap().entries.map((entry) {
@@ -141,7 +141,12 @@ class TaskListViewModel extends StreamNotifier<List<Task>> {
   }
 
   Future<bool> toggleTaskCompletion(Task task) {
-    final updatedTask = task.copyWith(isCompleted: !task.isCompleted);
+    final isCurrentlyCompleted = task.completedAt != null;
+    final updatedTask = task.copyWith(
+      completedAt:
+          isCurrentlyCompleted ? const Value(null) : Value(DateTime.now()),
+    );
+
     return _repository.updateTaskBasic(updatedTask);
   }
 }
