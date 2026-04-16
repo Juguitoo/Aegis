@@ -4,6 +4,7 @@ import 'package:aegis/data/repositories/habits_repository.dart';
 import 'package:aegis/data/repositories/project_repository.dart';
 import 'package:aegis/data/repositories/sessions_repository.dart';
 import 'package:aegis/data/repositories/settings_repository.dart';
+import 'package:aegis/data/repositories/statistics_repository.dart';
 import 'package:aegis/data/repositories/tag_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/repositories/task_repository.dart';
@@ -47,4 +48,9 @@ final diaryRepositoryProvider = Provider<DiaryRepository>((ref) {
 final habitsRepositoryProvider = Provider<HabitsRepository>((ref) {
   final database = ref.watch(databaseProvider);
   return HabitsRepository(database);
+});
+
+final statisticsRepositoryProvider = Provider<StatisticsRepository>((ref) {
+  final database = ref.watch(databaseProvider);
+  return StatisticsRepository(database);
 });
