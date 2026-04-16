@@ -31,7 +31,7 @@ class StatisticsRepository {
     return result.read(sumExpr) ?? 0;
   }
 
-  Future<int> getCompletedTasksByDate(DateTime start, DateTime end) async {
+  Future<int> getCompletedTasksCount(DateTime start, DateTime end) async {
     final countExpr = _db.tasks.id.count();
 
     final query = _db.selectOnly(_db.tasks)
