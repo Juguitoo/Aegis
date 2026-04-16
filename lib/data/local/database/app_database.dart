@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:path_provider/path_provider.dart';
@@ -125,39 +126,117 @@ class AppDatabase extends _$AppDatabase {
           batch.insertAll(projects, [
             ProjectsCompanion.insert(
               name: 'Personal',
-              colorHex: Value('#3B82F6'),
+              colorHex: const Value('#3B82F6'),
             ),
             ProjectsCompanion.insert(
               name: 'Trabajo',
-              colorHex: Value('#10B981'),
+              colorHex: const Value('#10B981'),
             ),
             ProjectsCompanion.insert(
               name: 'Estudios',
-              colorHex: Value('#8B5CF6'),
+              colorHex: const Value('#8B5CF6'),
             ),
           ]);
 
           batch.insertAll(tags, [
             TagsCompanion.insert(
               name: 'Urgente',
-              colorHex: Value('#EF4444'),
+              colorHex: const Value('#EF4444'),
             ),
             TagsCompanion.insert(
               name: 'Salud',
-              colorHex: Value('#EC4899'),
+              colorHex: const Value('#EC4899'),
             ),
             TagsCompanion.insert(
               name: 'Casa',
-              colorHex: Value('#F59E0B'),
+              colorHex: const Value('#F59E0B'),
             ),
             TagsCompanion.insert(
               name: 'Ocio',
-              colorHex: Value('#06B6D4'),
+              colorHex: const Value('#06B6D4'),
             ),
           ]);
         });
       },
     );
+  }
+
+  Future<void> seedTestStatistics() async {
+    await customStatement('PRAGMA foreign_keys = OFF');
+    await delete(focusSessions).go();
+    await delete(habitEntries).go();
+    await delete(tasks).go();
+    await delete(habits).go();
+    await customStatement('PRAGMA foreign_keys = ON');
+
+    final existingProjects = await select(projects).get();
+    final projectIds = existingProjects.map((p) => p.id).toList();
+
+    final h1Id = await into(habits).insert(
+      HabitsCompanion.insert(name: 'Leer 20 mins'),
+    );
+    final h2Id = await into(habits).insert(
+      HabitsCompanion.insert(name: 'Ejercicio'),
+    );
+
+    final random = Random();
+    final now = DateTime.now();
+
+    for (int i = 0; i <= 30; i++) {
+      final currentDay = now.subtract(Duration(days: i));
+
+      if (i <= 12) {
+        await into(habitEntries).insert(
+          HabitEntriesCompanion.insert(
+            habitId: h1Id,
+            date: currentDay,
+          ),
+        );
+        if (random.nextBool()) {
+          await into(habitEntries).insert(
+            HabitEntriesCompanion.insert(
+              habitId: h2Id,
+              date: currentDay,
+            ),
+          );
+        }
+      }
+
+      final numTasks = random.nextInt(5) + 1;
+      for (int j = 0; j < numTasks; j++) {
+        final isCompleted = random.nextDouble() > 0.2;
+        final estSeconds = (random.nextInt(4) + 1) * 1800;
+        final actSeconds = estSeconds + (random.nextInt(1800) - 900);
+
+        await into(tasks).insert(
+          TasksCompanion.insert(
+            title: 'Tarea generada $j',
+            projectId: projectIds.isNotEmpty
+                ? Value(projectIds[random.nextInt(projectIds.length)])
+                : const Value.absent(),
+            estimatedDuration: Value(estSeconds),
+            actualDuration:
+                Value(isCompleted ? (actSeconds > 0 ? actSeconds : 600) : null),
+            completedAt: Value(isCompleted ? currentDay : null),
+          ),
+        );
+      }
+
+      final numSessions = random.nextInt(4) + 1;
+      for (int k = 0; k < numSessions; k++) {
+        await into(focusSessions).insert(
+          FocusSessionsCompanion.insert(
+            mode: 'TimerMode.focus',
+            actualSeconds: random.nextInt(2400) + 1200,
+            pauseCount: random.nextInt(3),
+            pauseDuration: random.nextInt(300),
+            extraTimeAdded: 0,
+            createdAt: Value(currentDay),
+            blocklistAttempts: random.nextInt(4),
+          ),
+        );
+      }
+    }
   }
 }
 

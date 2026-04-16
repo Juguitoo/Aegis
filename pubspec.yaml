@@ -59,8 +59,13 @@ dependencies:
 
   # Reproducción de audio
   audioplayers: ^5.2.1
+
+  # Calendarios y fechas
   table_calendar: ^3.2.0
   intl: ^0.20.2
+
+  # Graficas
+  fl_chart: ^1.2.0
 
 dev_dependencies:
   flutter_test:
