@@ -169,7 +169,7 @@ class _DesktopHabitsWidget extends ConsumerWidget {
                       children: [
                         const Expanded(flex: 3, child: SizedBox()),
                         Expanded(
-                          flex: 5,
+                          flex: 6,
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: currentWeekDays.map((date) {
@@ -180,24 +180,33 @@ class _DesktopHabitsWidget extends ConsumerWidget {
                                   .format(date)
                                   .substring(0, 1)
                                   .toUpperCase();
-                              return Container(
-                                width: 28,
-                                height: 28,
-                                alignment: Alignment.center,
-                                decoration: isToday
-                                    ? const BoxDecoration(
-                                        color: Color(0xFF6366F1),
-                                        shape: BoxShape.circle,
-                                      )
-                                    : null,
-                                child: Text(
-                                  dayInitials,
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
-                                    color: isToday
-                                        ? Colors.white
-                                        : const Color(0xFF64748B),
+                              return Flexible(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 2.0),
+                                  child: FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    child: Container(
+                                      width: 28,
+                                      height: 28,
+                                      alignment: Alignment.center,
+                                      decoration: isToday
+                                          ? const BoxDecoration(
+                                              color: Color(0xFF6366F1),
+                                              shape: BoxShape.circle,
+                                            )
+                                          : null,
+                                      child: Text(
+                                        dayInitials,
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                          color: isToday
+                                              ? Colors.white
+                                              : const Color(0xFF64748B),
+                                        ),
+                                      ),
+                                    ),
                                   ),
                                 ),
                               );
@@ -233,7 +242,7 @@ class _DesktopHabitsWidget extends ConsumerWidget {
                                 ),
                               ),
                               Expanded(
-                                flex: 5,
+                                flex: 6,
                                 child: Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceEvenly,
@@ -242,45 +251,59 @@ class _DesktopHabitsWidget extends ConsumerWidget {
                                         .any((e) => e.date == date);
                                     final isFuture = date.isAfter(today);
 
-                                    return MouseRegion(
-                                      cursor: isFuture
-                                          ? SystemMouseCursors.basic
-                                          : SystemMouseCursors.click,
-                                      child: GestureDetector(
-                                        onTap: isFuture
-                                            ? null
-                                            : () {
-                                                ref
-                                                    .read(
-                                                        habitsViewModelProvider
-                                                            .notifier)
-                                                    .toggleHabitEntry(
-                                                        habitData.habit.id,
-                                                        date);
-                                              },
-                                        child: Opacity(
-                                          opacity: isFuture ? 0.3 : 1.0,
-                                          child: Container(
-                                            width: 24,
-                                            height: 24,
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(6),
-                                              color: isCompleted
-                                                  ? const Color(0xFF6366F1)
-                                                  : Colors.transparent,
-                                              border: Border.all(
-                                                color: isCompleted
-                                                    ? const Color(0xFF6366F1)
-                                                    : const Color(0xFF94A3B8),
-                                                width: 1.5,
+                                    return Flexible(
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 2.0),
+                                        child: FittedBox(
+                                          fit: BoxFit.scaleDown,
+                                          child: MouseRegion(
+                                            cursor: isFuture
+                                                ? SystemMouseCursors.basic
+                                                : SystemMouseCursors.click,
+                                            child: GestureDetector(
+                                              onTap: isFuture
+                                                  ? null
+                                                  : () {
+                                                      ref
+                                                          .read(
+                                                              habitsViewModelProvider
+                                                                  .notifier)
+                                                          .toggleHabitEntry(
+                                                              habitData
+                                                                  .habit.id,
+                                                              date);
+                                                    },
+                                              child: Opacity(
+                                                opacity: isFuture ? 0.3 : 1.0,
+                                                child: Container(
+                                                  width: 24,
+                                                  height: 24,
+                                                  decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            6),
+                                                    color: isCompleted
+                                                        ? const Color(
+                                                            0xFF6366F1)
+                                                        : Colors.transparent,
+                                                    border: Border.all(
+                                                      color: isCompleted
+                                                          ? const Color(
+                                                              0xFF6366F1)
+                                                          : const Color(
+                                                              0xFF94A3B8),
+                                                      width: 1.5,
+                                                    ),
+                                                  ),
+                                                  child: isCompleted
+                                                      ? const Icon(Icons.check,
+                                                          size: 16,
+                                                          color: Colors.white)
+                                                      : null,
+                                                ),
                                               ),
                                             ),
-                                            child: isCompleted
-                                                ? const Icon(Icons.check,
-                                                    size: 16,
-                                                    color: Colors.white)
-                                                : null,
                                           ),
                                         ),
                                       ),
