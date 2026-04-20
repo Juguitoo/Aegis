@@ -67,6 +67,10 @@ dependencies:
   # Graficas
   fl_chart: ^1.2.0
 
+  # Backups
+  share_plus: ^12.0.2
+  file_picker: ^11.0.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
