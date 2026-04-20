@@ -788,25 +788,63 @@ class _StatisticsScreenMobileState
               style: TextStyle(color: Color(0xFF94A3B8))));
     }
 
-    return PieChart(
-      PieChartData(
-        sectionsSpace: 2,
-        centerSpaceRadius: 30,
-        sections: data.map((p) {
-          return PieChartSectionData(
-            color: ColorUtils.parseColor(p.colorHex),
-            value: p.taskCount.toDouble(),
-            title: '${p.taskCount}',
-            radius: 35,
-            titleStyle: const TextStyle(
-                fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white),
-          );
-        }).toList(),
-        pieTouchData: PieTouchData(
-          enabled: true,
-          touchCallback: (FlTouchEvent event, pieTouchResponse) {},
+    return Column(
+      children: [
+        Expanded(
+          child: PieChart(
+            PieChartData(
+              sectionsSpace: 2,
+              centerSpaceRadius: 30,
+              sections: data.map((p) {
+                return PieChartSectionData(
+                  color: ColorUtils.parseColor(p.colorHex),
+                  value: p.taskCount.toDouble(),
+                  title: '${p.taskCount}',
+                  radius: 35,
+                  titleStyle: const TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
+                );
+              }).toList(),
+              pieTouchData: PieTouchData(
+                enabled: true,
+                touchCallback: (FlTouchEvent event, pieTouchResponse) {},
+              ),
+            ),
+          ),
         ),
-      ),
+        const SizedBox(height: 16),
+        Wrap(
+          spacing: 12,
+          runSpacing: 8,
+          alignment: WrapAlignment.center,
+          children: data.map((p) {
+            return Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 10,
+                  height: 10,
+                  decoration: BoxDecoration(
+                    color: ColorUtils.parseColor(p.colorHex),
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  p.projectName,
+                  style: const TextStyle(
+                    fontSize: 11,
+                    color: Color(0xFF475569),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            );
+          }).toList(),
+        ),
+      ],
     );
   }
 }
@@ -855,7 +893,7 @@ class _PeriodButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
         decoration: BoxDecoration(
           color: isSelected ? Colors.white : Colors.transparent,
           borderRadius: BorderRadius.circular(24),
@@ -871,7 +909,7 @@ class _PeriodButton extends StatelessWidget {
         child: Text(
           label,
           style: TextStyle(
-            fontSize: 13,
+            fontSize: 12,
             fontWeight: FontWeight.bold,
             color:
                 isSelected ? const Color(0xFF6366F1) : const Color(0xFF94A3B8),
@@ -954,7 +992,7 @@ class _ChartContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 280,
+      height: 320,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,

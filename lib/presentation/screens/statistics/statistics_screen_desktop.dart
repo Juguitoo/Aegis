@@ -16,19 +16,11 @@ class StatisticsScreenDesktop extends ConsumerStatefulWidget {
 
 class _StatisticsScreenDesktopState
     extends ConsumerState<StatisticsScreenDesktop> {
-  final ValueNotifier<bool> _isHoveringDate = ValueNotifier<bool>(false);
-
   @override
   void initState() {
     super.initState();
     Future.microtask(
         () => ref.read(statisticsViewModelProvider.notifier).loadStatistics());
-  }
-
-  @override
-  void dispose() {
-    _isHoveringDate.dispose();
-    super.dispose();
   }
 
   void _changePeriod(ChartPeriod newPeriod) {
@@ -168,7 +160,7 @@ class _StatisticsScreenDesktopState
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(
-                    height: 46,
+                    height: 48,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -184,7 +176,7 @@ class _StatisticsScreenDesktopState
                         Row(
                           children: [
                             Container(
-                              height: 36,
+                              height: 44,
                               decoration: BoxDecoration(
                                 color: const Color(0xFFEEF2FF),
                                 borderRadius: BorderRadius.circular(24),
@@ -216,58 +208,60 @@ class _StatisticsScreenDesktopState
                                 ],
                               ),
                             ),
-                            const SizedBox(width: 24),
+                            const SizedBox(width: 32),
                             Row(
                               children: [
                                 IconButton(
                                   padding: EdgeInsets.zero,
-                                  constraints: const BoxConstraints(),
+                                  constraints: const BoxConstraints(
+                                      minWidth: 40, minHeight: 40),
                                   icon: const Icon(Icons.arrow_left,
-                                      color: Color(0xFF475569)),
+                                      color: Color(0xFF475569), size: 28),
                                   onPressed: () => _navigateDate(false),
                                 ),
+                                const SizedBox(width: 4),
                                 InkWell(
                                   onTap: () => _pickDate(context),
-                                  onHover: (hovering) {
-                                    _isHoveringDate.value = hovering;
-                                  },
-                                  borderRadius: BorderRadius.circular(8),
-                                  child: ValueListenableBuilder<bool>(
-                                    valueListenable: _isHoveringDate,
-                                    builder: (context, isHovering, child) {
-                                      return Container(
-                                        width: 140,
-                                        height: 32,
-                                        decoration: BoxDecoration(
-                                          color: isHovering
-                                              ? const Color(0xFFE0E7FF)
-                                              : const Color(0xFFEEF2FF),
-                                          borderRadius:
-                                              BorderRadius.circular(8),
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 16.0, vertical: 10.0),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
+                                          color: const Color(0xFFE2E8F0)),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black
+                                              .withValues(alpha: 0.02),
+                                          blurRadius: 4,
+                                          offset: const Offset(0, 2),
                                         ),
-                                        child: Center(
-                                          child: Text(
-                                            _formatDateRange(
-                                                state.startDate,
-                                                state.endDate,
-                                                state.currentPeriod),
-                                            textAlign: TextAlign.center,
-                                            style: const TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.w600,
-                                              color: Color(0xFF1E293B),
-                                            ),
-                                          ),
+                                      ],
+                                    ),
+                                    child: SizedBox(
+                                      width: 150,
+                                      child: Text(
+                                        _formatDateRange(state.startDate,
+                                            state.endDate, state.currentPeriod),
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                          color: Color(0xFF1E293B),
                                         ),
-                                      );
-                                    },
+                                      ),
+                                    ),
                                   ),
                                 ),
+                                const SizedBox(width: 4),
                                 IconButton(
                                   padding: EdgeInsets.zero,
-                                  constraints: const BoxConstraints(),
+                                  constraints: const BoxConstraints(
+                                      minWidth: 40, minHeight: 40),
                                   icon: const Icon(Icons.arrow_right,
-                                      color: Color(0xFF475569)),
+                                      color: Color(0xFF475569), size: 28),
                                   onPressed: () => _navigateDate(true),
                                 ),
                               ],
@@ -292,6 +286,13 @@ class _StatisticsScreenDesktopState
                         child: _KpiCard(
                           title: 'Tareas',
                           value: state.completedTasks.toString(),
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: _KpiCard(
+                          title: 'Distracciones',
+                          value: state.distractionsCount.toString(),
                         ),
                       ),
                       const SizedBox(width: 16),
@@ -404,11 +405,8 @@ class _StatisticsScreenDesktopState
           bottomTitles: AxisTitles(
             sideTitles: SideTitles(
               showTitles: true,
-              interval: 1,
               getTitlesWidget: (value, meta) {
-                if (value == value.toInt() &&
-                    value.toInt() >= 0 &&
-                    value.toInt() < data.length) {
+                if (value.toInt() >= 0 && value.toInt() < data.length) {
                   if (isDense && value.toInt() % 2 != 0) {
                     return const SizedBox();
                   }
@@ -520,11 +518,8 @@ class _StatisticsScreenDesktopState
           bottomTitles: AxisTitles(
             sideTitles: SideTitles(
               showTitles: true,
-              interval: 1,
               getTitlesWidget: (value, meta) {
-                if (value == value.toInt() &&
-                    value.toInt() >= 0 &&
-                    value.toInt() < data.length) {
+                if (value.toInt() >= 0 && value.toInt() < data.length) {
                   if (isDense && value.toInt() % 2 != 0) {
                     return const SizedBox();
                   }
@@ -641,11 +636,8 @@ class _StatisticsScreenDesktopState
           bottomTitles: AxisTitles(
             sideTitles: SideTitles(
               showTitles: true,
-              interval: 1,
               getTitlesWidget: (value, meta) {
-                if (value == value.toInt() &&
-                    value.toInt() >= 0 &&
-                    value.toInt() < data.length) {
+                if (value.toInt() >= 0 && value.toInt() < data.length) {
                   if (isDense && value.toInt() % 2 != 0) {
                     return const SizedBox();
                   }
@@ -723,22 +715,71 @@ class _StatisticsScreenDesktopState
               style: TextStyle(color: Color(0xFF94A3B8))));
     }
 
-    return PieChart(
-      PieChartData(
-        sectionsSpace: 2,
-        centerSpaceRadius: 40,
-        sections: data.map((p) {
-          return PieChartSectionData(
-            color: ColorUtils.parseColor(p.colorHex),
-            value: p.taskCount.toDouble(),
-            title: '${p.taskCount}',
-            radius: 40,
-            titleStyle: const TextStyle(
-                fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
-          );
-        }).toList(),
-        pieTouchData: PieTouchData(enabled: false),
-      ),
+    return Row(
+      children: [
+        Expanded(
+          flex: 3,
+          child: PieChart(
+            PieChartData(
+              sectionsSpace: 2,
+              centerSpaceRadius: 40,
+              sections: data.map((p) {
+                return PieChartSectionData(
+                  color: ColorUtils.parseColor(p.colorHex),
+                  value: p.taskCount.toDouble(),
+                  title: '${p.taskCount}',
+                  radius: 40,
+                  titleStyle: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
+                );
+              }).toList(),
+              pieTouchData: PieTouchData(enabled: false),
+            ),
+          ),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          flex: 2,
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: data.map((p) {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 12,
+                        height: 12,
+                        decoration: BoxDecoration(
+                          color: ColorUtils.parseColor(p.colorHex),
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          p.projectName,
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: Color(0xFF475569),
+                            fontWeight: FontWeight.w500,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -759,7 +800,7 @@ class _PeriodButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 10),
         decoration: BoxDecoration(
           color: isSelected ? Colors.white : Colors.transparent,
           borderRadius: BorderRadius.circular(24),
@@ -775,6 +816,7 @@ class _PeriodButton extends StatelessWidget {
         child: Text(
           label,
           style: TextStyle(
+            fontSize: 14,
             fontWeight: FontWeight.bold,
             color:
                 isSelected ? const Color(0xFF6366F1) : const Color(0xFF94A3B8),
