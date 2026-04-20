@@ -58,6 +58,8 @@ class BackupRepository {
       if (outputFile != null) {
         final file = File(outputFile);
         await file.writeAsString(jsonString);
+      } else {
+        throw Exception('Operación cancelada por el usuario');
       }
     } else {
       final directory = await getTemporaryDirectory();
@@ -65,11 +67,19 @@ class BackupRepository {
       await file.writeAsString(jsonString);
 
       final params = ShareParams(
-        files: [XFile(file.path)],
-        text: 'Copia de seguridad Aegis',
+        files: [
+          XFile(
+            file.path,
+            mimeType: 'application/json',
+          )
+        ],
       );
 
-      await SharePlus.instance.share(params);
+      final result = await SharePlus.instance.share(params);
+
+      if (result.status == ShareResultStatus.dismissed) {
+        throw Exception('Operación cancelada por el usuario');
+      }
     }
   }
 
@@ -84,12 +94,18 @@ class BackupRepository {
     }
 
     final file = File(result.files.single.path!);
-    final jsonString = await file.readAsString();
-    final data = jsonDecode(jsonString) as Map<String, dynamic>;
+    Map<String, dynamic> data;
 
-    if (data['version'] == null) {
+    try {
+      final jsonString = await file.readAsString();
+      data = jsonDecode(jsonString) as Map<String, dynamic>;
+
+      if (data['version'] == null) {
+        throw const FormatException();
+      }
+    } catch (e) {
       throw Exception(
-          'El archivo seleccionado no es un backup válido o está corrupto.');
+          'El archivo seleccionado no tiene un formato válido o está corrupto. Por favor, asegúrate de elegir un backup de Aegis correcto.');
     }
 
     await _db.transaction(() async {
