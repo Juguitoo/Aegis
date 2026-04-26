@@ -1,5 +1,6 @@
 import 'package:aegis/core/utils/native_app_monitor.dart';
 import 'package:aegis/presentation/screens/blocker/block_overlay_screen.dart';
+import 'package:aegis/presentation/screens/calendar/calendar_screen_mobile.dart';
 import 'package:aegis/presentation/screens/diary/diary_screen_mobile.dart';
 import 'package:aegis/presentation/screens/statistics/statistics_screen_mobile.dart';
 import 'package:aegis/presentation/screens/tasks/task_list_screen_mobile.dart';
@@ -69,7 +70,7 @@ class _MainMobileLayoutState extends ConsumerState<MainMobileLayout>
     final currentIndex = ref.watch(navigationIndexProvider);
 
     final screens = [
-      const Center(child: Text('Pantalla Calendario')),
+      const CalendarScreenMobile(),
       const TimerScreenMobile(),
       const TaskListScreenMobile(),
       const StatisticsScreenMobile(),

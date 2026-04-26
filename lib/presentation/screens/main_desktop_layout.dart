@@ -1,3 +1,4 @@
+import 'package:aegis/presentation/screens/calendar/calendar_screen_desktop.dart';
 import 'package:aegis/presentation/screens/diary/diary_screen_desktop.dart';
 import 'package:aegis/presentation/screens/statistics/statistics_screen_desktop.dart';
 import 'package:aegis/presentation/screens/tasks/task_list_screen_desktop.dart';
@@ -16,7 +17,7 @@ class MainDesktopLayout extends ConsumerWidget {
     final currentIndex = ref.watch(navigationIndexProvider);
 
     final screens = [
-      const Center(child: Text('Pantalla Calendario (Escritorio)')),
+      const CalendarScreenDesktop(),
       const TimerScreenDesktop(),
       const TaskListScreenDesktop(),
       const StatisticsScreenDesktop(),

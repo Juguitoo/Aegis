@@ -32,8 +32,12 @@ class _TaskFormMobileState extends ConsumerState<TaskFormMobile>
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
       ),
-      child: SizedBox(
+      child: Container(
         height: screenHeight * 0.85,
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
         child: DefaultTabController(
           length: 3,
           child: Column(
@@ -326,7 +330,7 @@ class _TaskDetailsTab extends StatelessWidget {
                             color: selectedNotificationDate != null
                                 ? const Color(0xFF6366F1)
                                 : const Color(0xFF64748B)),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: 12),
                         Expanded(
                           child: Text(
                             selectedNotificationDate == null
@@ -334,6 +338,7 @@ class _TaskDetailsTab extends StatelessWidget {
                                 : DateFormat('dd/MM HH:mm')
                                     .format(selectedNotificationDate!),
                             style: TextStyle(
+                              fontSize: 16,
                               color: selectedNotificationDate == null
                                   ? const Color(0xFF94A3B8)
                                   : const Color(0xFF6366F1),
@@ -688,7 +693,7 @@ class _InlineChecklistRowState extends State<_InlineChecklistRow> {
       margin: const EdgeInsets.only(bottom: 8),
       color: widget.isLastEmpty ? Colors.transparent : Colors.white,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(8),
         side: BorderSide(
           color:
               widget.isLastEmpty ? Colors.transparent : const Color(0xFFE2E8F0),
@@ -732,7 +737,7 @@ class _InlineChecklistRowState extends State<_InlineChecklistRow> {
                 ),
                 decoration: InputDecoration(
                   counterText: "",
-                  hintText: widget.isLastEmpty ? "Añadir paso..." : "",
+                  hintText: widget.isLastEmpty ? "Añadir subpaso..." : "",
                   hintStyle: const TextStyle(color: Color(0xFF94A3B8)),
                   border: InputBorder.none,
                   isDense: true,
