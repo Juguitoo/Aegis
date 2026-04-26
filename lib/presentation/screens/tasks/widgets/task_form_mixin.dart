@@ -14,6 +14,7 @@ mixin TaskFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
   final notesController = TextEditingController();
 
   DateTime? selectedDueDate;
+  DateTime? selectedNotificationDate;
   int? selectedProjectId;
   int selectedPriority = 0;
   List<int> selectedTagIds = [];
@@ -55,6 +56,7 @@ mixin TaskFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
             (task.estimatedDuration! ~/ 60).toString();
       }
       selectedDueDate = task.dueDate;
+      selectedNotificationDate = task.notificationAt;
       selectedProjectId = task.projectId;
       selectedPriority = task.priority;
 
@@ -101,6 +103,33 @@ mixin TaskFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
       setState(() {
         selectedDueDate = date;
       });
+    }
+  }
+
+  Future<void> pickNotificationDate() async {
+    final date = await showDatePicker(
+      context: context,
+      initialDate: selectedNotificationDate ?? DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2100),
+    );
+    if (date != null && mounted) {
+      final time = await showTimePicker(
+        context: context,
+        initialTime:
+            TimeOfDay.fromDateTime(selectedNotificationDate ?? DateTime.now()),
+      );
+      if (time != null && mounted) {
+        setState(() {
+          selectedNotificationDate = DateTime(
+            date.year,
+            date.month,
+            date.day,
+            time.hour,
+            time.minute,
+          );
+        });
+      }
     }
   }
 
@@ -175,6 +204,7 @@ mixin TaskFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
                 : notesController.text.trim(),
             estimatedDuration: duration,
             dueDate: selectedDueDate,
+            notificationAt: selectedNotificationDate,
             projectId: selectedProjectId,
             priority: selectedPriority,
             tagIds: selectedTagIds,
@@ -215,6 +245,7 @@ mixin TaskFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
       notes: Value(notesController.text.trim()),
       estimatedDuration: Value(duration),
       dueDate: Value(selectedDueDate),
+      notificationAt: Value(selectedNotificationDate),
       projectId: Value(selectedProjectId),
       priority: selectedPriority,
     );
@@ -264,6 +295,7 @@ mixin TaskFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
       estimatedDurationController.clear();
       notesController.clear();
       selectedDueDate = null;
+      selectedNotificationDate = null;
       selectedProjectId = null;
       selectedPriority = 0;
       selectedTagIds = [];

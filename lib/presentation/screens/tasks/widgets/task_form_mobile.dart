@@ -6,6 +6,7 @@ import 'package:aegis/presentation/viewmodels/task_list_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import '../../tags/widgets/tag_multi_selector.dart';
 
 class TaskFormMobile extends ConsumerStatefulWidget {
@@ -69,6 +70,8 @@ class _TaskFormMobileState extends ConsumerState<TaskFormMobile>
                       estimatedDurationController: estimatedDurationController,
                       selectedDueDate: selectedDueDate,
                       onPickDueDate: pickDueDate,
+                      selectedNotificationDate: selectedNotificationDate,
+                      onPickNotificationDate: pickNotificationDate,
                       projectsAsync: projectsAsync,
                       selectedProjectId: selectedProjectId,
                       onProjectChanged: (value) =>
@@ -165,6 +168,8 @@ class _TaskDetailsTab extends StatelessWidget {
   final TextEditingController estimatedDurationController;
   final DateTime? selectedDueDate;
   final VoidCallback onPickDueDate;
+  final DateTime? selectedNotificationDate;
+  final VoidCallback onPickNotificationDate;
   final AsyncValue<List<Project>> projectsAsync;
   final int? selectedProjectId;
   final ValueChanged<int?> onProjectChanged;
@@ -179,6 +184,8 @@ class _TaskDetailsTab extends StatelessWidget {
     required this.estimatedDurationController,
     required this.selectedDueDate,
     required this.onPickDueDate,
+    required this.selectedNotificationDate,
+    required this.onPickNotificationDate,
     required this.projectsAsync,
     required this.selectedProjectId,
     required this.onProjectChanged,
@@ -239,32 +246,30 @@ class _TaskDetailsTab extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
+          TextField(
+            controller: estimatedDurationController,
+            keyboardType: TextInputType.number,
+            inputFormatters: [
+              FilteringTextInputFormatter.digitsOnly,
+            ],
+            decoration: InputDecoration(
+              labelText: 'Estimación (min)',
+              hintText: 'Ej: 30',
+              hintStyle: const TextStyle(color: Color(0xFF94A3B8)),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide:
+                    const BorderSide(color: Color(0xFF6366F1), width: 2),
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
           Row(
             children: [
-              Expanded(
-                child: TextField(
-                  controller: estimatedDurationController,
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [
-                    FilteringTextInputFormatter.digitsOnly,
-                  ],
-                  decoration: InputDecoration(
-                    labelText: 'Estimación (min)',
-                    hintText: 'Ej: 30',
-                    hintStyle: const TextStyle(color: Color(0xFF94A3B8)),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide:
-                          const BorderSide(color: Color(0xFF6366F1), width: 2),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 16),
               Expanded(
                 child: InkWell(
                   onTap: onPickDueDate,
@@ -290,6 +295,51 @@ class _TaskDetailsTab extends StatelessWidget {
                               color: selectedDueDate == null
                                   ? const Color(0xFF94A3B8)
                                   : const Color(0xFF1E293B),
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: InkWell(
+                  onTap: onPickNotificationDate,
+                  borderRadius: BorderRadius.circular(12),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 12, vertical: 16),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: const Color(0xFFCBD5E1)),
+                      borderRadius: BorderRadius.circular(12),
+                      color: selectedNotificationDate != null
+                          ? const Color(0xFFEEF2FF)
+                          : Colors.transparent,
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.notifications_active_outlined,
+                            size: 20,
+                            color: selectedNotificationDate != null
+                                ? const Color(0xFF6366F1)
+                                : const Color(0xFF64748B)),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            selectedNotificationDate == null
+                                ? 'Recordatorio'
+                                : DateFormat('dd/MM HH:mm')
+                                    .format(selectedNotificationDate!),
+                            style: TextStyle(
+                              color: selectedNotificationDate == null
+                                  ? const Color(0xFF94A3B8)
+                                  : const Color(0xFF6366F1),
+                              fontWeight: selectedNotificationDate != null
+                                  ? FontWeight.bold
+                                  : FontWeight.normal,
                             ),
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -666,10 +716,8 @@ class _InlineChecklistRowState extends State<_InlineChecklistRow> {
               child: TextField(
                 controller: _controller,
                 focusNode: _focusNode,
-                textInputAction: TextInputAction.next,
                 textCapitalization: TextCapitalization.sentences,
-                onEditingComplete: () {
-                  widget.onChanged(_controller.text);
+                onSubmitted: (_) {
                   Future.delayed(const Duration(milliseconds: 50), () {
                     if (mounted) FocusScope.of(context).nextFocus();
                   });
@@ -683,7 +731,8 @@ class _InlineChecklistRowState extends State<_InlineChecklistRow> {
                       : null,
                 ),
                 decoration: InputDecoration(
-                  hintText: widget.isLastEmpty ? "Añadir subpaso..." : "",
+                  counterText: "",
+                  hintText: widget.isLastEmpty ? "Añadir paso..." : "",
                   hintStyle: const TextStyle(color: Color(0xFF94A3B8)),
                   border: InputBorder.none,
                   isDense: true,

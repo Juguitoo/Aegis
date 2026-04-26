@@ -6,6 +6,7 @@ import 'package:aegis/presentation/viewmodels/task_list_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import '../../tags/widgets/tag_multi_selector.dart';
 
 class TaskFormDesktop extends ConsumerStatefulWidget {
@@ -87,6 +88,9 @@ class _TaskFormDesktopState extends ConsumerState<TaskFormDesktop>
                                   estimatedDurationController,
                               selectedDueDate: selectedDueDate,
                               onPickDueDate: pickDueDate,
+                              selectedNotificationDate:
+                                  selectedNotificationDate,
+                              onPickNotificationDate: pickNotificationDate,
                               projectsAsync: projectsAsync,
                               selectedProjectId: selectedProjectId,
                               onProjectChanged: (value) =>
@@ -262,6 +266,8 @@ class _TaskDetailsColumn extends StatelessWidget {
   final TextEditingController estimatedDurationController;
   final DateTime? selectedDueDate;
   final VoidCallback onPickDueDate;
+  final DateTime? selectedNotificationDate;
+  final VoidCallback onPickNotificationDate;
   final AsyncValue<List<Project>> projectsAsync;
   final int? selectedProjectId;
   final ValueChanged<int?> onProjectChanged;
@@ -276,6 +282,8 @@ class _TaskDetailsColumn extends StatelessWidget {
     required this.estimatedDurationController,
     required this.selectedDueDate,
     required this.onPickDueDate,
+    required this.selectedNotificationDate,
+    required this.onPickNotificationDate,
     required this.projectsAsync,
     required this.selectedProjectId,
     required this.onProjectChanged,
@@ -360,7 +368,7 @@ class _TaskDetailsColumn extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(width: 24),
+              const SizedBox(width: 16),
               Expanded(
                 child: InkWell(
                   onTap: onPickDueDate,
@@ -387,6 +395,52 @@ class _TaskDetailsColumn extends StatelessWidget {
                               color: selectedDueDate == null
                                   ? const Color(0xFF94A3B8)
                                   : const Color(0xFF1E293B),
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: InkWell(
+                  onTap: onPickNotificationDate,
+                  borderRadius: BorderRadius.circular(8),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 12),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: const Color(0xFFCBD5E1)),
+                      borderRadius: BorderRadius.circular(8),
+                      color: selectedNotificationDate != null
+                          ? const Color(0xFFEEF2FF)
+                          : Colors.transparent,
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.notifications_active_outlined,
+                            size: 20,
+                            color: selectedNotificationDate != null
+                                ? const Color(0xFF6366F1)
+                                : const Color(0xFF64748B)),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            selectedNotificationDate == null
+                                ? 'Recordatorio'
+                                : DateFormat('dd/MM HH:mm')
+                                    .format(selectedNotificationDate!),
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: selectedNotificationDate == null
+                                  ? const Color(0xFF94A3B8)
+                                  : const Color(0xFF6366F1),
+                              fontWeight: selectedNotificationDate != null
+                                  ? FontWeight.bold
+                                  : FontWeight.normal,
                             ),
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -594,45 +648,40 @@ class _TaskChecklistColumn extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         if (total > 0) ...[
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Expanded(
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: TweenAnimationBuilder<double>(
-                      tween: Tween<double>(begin: 0, end: progress),
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeInOut,
-                      builder: (context, value, _) => LinearProgressIndicator(
-                        value: value,
-                        backgroundColor: const Color(0xFFE2E8F0),
-                        color: value == 1.0
-                            ? const Color(0xFF10B981)
-                            : const Color(0xFF6366F1),
-                        minHeight: 6,
-                      ),
+          Row(
+            children: [
+              Expanded(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: TweenAnimationBuilder<double>(
+                    tween: Tween<double>(begin: 0, end: progress),
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeInOut,
+                    builder: (context, value, _) => LinearProgressIndicator(
+                      value: value,
+                      backgroundColor: const Color(0xFFE2E8F0),
+                      color: value == 1.0
+                          ? const Color(0xFF10B981)
+                          : const Color(0xFF6366F1),
+                      minHeight: 8,
                     ),
                   ),
                 ),
-                const SizedBox(width: 16),
-                Text(
-                  '$completed/$total',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: progress == 1.0
-                        ? const Color(0xFF10B981)
-                        : const Color(0xFF64748B),
-                  ),
+              ),
+              const SizedBox(width: 16),
+              Text(
+                '$completed/$total',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: progress == 1.0
+                      ? const Color(0xFF10B981)
+                      : const Color(0xFF64748B),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-          const Divider(color: Color(0xFFE2E8F0), height: 1),
-          const SizedBox(height: 8),
+          const SizedBox(height: 16),
         ],
         Expanded(
           child: ReorderableListView.builder(
@@ -732,7 +781,7 @@ class _InlineChecklistRowState extends State<_InlineChecklistRow> {
     return Card(
       elevation: 0,
       margin: const EdgeInsets.only(bottom: 8),
-      color: widget.isLastEmpty ? Colors.transparent : const Color(0xFFF8FAFC),
+      color: widget.isLastEmpty ? Colors.transparent : Colors.white,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
         side: BorderSide(
@@ -762,13 +811,8 @@ class _InlineChecklistRowState extends State<_InlineChecklistRow> {
               child: TextField(
                 controller: _controller,
                 focusNode: _focusNode,
-                minLines: 1,
-                maxLines: 2,
-                maxLength: 70,
-                textInputAction: TextInputAction.next,
                 textCapitalization: TextCapitalization.sentences,
-                onEditingComplete: () {
-                  widget.onChanged(_controller.text);
+                onSubmitted: (_) {
                   Future.delayed(const Duration(milliseconds: 50), () {
                     if (mounted) FocusScope.of(context).nextFocus();
                   });
