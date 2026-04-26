@@ -25,6 +25,7 @@ class Tasks extends Table {
   DateTimeColumn get dueDate => dateTime().nullable()();
   DateTimeColumn get completedAt => dateTime().nullable()();
   TextColumn get notes => text().nullable()();
+  DateTimeColumn get notificationAt => dateTime().nullable()();
 }
 
 class Tags extends Table {
@@ -96,6 +97,15 @@ class HabitEntries extends Table {
   DateTimeColumn get date => dateTime()();
 }
 
+class Events extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get title => text()();
+  BoolColumn get isAllDay => boolean().withDefault(const Constant(false))();
+  DateTimeColumn get date => dateTime()();
+  DateTimeColumn get notificationAt => dateTime().nullable()();
+  DateTimeColumn get createdAt => dateTime()();
+}
+
 @DriftDatabase(tables: [
   Tasks,
   Projects,
@@ -108,6 +118,7 @@ class HabitEntries extends Table {
   DiaryNote,
   Habits,
   HabitEntries,
+  Events,
 ])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());

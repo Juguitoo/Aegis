@@ -341,6 +341,12 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
   late final GeneratedColumn<String> notes = GeneratedColumn<String>(
       'notes', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _notificationAtMeta =
+      const VerificationMeta('notificationAt');
+  @override
+  late final GeneratedColumn<DateTime> notificationAt =
+      GeneratedColumn<DateTime>('notification_at', aliasedName, true,
+          type: DriftSqlType.dateTime, requiredDuringInsert: false);
   @override
   List<GeneratedColumn> get $columns => [
         id,
@@ -352,7 +358,8 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
         actualDuration,
         dueDate,
         completedAt,
-        notes
+        notes,
+        notificationAt
       ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -413,6 +420,12 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
       context.handle(
           _notesMeta, notes.isAcceptableOrUnknown(data['notes']!, _notesMeta));
     }
+    if (data.containsKey('notification_at')) {
+      context.handle(
+          _notificationAtMeta,
+          notificationAt.isAcceptableOrUnknown(
+              data['notification_at']!, _notificationAtMeta));
+    }
     return context;
   }
 
@@ -442,6 +455,8 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
           .read(DriftSqlType.dateTime, data['${effectivePrefix}completed_at']),
       notes: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}notes']),
+      notificationAt: attachedDatabase.typeMapping.read(
+          DriftSqlType.dateTime, data['${effectivePrefix}notification_at']),
     );
   }
 
@@ -462,6 +477,7 @@ class Task extends DataClass implements Insertable<Task> {
   final DateTime? dueDate;
   final DateTime? completedAt;
   final String? notes;
+  final DateTime? notificationAt;
   const Task(
       {required this.id,
       required this.title,
@@ -472,7 +488,8 @@ class Task extends DataClass implements Insertable<Task> {
       this.actualDuration,
       this.dueDate,
       this.completedAt,
-      this.notes});
+      this.notes,
+      this.notificationAt});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -499,6 +516,9 @@ class Task extends DataClass implements Insertable<Task> {
     }
     if (!nullToAbsent || notes != null) {
       map['notes'] = Variable<String>(notes);
+    }
+    if (!nullToAbsent || notificationAt != null) {
+      map['notification_at'] = Variable<DateTime>(notificationAt);
     }
     return map;
   }
@@ -528,6 +548,9 @@ class Task extends DataClass implements Insertable<Task> {
           : Value(completedAt),
       notes:
           notes == null && nullToAbsent ? const Value.absent() : Value(notes),
+      notificationAt: notificationAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(notificationAt),
     );
   }
 
@@ -545,6 +568,7 @@ class Task extends DataClass implements Insertable<Task> {
       dueDate: serializer.fromJson<DateTime?>(json['dueDate']),
       completedAt: serializer.fromJson<DateTime?>(json['completedAt']),
       notes: serializer.fromJson<String?>(json['notes']),
+      notificationAt: serializer.fromJson<DateTime?>(json['notificationAt']),
     );
   }
   @override
@@ -561,6 +585,7 @@ class Task extends DataClass implements Insertable<Task> {
       'dueDate': serializer.toJson<DateTime?>(dueDate),
       'completedAt': serializer.toJson<DateTime?>(completedAt),
       'notes': serializer.toJson<String?>(notes),
+      'notificationAt': serializer.toJson<DateTime?>(notificationAt),
     };
   }
 
@@ -574,7 +599,8 @@ class Task extends DataClass implements Insertable<Task> {
           Value<int?> actualDuration = const Value.absent(),
           Value<DateTime?> dueDate = const Value.absent(),
           Value<DateTime?> completedAt = const Value.absent(),
-          Value<String?> notes = const Value.absent()}) =>
+          Value<String?> notes = const Value.absent(),
+          Value<DateTime?> notificationAt = const Value.absent()}) =>
       Task(
         id: id ?? this.id,
         title: title ?? this.title,
@@ -589,6 +615,8 @@ class Task extends DataClass implements Insertable<Task> {
         dueDate: dueDate.present ? dueDate.value : this.dueDate,
         completedAt: completedAt.present ? completedAt.value : this.completedAt,
         notes: notes.present ? notes.value : this.notes,
+        notificationAt:
+            notificationAt.present ? notificationAt.value : this.notificationAt,
       );
   Task copyWithCompanion(TasksCompanion data) {
     return Task(
@@ -608,6 +636,9 @@ class Task extends DataClass implements Insertable<Task> {
       completedAt:
           data.completedAt.present ? data.completedAt.value : this.completedAt,
       notes: data.notes.present ? data.notes.value : this.notes,
+      notificationAt: data.notificationAt.present
+          ? data.notificationAt.value
+          : this.notificationAt,
     );
   }
 
@@ -623,14 +654,25 @@ class Task extends DataClass implements Insertable<Task> {
           ..write('actualDuration: $actualDuration, ')
           ..write('dueDate: $dueDate, ')
           ..write('completedAt: $completedAt, ')
-          ..write('notes: $notes')
+          ..write('notes: $notes, ')
+          ..write('notificationAt: $notificationAt')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, title, description, projectId, priority,
-      estimatedDuration, actualDuration, dueDate, completedAt, notes);
+  int get hashCode => Object.hash(
+      id,
+      title,
+      description,
+      projectId,
+      priority,
+      estimatedDuration,
+      actualDuration,
+      dueDate,
+      completedAt,
+      notes,
+      notificationAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -644,7 +686,8 @@ class Task extends DataClass implements Insertable<Task> {
           other.actualDuration == this.actualDuration &&
           other.dueDate == this.dueDate &&
           other.completedAt == this.completedAt &&
-          other.notes == this.notes);
+          other.notes == this.notes &&
+          other.notificationAt == this.notificationAt);
 }
 
 class TasksCompanion extends UpdateCompanion<Task> {
@@ -658,6 +701,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
   final Value<DateTime?> dueDate;
   final Value<DateTime?> completedAt;
   final Value<String?> notes;
+  final Value<DateTime?> notificationAt;
   const TasksCompanion({
     this.id = const Value.absent(),
     this.title = const Value.absent(),
@@ -669,6 +713,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
     this.dueDate = const Value.absent(),
     this.completedAt = const Value.absent(),
     this.notes = const Value.absent(),
+    this.notificationAt = const Value.absent(),
   });
   TasksCompanion.insert({
     this.id = const Value.absent(),
@@ -681,6 +726,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
     this.dueDate = const Value.absent(),
     this.completedAt = const Value.absent(),
     this.notes = const Value.absent(),
+    this.notificationAt = const Value.absent(),
   }) : title = Value(title);
   static Insertable<Task> custom({
     Expression<int>? id,
@@ -693,6 +739,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
     Expression<DateTime>? dueDate,
     Expression<DateTime>? completedAt,
     Expression<String>? notes,
+    Expression<DateTime>? notificationAt,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -705,6 +752,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
       if (dueDate != null) 'due_date': dueDate,
       if (completedAt != null) 'completed_at': completedAt,
       if (notes != null) 'notes': notes,
+      if (notificationAt != null) 'notification_at': notificationAt,
     });
   }
 
@@ -718,7 +766,8 @@ class TasksCompanion extends UpdateCompanion<Task> {
       Value<int?>? actualDuration,
       Value<DateTime?>? dueDate,
       Value<DateTime?>? completedAt,
-      Value<String?>? notes}) {
+      Value<String?>? notes,
+      Value<DateTime?>? notificationAt}) {
     return TasksCompanion(
       id: id ?? this.id,
       title: title ?? this.title,
@@ -730,6 +779,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
       dueDate: dueDate ?? this.dueDate,
       completedAt: completedAt ?? this.completedAt,
       notes: notes ?? this.notes,
+      notificationAt: notificationAt ?? this.notificationAt,
     );
   }
 
@@ -766,6 +816,9 @@ class TasksCompanion extends UpdateCompanion<Task> {
     if (notes.present) {
       map['notes'] = Variable<String>(notes.value);
     }
+    if (notificationAt.present) {
+      map['notification_at'] = Variable<DateTime>(notificationAt.value);
+    }
     return map;
   }
 
@@ -781,7 +834,8 @@ class TasksCompanion extends UpdateCompanion<Task> {
           ..write('actualDuration: $actualDuration, ')
           ..write('dueDate: $dueDate, ')
           ..write('completedAt: $completedAt, ')
-          ..write('notes: $notes')
+          ..write('notes: $notes, ')
+          ..write('notificationAt: $notificationAt')
           ..write(')'))
         .toString();
   }
@@ -3070,6 +3124,347 @@ class HabitEntriesCompanion extends UpdateCompanion<HabitEntry> {
   }
 }
 
+class $EventsTable extends Events with TableInfo<$EventsTable, Event> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $EventsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+      'id', aliasedName, false,
+      hasAutoIncrement: true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+  static const VerificationMeta _titleMeta = const VerificationMeta('title');
+  @override
+  late final GeneratedColumn<String> title = GeneratedColumn<String>(
+      'title', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _isAllDayMeta =
+      const VerificationMeta('isAllDay');
+  @override
+  late final GeneratedColumn<bool> isAllDay = GeneratedColumn<bool>(
+      'is_all_day', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("is_all_day" IN (0, 1))'),
+      defaultValue: const Constant(false));
+  static const VerificationMeta _dateMeta = const VerificationMeta('date');
+  @override
+  late final GeneratedColumn<DateTime> date = GeneratedColumn<DateTime>(
+      'date', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _notificationAtMeta =
+      const VerificationMeta('notificationAt');
+  @override
+  late final GeneratedColumn<DateTime> notificationAt =
+      GeneratedColumn<DateTime>('notification_at', aliasedName, true,
+          type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  static const VerificationMeta _createdAtMeta =
+      const VerificationMeta('createdAt');
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+      'created_at', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  @override
+  List<GeneratedColumn> get $columns =>
+      [id, title, isAllDay, date, notificationAt, createdAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'events';
+  @override
+  VerificationContext validateIntegrity(Insertable<Event> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('title')) {
+      context.handle(
+          _titleMeta, title.isAcceptableOrUnknown(data['title']!, _titleMeta));
+    } else if (isInserting) {
+      context.missing(_titleMeta);
+    }
+    if (data.containsKey('is_all_day')) {
+      context.handle(_isAllDayMeta,
+          isAllDay.isAcceptableOrUnknown(data['is_all_day']!, _isAllDayMeta));
+    }
+    if (data.containsKey('date')) {
+      context.handle(
+          _dateMeta, date.isAcceptableOrUnknown(data['date']!, _dateMeta));
+    } else if (isInserting) {
+      context.missing(_dateMeta);
+    }
+    if (data.containsKey('notification_at')) {
+      context.handle(
+          _notificationAtMeta,
+          notificationAt.isAcceptableOrUnknown(
+              data['notification_at']!, _notificationAtMeta));
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(_createdAtMeta,
+          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Event map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Event(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+      title: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}title'])!,
+      isAllDay: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}is_all_day'])!,
+      date: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}date'])!,
+      notificationAt: attachedDatabase.typeMapping.read(
+          DriftSqlType.dateTime, data['${effectivePrefix}notification_at']),
+      createdAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
+    );
+  }
+
+  @override
+  $EventsTable createAlias(String alias) {
+    return $EventsTable(attachedDatabase, alias);
+  }
+}
+
+class Event extends DataClass implements Insertable<Event> {
+  final int id;
+  final String title;
+  final bool isAllDay;
+  final DateTime date;
+  final DateTime? notificationAt;
+  final DateTime createdAt;
+  const Event(
+      {required this.id,
+      required this.title,
+      required this.isAllDay,
+      required this.date,
+      this.notificationAt,
+      required this.createdAt});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['title'] = Variable<String>(title);
+    map['is_all_day'] = Variable<bool>(isAllDay);
+    map['date'] = Variable<DateTime>(date);
+    if (!nullToAbsent || notificationAt != null) {
+      map['notification_at'] = Variable<DateTime>(notificationAt);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  EventsCompanion toCompanion(bool nullToAbsent) {
+    return EventsCompanion(
+      id: Value(id),
+      title: Value(title),
+      isAllDay: Value(isAllDay),
+      date: Value(date),
+      notificationAt: notificationAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(notificationAt),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory Event.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Event(
+      id: serializer.fromJson<int>(json['id']),
+      title: serializer.fromJson<String>(json['title']),
+      isAllDay: serializer.fromJson<bool>(json['isAllDay']),
+      date: serializer.fromJson<DateTime>(json['date']),
+      notificationAt: serializer.fromJson<DateTime?>(json['notificationAt']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'title': serializer.toJson<String>(title),
+      'isAllDay': serializer.toJson<bool>(isAllDay),
+      'date': serializer.toJson<DateTime>(date),
+      'notificationAt': serializer.toJson<DateTime?>(notificationAt),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  Event copyWith(
+          {int? id,
+          String? title,
+          bool? isAllDay,
+          DateTime? date,
+          Value<DateTime?> notificationAt = const Value.absent(),
+          DateTime? createdAt}) =>
+      Event(
+        id: id ?? this.id,
+        title: title ?? this.title,
+        isAllDay: isAllDay ?? this.isAllDay,
+        date: date ?? this.date,
+        notificationAt:
+            notificationAt.present ? notificationAt.value : this.notificationAt,
+        createdAt: createdAt ?? this.createdAt,
+      );
+  Event copyWithCompanion(EventsCompanion data) {
+    return Event(
+      id: data.id.present ? data.id.value : this.id,
+      title: data.title.present ? data.title.value : this.title,
+      isAllDay: data.isAllDay.present ? data.isAllDay.value : this.isAllDay,
+      date: data.date.present ? data.date.value : this.date,
+      notificationAt: data.notificationAt.present
+          ? data.notificationAt.value
+          : this.notificationAt,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Event(')
+          ..write('id: $id, ')
+          ..write('title: $title, ')
+          ..write('isAllDay: $isAllDay, ')
+          ..write('date: $date, ')
+          ..write('notificationAt: $notificationAt, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, title, isAllDay, date, notificationAt, createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Event &&
+          other.id == this.id &&
+          other.title == this.title &&
+          other.isAllDay == this.isAllDay &&
+          other.date == this.date &&
+          other.notificationAt == this.notificationAt &&
+          other.createdAt == this.createdAt);
+}
+
+class EventsCompanion extends UpdateCompanion<Event> {
+  final Value<int> id;
+  final Value<String> title;
+  final Value<bool> isAllDay;
+  final Value<DateTime> date;
+  final Value<DateTime?> notificationAt;
+  final Value<DateTime> createdAt;
+  const EventsCompanion({
+    this.id = const Value.absent(),
+    this.title = const Value.absent(),
+    this.isAllDay = const Value.absent(),
+    this.date = const Value.absent(),
+    this.notificationAt = const Value.absent(),
+    this.createdAt = const Value.absent(),
+  });
+  EventsCompanion.insert({
+    this.id = const Value.absent(),
+    required String title,
+    this.isAllDay = const Value.absent(),
+    required DateTime date,
+    this.notificationAt = const Value.absent(),
+    required DateTime createdAt,
+  })  : title = Value(title),
+        date = Value(date),
+        createdAt = Value(createdAt);
+  static Insertable<Event> custom({
+    Expression<int>? id,
+    Expression<String>? title,
+    Expression<bool>? isAllDay,
+    Expression<DateTime>? date,
+    Expression<DateTime>? notificationAt,
+    Expression<DateTime>? createdAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (title != null) 'title': title,
+      if (isAllDay != null) 'is_all_day': isAllDay,
+      if (date != null) 'date': date,
+      if (notificationAt != null) 'notification_at': notificationAt,
+      if (createdAt != null) 'created_at': createdAt,
+    });
+  }
+
+  EventsCompanion copyWith(
+      {Value<int>? id,
+      Value<String>? title,
+      Value<bool>? isAllDay,
+      Value<DateTime>? date,
+      Value<DateTime?>? notificationAt,
+      Value<DateTime>? createdAt}) {
+    return EventsCompanion(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      isAllDay: isAllDay ?? this.isAllDay,
+      date: date ?? this.date,
+      notificationAt: notificationAt ?? this.notificationAt,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (title.present) {
+      map['title'] = Variable<String>(title.value);
+    }
+    if (isAllDay.present) {
+      map['is_all_day'] = Variable<bool>(isAllDay.value);
+    }
+    if (date.present) {
+      map['date'] = Variable<DateTime>(date.value);
+    }
+    if (notificationAt.present) {
+      map['notification_at'] = Variable<DateTime>(notificationAt.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('EventsCompanion(')
+          ..write('id: $id, ')
+          ..write('title: $title, ')
+          ..write('isAllDay: $isAllDay, ')
+          ..write('date: $date, ')
+          ..write('notificationAt: $notificationAt, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -3085,6 +3480,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $DiaryNoteTable diaryNote = $DiaryNoteTable(this);
   late final $HabitsTable habits = $HabitsTable(this);
   late final $HabitEntriesTable habitEntries = $HabitEntriesTable(this);
+  late final $EventsTable events = $EventsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -3100,7 +3496,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         focusSessions,
         diaryNote,
         habits,
-        habitEntries
+        habitEntries,
+        events
       ];
 }
 
@@ -3342,6 +3739,7 @@ typedef $$TasksTableCreateCompanionBuilder = TasksCompanion Function({
   Value<DateTime?> dueDate,
   Value<DateTime?> completedAt,
   Value<String?> notes,
+  Value<DateTime?> notificationAt,
 });
 typedef $$TasksTableUpdateCompanionBuilder = TasksCompanion Function({
   Value<int> id,
@@ -3354,6 +3752,7 @@ typedef $$TasksTableUpdateCompanionBuilder = TasksCompanion Function({
   Value<DateTime?> dueDate,
   Value<DateTime?> completedAt,
   Value<String?> notes,
+  Value<DateTime?> notificationAt,
 });
 
 final class $$TasksTableReferences
@@ -3439,6 +3838,10 @@ class $$TasksTableFilterComposer extends Composer<_$AppDatabase, $TasksTable> {
 
   ColumnFilters<String> get notes => $composableBuilder(
       column: $table.notes, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get notificationAt => $composableBuilder(
+      column: $table.notificationAt,
+      builder: (column) => ColumnFilters(column));
 
   $$ProjectsTableFilterComposer get projectId {
     final $$ProjectsTableFilterComposer composer = $composerBuilder(
@@ -3541,6 +3944,10 @@ class $$TasksTableOrderingComposer
   ColumnOrderings<String> get notes => $composableBuilder(
       column: $table.notes, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<DateTime> get notificationAt => $composableBuilder(
+      column: $table.notificationAt,
+      builder: (column) => ColumnOrderings(column));
+
   $$ProjectsTableOrderingComposer get projectId {
     final $$ProjectsTableOrderingComposer composer = $composerBuilder(
         composer: this,
@@ -3597,6 +4004,9 @@ class $$TasksTableAnnotationComposer
 
   GeneratedColumn<String> get notes =>
       $composableBuilder(column: $table.notes, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get notificationAt => $composableBuilder(
+      column: $table.notificationAt, builder: (column) => column);
 
   $$ProjectsTableAnnotationComposer get projectId {
     final $$ProjectsTableAnnotationComposer composer = $composerBuilder(
@@ -3695,6 +4105,7 @@ class $$TasksTableTableManager extends RootTableManager<
             Value<DateTime?> dueDate = const Value.absent(),
             Value<DateTime?> completedAt = const Value.absent(),
             Value<String?> notes = const Value.absent(),
+            Value<DateTime?> notificationAt = const Value.absent(),
           }) =>
               TasksCompanion(
             id: id,
@@ -3707,6 +4118,7 @@ class $$TasksTableTableManager extends RootTableManager<
             dueDate: dueDate,
             completedAt: completedAt,
             notes: notes,
+            notificationAt: notificationAt,
           ),
           createCompanionCallback: ({
             Value<int> id = const Value.absent(),
@@ -3719,6 +4131,7 @@ class $$TasksTableTableManager extends RootTableManager<
             Value<DateTime?> dueDate = const Value.absent(),
             Value<DateTime?> completedAt = const Value.absent(),
             Value<String?> notes = const Value.absent(),
+            Value<DateTime?> notificationAt = const Value.absent(),
           }) =>
               TasksCompanion.insert(
             id: id,
@@ -3731,6 +4144,7 @@ class $$TasksTableTableManager extends RootTableManager<
             dueDate: dueDate,
             completedAt: completedAt,
             notes: notes,
+            notificationAt: notificationAt,
           ),
           withReferenceMapper: (p0) => p0
               .map((e) =>
@@ -5668,6 +6082,182 @@ typedef $$HabitEntriesTableProcessedTableManager = ProcessedTableManager<
     (HabitEntry, $$HabitEntriesTableReferences),
     HabitEntry,
     PrefetchHooks Function({bool habitId})>;
+typedef $$EventsTableCreateCompanionBuilder = EventsCompanion Function({
+  Value<int> id,
+  required String title,
+  Value<bool> isAllDay,
+  required DateTime date,
+  Value<DateTime?> notificationAt,
+  required DateTime createdAt,
+});
+typedef $$EventsTableUpdateCompanionBuilder = EventsCompanion Function({
+  Value<int> id,
+  Value<String> title,
+  Value<bool> isAllDay,
+  Value<DateTime> date,
+  Value<DateTime?> notificationAt,
+  Value<DateTime> createdAt,
+});
+
+class $$EventsTableFilterComposer
+    extends Composer<_$AppDatabase, $EventsTable> {
+  $$EventsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get title => $composableBuilder(
+      column: $table.title, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get isAllDay => $composableBuilder(
+      column: $table.isAllDay, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get date => $composableBuilder(
+      column: $table.date, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get notificationAt => $composableBuilder(
+      column: $table.notificationAt,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnFilters(column));
+}
+
+class $$EventsTableOrderingComposer
+    extends Composer<_$AppDatabase, $EventsTable> {
+  $$EventsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get title => $composableBuilder(
+      column: $table.title, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get isAllDay => $composableBuilder(
+      column: $table.isAllDay, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get date => $composableBuilder(
+      column: $table.date, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get notificationAt => $composableBuilder(
+      column: $table.notificationAt,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+}
+
+class $$EventsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $EventsTable> {
+  $$EventsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get title =>
+      $composableBuilder(column: $table.title, builder: (column) => column);
+
+  GeneratedColumn<bool> get isAllDay =>
+      $composableBuilder(column: $table.isAllDay, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get date =>
+      $composableBuilder(column: $table.date, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get notificationAt => $composableBuilder(
+      column: $table.notificationAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+}
+
+class $$EventsTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $EventsTable,
+    Event,
+    $$EventsTableFilterComposer,
+    $$EventsTableOrderingComposer,
+    $$EventsTableAnnotationComposer,
+    $$EventsTableCreateCompanionBuilder,
+    $$EventsTableUpdateCompanionBuilder,
+    (Event, BaseReferences<_$AppDatabase, $EventsTable, Event>),
+    Event,
+    PrefetchHooks Function()> {
+  $$EventsTableTableManager(_$AppDatabase db, $EventsTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$EventsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$EventsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$EventsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<String> title = const Value.absent(),
+            Value<bool> isAllDay = const Value.absent(),
+            Value<DateTime> date = const Value.absent(),
+            Value<DateTime?> notificationAt = const Value.absent(),
+            Value<DateTime> createdAt = const Value.absent(),
+          }) =>
+              EventsCompanion(
+            id: id,
+            title: title,
+            isAllDay: isAllDay,
+            date: date,
+            notificationAt: notificationAt,
+            createdAt: createdAt,
+          ),
+          createCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            required String title,
+            Value<bool> isAllDay = const Value.absent(),
+            required DateTime date,
+            Value<DateTime?> notificationAt = const Value.absent(),
+            required DateTime createdAt,
+          }) =>
+              EventsCompanion.insert(
+            id: id,
+            title: title,
+            isAllDay: isAllDay,
+            date: date,
+            notificationAt: notificationAt,
+            createdAt: createdAt,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$EventsTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $EventsTable,
+    Event,
+    $$EventsTableFilterComposer,
+    $$EventsTableOrderingComposer,
+    $$EventsTableAnnotationComposer,
+    $$EventsTableCreateCompanionBuilder,
+    $$EventsTableUpdateCompanionBuilder,
+    (Event, BaseReferences<_$AppDatabase, $EventsTable, Event>),
+    Event,
+    PrefetchHooks Function()>;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -5693,4 +6283,6 @@ class $AppDatabaseManager {
       $$HabitsTableTableManager(_db, _db.habits);
   $$HabitEntriesTableTableManager get habitEntries =>
       $$HabitEntriesTableTableManager(_db, _db.habitEntries);
+  $$EventsTableTableManager get events =>
+      $$EventsTableTableManager(_db, _db.events);
 }
