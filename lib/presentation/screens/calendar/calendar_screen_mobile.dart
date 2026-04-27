@@ -6,6 +6,7 @@ import 'package:aegis/presentation/viewmodels/calendar_viewmodel.dart';
 import 'package:aegis/presentation/viewmodels/task_list_viewmodel.dart';
 import 'package:aegis/presentation/screens/tasks/components/task_card.dart';
 import 'package:aegis/presentation/screens/tasks/widgets/task_form_mobile.dart';
+import 'package:aegis/presentation/screens/calendar/widgets/event_form_mobile.dart';
 
 class CalendarScreenMobile extends ConsumerWidget {
   const CalendarScreenMobile({super.key});
@@ -15,6 +16,7 @@ class CalendarScreenMobile extends ConsumerWidget {
     final state = ref.watch(calendarViewModelProvider);
     final eventsMap = ref.watch(calendarItemsProvider);
     final tasksListAsync = ref.watch(taskListViewModelProvider);
+    final eventsListAsync = ref.watch(eventsStreamProvider);
 
     final normalizedSelectedDay = DateTime(
         state.selectedDay.year, state.selectedDay.month, state.selectedDay.day);
@@ -49,7 +51,14 @@ class CalendarScreenMobile extends ConsumerWidget {
             padding: const EdgeInsets.only(right: 8.0),
             child: IconButton(
               icon: const Icon(Icons.add, color: Color(0xFF6366F1), size: 28),
-              onPressed: () {},
+              onPressed: () {
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  backgroundColor: Colors.transparent,
+                  builder: (context) => const EventFormMobile(),
+                );
+              },
             ),
           ),
         ],
@@ -181,7 +190,28 @@ class CalendarScreenMobile extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  ...events.map((e) => _EventCard(item: e)),
+                  ...events.map((e) {
+                    final eventList = eventsListAsync.value ?? [];
+                    final eventObj =
+                        eventList.where((ev) => ev.id == e.id).firstOrNull;
+
+                    if (eventObj == null) {
+                      return const SizedBox();
+                    }
+
+                    return _EventCard(
+                      item: e,
+                      onTap: () {
+                        showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          backgroundColor: Colors.transparent,
+                          builder: (context) =>
+                              EventFormMobile(event: eventObj),
+                        );
+                      },
+                    );
+                  }),
                   const SizedBox(height: 16),
                 ],
                 if (calendarTasks.isNotEmpty) ...[
@@ -236,57 +266,68 @@ class CalendarScreenMobile extends ConsumerWidget {
 
 class _EventCard extends StatelessWidget {
   final CalendarItem item;
+  final VoidCallback? onTap;
 
-  const _EventCard({required this.item});
+  const _EventCard({required this.item, this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: const Color(0xFFEEF2FF),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: const Color(0xFFE0E7FF)),
       ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(Icons.event, color: Color(0xFF6366F1), size: 24),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
               children: [
-                Text(
-                  item.title,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF1E293B),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
                   ),
+                  child: const Icon(Icons.event,
+                      color: Color(0xFF6366F1), size: 24),
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  item.isAllDay
-                      ? 'Todo el día'
-                      : DateFormat('HH:mm').format(item.date),
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Color(0xFF6366F1),
-                    fontWeight: FontWeight.w600,
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        item.title,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF1E293B),
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        item.isAllDay
+                            ? 'Todo el día'
+                            : DateFormat('HH:mm').format(item.date),
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Color(0xFF6366F1),
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }
