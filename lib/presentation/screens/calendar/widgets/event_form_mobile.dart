@@ -21,6 +21,7 @@ class _EventFormMobileState extends ConsumerState<EventFormMobile>
   @override
   Widget build(BuildContext context) {
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+    final safeBottom = MediaQuery.of(context).padding.bottom;
 
     return Padding(
       padding: EdgeInsets.only(bottom: bottomInset),
@@ -29,7 +30,8 @@ class _EventFormMobileState extends ConsumerState<EventFormMobile>
           color: Colors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         ),
-        padding: const EdgeInsets.fromLTRB(20, 24, 20, 32),
+        padding: EdgeInsets.fromLTRB(
+            20, 24, 20, safeBottom > 0 ? safeBottom + 16 : 32),
         child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,

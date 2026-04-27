@@ -7,6 +7,7 @@ import 'package:aegis/presentation/viewmodels/task_list_viewmodel.dart';
 import 'package:aegis/presentation/screens/tasks/components/task_card.dart';
 import 'package:aegis/presentation/screens/tasks/widgets/task_form_mobile.dart';
 import 'package:aegis/presentation/screens/calendar/widgets/event_form_mobile.dart';
+import 'package:aegis/presentation/screens/settings/settings_screen_mobile.dart';
 
 class CalendarScreenMobile extends ConsumerWidget {
   const CalendarScreenMobile({super.key});
@@ -42,21 +43,32 @@ class CalendarScreenMobile extends ConsumerWidget {
             ),
           ),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: const Color(0xFFF8FAFC),
         foregroundColor: const Color(0xFF1E293B),
         elevation: 0,
         scrolledUnderElevation: 0,
+        surfaceTintColor: Colors.transparent,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.add, color: Color(0xFF6366F1), size: 28),
+            onPressed: () {
+              showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                backgroundColor: Colors.transparent,
+                builder: (context) => const EventFormMobile(),
+              );
+            },
+          ),
           Padding(
             padding: const EdgeInsets.only(right: 8.0),
             child: IconButton(
-              icon: const Icon(Icons.add, color: Color(0xFF6366F1), size: 28),
+              icon: const Icon(Icons.settings, color: Color(0xFF1E293B)),
               onPressed: () {
-                showModalBottomSheet(
-                  context: context,
-                  isScrollControlled: true,
-                  backgroundColor: Colors.transparent,
-                  builder: (context) => const EventFormMobile(),
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const SettingsScreenMobile()),
                 );
               },
             ),
@@ -65,6 +77,7 @@ class CalendarScreenMobile extends ConsumerWidget {
       ),
       body: Column(
         children: [
+          const Divider(color: Color(0xFFE2E8F0), height: 1),
           Container(
             color: Colors.white,
             padding: const EdgeInsets.only(bottom: 16),
@@ -92,6 +105,11 @@ class CalendarScreenMobile extends ConsumerWidget {
               headerStyle: const HeaderStyle(
                 formatButtonVisible: false,
                 titleCentered: true,
+                titleTextStyle: TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF1E293B),
+                ),
               ),
               calendarBuilders: CalendarBuilders(
                 selectedBuilder: (context, date, focusedDay) {
@@ -134,8 +152,8 @@ class CalendarScreenMobile extends ConsumerWidget {
                     ),
                   );
                 },
-                markerBuilder: (context, date, events) {
-                  if (events.isEmpty) return const SizedBox();
+                markerBuilder: (context, date, items) {
+                  if (items.isEmpty) return const SizedBox();
                   return Align(
                     alignment: Alignment.center,
                     child: Transform.translate(
@@ -194,10 +212,7 @@ class CalendarScreenMobile extends ConsumerWidget {
                     final eventList = eventsListAsync.value ?? [];
                     final eventObj =
                         eventList.where((ev) => ev.id == e.id).firstOrNull;
-
-                    if (eventObj == null) {
-                      return const SizedBox();
-                    }
+                    if (eventObj == null) return const SizedBox();
 
                     return _EventCard(
                       item: e,
@@ -229,9 +244,7 @@ class CalendarScreenMobile extends ConsumerWidget {
                     final taskObj =
                         taskList.where((t) => t.id == ct.id).firstOrNull;
 
-                    if (taskObj == null) {
-                      return const SizedBox();
-                    }
+                    if (taskObj == null) return const SizedBox();
 
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 8.0),
