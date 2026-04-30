@@ -35,7 +35,7 @@ Para ejecutar este proyecto en tu entorno local, asegúrate de tener Flutter ins
 
 1. **Clonar el repositorio:**
    ```bash
-   git clone [https://github.com/tu-usuario/aegis.git](https://github.com/tu-usuario/aegis.git)
+   git clone [https://github.com/Juguitoo/Aegis.git](https://github.com/Juguitoo/Aegis.git)
    cd aegis
 2. **Instalar dependencias:**
    ```bash
@@ -47,7 +47,7 @@ Dado que el proyecto utiliza generación de código para la base de datos, es fu
 4. **Ejecutar la aplicación:**
    Dependiendo del entorno donde quieras probar la aplicación, utiliza el comando correspondiente:
 
-   *   **Para Escritorio (ej. Windows):**
+   *   **Para Escritorio:**
        ```bash
        flutter run -d windows
        ```
