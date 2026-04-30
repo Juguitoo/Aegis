@@ -18,15 +18,15 @@ void main() {
   ProviderSubscription? subscription;
 
   final task1 = Task(
-      id: 1, title: 'Tarea 1', isCompleted: false, priority: 0, projectId: 1);
+      id: 1, title: 'Tarea 1', completedAt: null, priority: 0, projectId: 1);
   final task2 = Task(
-      id: 2, title: 'Tarea 2', isCompleted: false, priority: 0, projectId: 1);
+      id: 2, title: 'Tarea 2', completedAt: null, priority: 0, projectId: 1);
   final task3 = Task(
-      id: 3, title: 'Tarea 3', isCompleted: false, priority: 0, projectId: 2);
+      id: 3, title: 'Tarea 3', completedAt: null, priority: 0, projectId: 2);
   final task4 = Task(
       id: 4,
       title: 'Bandeja Entrada',
-      isCompleted: false,
+      completedAt: null,
       priority: 0,
       projectId: null);
 
@@ -167,7 +167,7 @@ void main() {
           verify(() => mockRepository.updateTaskBasic(captureAny())).captured;
       final updatedTask = captured.first as Task;
 
-      expect(updatedTask.isCompleted, true);
+      expect(updatedTask.completedAt, isNotNull);
     });
   });
 }

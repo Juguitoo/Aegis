@@ -47,7 +47,7 @@ void main() {
   testWidgets('TaskCard renderiza el titulo y no lo tacha si esta pendiente',
       (WidgetTester tester) async {
     final task =
-        Task(id: 1, title: 'Comprar leche', priority: 1, isCompleted: false);
+        Task(id: 1, title: 'Comprar leche', priority: 1, completedAt: null);
     await tester.pumpWidget(buildTestableTaskCard(task));
     expect(find.text('Comprar leche'), findsOneWidget);
     final titleText = tester.widget<Text>(find.text('Comprar leche'));
@@ -57,7 +57,10 @@ void main() {
   testWidgets('TaskCard renderiza el titulo tachado si esta completada',
       (WidgetTester tester) async {
     final task = Task(
-        id: 2, title: 'Llamar al fontanero', priority: 2, isCompleted: true);
+        id: 2,
+        title: 'Llamar al fontanero',
+        priority: 2,
+        completedAt: DateTime.now());
     await tester.pumpWidget(buildTestableTaskCard(task));
     expect(find.text('Llamar al fontanero'), findsOneWidget);
     final titleText = tester.widget<Text>(find.text('Llamar al fontanero'));
@@ -68,7 +71,7 @@ void main() {
       (WidgetTester tester) async {
     bool togglePressed = false;
     final task =
-        Task(id: 3, title: 'Hacer ejercicio', priority: 3, isCompleted: false);
+        Task(id: 3, title: 'Hacer ejercicio', priority: 3, completedAt: null);
 
     await tester.pumpWidget(
       buildTestableTaskCard(
@@ -98,7 +101,7 @@ void main() {
         title: 'Renovar el DNI',
         priority: 0,
         dueDate: taskDate,
-        isCompleted: false);
+        completedAt: null);
 
     await tester.pumpWidget(buildTestableTaskCard(task));
 

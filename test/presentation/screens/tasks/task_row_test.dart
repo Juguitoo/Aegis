@@ -43,7 +43,7 @@ void main() {
   testWidgets('TaskRow renderiza el titulo y no lo tacha si esta pendiente',
       (WidgetTester tester) async {
     final task = Task(
-        id: 1, title: 'Configurar servidor', priority: 3, isCompleted: false);
+        id: 1, title: 'Configurar servidor', priority: 3, completedAt: null);
     await tester.pumpWidget(buildTestableTaskRow(task));
     expect(find.text('Configurar servidor'), findsOneWidget);
     final titleText = tester.widget<Text>(find.text('Configurar servidor'));
@@ -53,7 +53,10 @@ void main() {
   testWidgets('TaskRow renderiza el titulo tachado si esta completada',
       (WidgetTester tester) async {
     final task = Task(
-        id: 2, title: 'Redactar documentacion', priority: 1, isCompleted: true);
+        id: 2,
+        title: 'Redactar documentacion',
+        priority: 1,
+        completedAt: DateTime.now());
     await tester.pumpWidget(buildTestableTaskRow(task));
     expect(find.text('Redactar documentacion'), findsOneWidget);
     final titleText = tester.widget<Text>(find.text('Redactar documentacion'));
@@ -68,7 +71,7 @@ void main() {
         title: 'Reunion de seguimiento',
         priority: 2,
         dueDate: taskDate,
-        isCompleted: false);
+        completedAt: null);
     await tester.pumpWidget(buildTestableTaskRow(task));
     expect(find.text('05, Agosto, 2026'), findsOneWidget);
   });
@@ -80,7 +83,7 @@ void main() {
         title: 'Tarea sin prisa',
         priority: 0,
         dueDate: null,
-        isCompleted: false);
+        completedAt: null);
     await tester.pumpWidget(buildTestableTaskRow(task));
     expect(find.text('Sin fecha'), findsOneWidget);
   });
@@ -88,7 +91,7 @@ void main() {
   testWidgets('TaskRow renderiza el menu de opciones (tres puntos)',
       (WidgetTester tester) async {
     final task =
-        Task(id: 5, title: 'Revisar PRs', priority: 3, isCompleted: false);
+        Task(id: 5, title: 'Revisar PRs', priority: 3, completedAt: null);
     await tester.pumpWidget(buildTestableTaskRow(task));
     expect(find.byIcon(Icons.more_vert), findsOneWidget);
   });

@@ -1,4 +1,4 @@
-import 'package:drift/drift.dart';
+import 'package:drift/drift.dart' hide isNotNull;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:aegis/data/local/database/app_database.dart';
@@ -36,7 +36,7 @@ void main() {
       expect(tasks.first.id, taskId);
       expect(tasks.first.title, 'Tarea de prueba');
       expect(tasks.first.priority, 2);
-      expect(tasks.first.isCompleted, false);
+      expect(tasks.first.completedAt, null);
     });
 
     test('Debe insertar una tarea compleja con notas, etiquetas y subtareas',
@@ -86,7 +86,7 @@ void main() {
 
       final updatedTask = task.copyWith(
         title: 'Titulo modificado',
-        isCompleted: true,
+        completedAt: Value(DateTime.now()),
       );
 
       await taskRepo.updateTaskBasic(updatedTask);
@@ -96,7 +96,7 @@ void main() {
           .getSingle();
 
       expect(taskAfterUpdate.title, 'Titulo modificado');
-      expect(taskAfterUpdate.isCompleted, true);
+      expect(taskAfterUpdate.completedAt, isNotNull);
     });
 
     test('Debe borrar una tarea por su ID', () async {

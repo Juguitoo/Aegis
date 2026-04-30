@@ -71,7 +71,7 @@ void main() {
       var tasks = container.read(taskListViewModelProvider).value ?? [];
 
       final taskToToggle = tasks.first;
-      expect(taskToToggle.isCompleted, false);
+      expect(taskToToggle.completedAt, null);
 
       await container
           .read(taskListViewModelProvider.notifier)
@@ -80,7 +80,7 @@ void main() {
       await Future.delayed(const Duration(milliseconds: 50));
       tasks = container.read(taskListViewModelProvider).value ?? [];
 
-      expect(tasks.first.isCompleted, true);
+      expect(tasks.first.completedAt, isNotNull);
       expect(tasks.first.id, taskToToggle.id);
     });
 

@@ -225,7 +225,7 @@ void main() {
         priority: 1,
         estimatedDuration: 1500,
         actualDuration: 0,
-        isCompleted: false,
+        completedAt: null,
       );
       final notifier = container.read(timerViewModelProvider.notifier);
 
@@ -248,7 +248,7 @@ void main() {
         priority: 1,
         estimatedDuration: 1500,
         actualDuration: 0,
-        isCompleted: false,
+        completedAt: null,
       );
       final notifier = container.read(timerViewModelProvider.notifier);
 
@@ -269,7 +269,7 @@ void main() {
       expect(state.status, TimerStatus.idle);
 
       expect(fakeTaskRepo.lastUpdatedTask, isNotNull);
-      expect(fakeTaskRepo.lastUpdatedTask!.isCompleted, isTrue);
+      expect(fakeTaskRepo.lastUpdatedTask!.completedAt, isNotNull);
       expect(fakeTaskRepo.lastUpdatedTask!.actualDuration, 100);
     });
 
@@ -283,7 +283,7 @@ void main() {
         priority: 1,
         estimatedDuration: 1500,
         actualDuration: 0,
-        isCompleted: false,
+        completedAt: null,
       );
       final notifier = container.read(timerViewModelProvider.notifier);
 
