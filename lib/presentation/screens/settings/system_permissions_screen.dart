@@ -1,3 +1,4 @@
+import 'package:aegis/core/services/notification_service.dart';
 import 'package:aegis/core/utils/native_app_monitor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -14,6 +15,7 @@ class _SystemPermissionsScreenState
     extends ConsumerState<SystemPermissionsScreen> with WidgetsBindingObserver {
   bool _hasUsagePermission = false;
   bool _hasOverlayPermission = false;
+  final bool _hasRequestedNotifications = true;
 
   @override
   void initState() {
@@ -90,6 +92,25 @@ class _SystemPermissionsScreenState
             isGranted: _hasOverlayPermission,
             onTap: () =>
                 ref.read(nativeAppMonitorProvider).requestOverlayPermission(),
+          ),
+          const SizedBox(height: 16),
+          _PermissionItem(
+            title: 'Notificaciones',
+            description:
+                'Permite que Aegis te avise sobre tareas y eventos programados.',
+            icon: Icons.notifications_active_outlined,
+            isGranted: _hasRequestedNotifications,
+            onTap: () async {
+              await NotificationService.requestPermissions();
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Permisos de notificaciones solicitados.'),
+                    backgroundColor: Color(0xFF10B981),
+                  ),
+                );
+              }
+            },
           ),
         ],
       ),

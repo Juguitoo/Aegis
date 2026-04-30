@@ -12,12 +12,13 @@ import 'package:intl/date_symbol_data_local.dart';
 void main() async {
   // Asegura que el motor y el gestor de ventanas estén inicializados
   WidgetsFlutterBinding.ensureInitialized();
-
   await initializeDateFormatting('es_ES', null);
+
+  await NotificationService.init();
+  await NotificationService.requestPermissions();
 
   if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
     await windowManager.ensureInitialized();
-    await NotificationService.init();
 
     // Configuración de la ventana para escritorio
     WindowOptions windowOptions = const WindowOptions(

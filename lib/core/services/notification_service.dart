@@ -4,6 +4,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_timezone/flutter_timezone.dart';
 
 final notificationServiceProvider = Provider<NotificationService>((ref) {
   return NotificationService();
@@ -14,10 +15,19 @@ class NotificationService {
       FlutterLocalNotificationsPlugin();
 
   static Future<void> init() async {
+    if (kIsWeb) return;
+
     tz.initializeTimeZones();
 
+    try {
+      final String timeZoneName = FlutterTimezone.getLocalTimezone().toString();
+      tz.setLocalLocation(tz.getLocation(timeZoneName));
+    } catch (e) {
+      tz.setLocalLocation(tz.getLocation('Europe/Madrid'));
+    }
+
     const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
+        AndroidInitializationSettings('@mipmap/launcher_icon');
 
     const DarwinInitializationSettings initializationSettingsDarwin =
         DarwinInitializationSettings(
@@ -29,12 +39,20 @@ class NotificationService {
     const LinuxInitializationSettings initializationSettingsLinux =
         LinuxInitializationSettings(defaultActionName: 'Open notification');
 
+    const WindowsInitializationSettings initializationSettingsWindows =
+        WindowsInitializationSettings(
+      appName: 'Aegis Productivity',
+      appUserModelId: 'com.hjuagom.aegis',
+      guid: 'f781dfaa-f73c-4148-8a43-e62a9bda7985',
+    );
+
     const InitializationSettings initializationSettings =
         InitializationSettings(
       android: initializationSettingsAndroid,
       iOS: initializationSettingsDarwin,
       macOS: initializationSettingsDarwin,
       linux: initializationSettingsLinux,
+      windows: initializationSettingsWindows,
     );
 
     await _notificationsPlugin.initialize(
@@ -78,6 +96,7 @@ class NotificationService {
     required String body,
     required DateTime scheduledDate,
   }) async {
+    if (kIsWeb) return;
     if (scheduledDate.isBefore(DateTime.now())) return;
 
     final tz.TZDateTime tzDate = tz.TZDateTime.from(scheduledDate, tz.local);
@@ -89,14 +108,19 @@ class NotificationService {
       channelDescription: 'Notificaciones de tareas y eventos programados',
       importance: Importance.max,
       priority: Priority.high,
+      showWhen: true,
     );
 
     const DarwinNotificationDetails darwinDetails = DarwinNotificationDetails();
+
+    const WindowsNotificationDetails windowsDetails =
+        WindowsNotificationDetails();
 
     const NotificationDetails platformDetails = NotificationDetails(
       android: androidDetails,
       iOS: darwinDetails,
       macOS: darwinDetails,
+      windows: windowsDetails,
     );
 
     await _notificationsPlugin.zonedSchedule(
@@ -110,10 +134,32 @@ class NotificationService {
   }
 
   static Future<void> cancelNotification(int id) async {
+    if (kIsWeb) return;
     await _notificationsPlugin.cancel(id: id);
   }
 
   static Future<void> cancelAllNotifications() async {
+    if (kIsWeb) return;
     await _notificationsPlugin.cancelAll();
+  }
+
+  static Future<void> showImmediateNotification() async {
+    if (kIsWeb) return;
+
+    const WindowsNotificationDetails windowsDetails =
+        WindowsNotificationDetails();
+
+    const NotificationDetails platformDetails = NotificationDetails(
+      windows: windowsDetails,
+      android: AndroidNotificationDetails(
+          'aegis_reminders_channel', 'Recordatorios'),
+    );
+
+    await _notificationsPlugin.show(
+      id: 999,
+      title: '¡Prueba instantánea!',
+      body: 'Si ves esto, el motor de notificaciones funciona perfectamente.',
+      notificationDetails: platformDetails,
+    );
   }
 }
