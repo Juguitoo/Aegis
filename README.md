@@ -60,13 +60,11 @@ Dado que el proyecto utiliza generación de código para la base de datos, es fu
 
 ## 📱 Capturas de Pantalla
 
-> **Nota:** Puedes añadir aquí capturas de pantalla de la aplicación. Crea una carpeta `/docs/images` en tu repositorio y enlaza las imágenes así:
-
 | Escritorio | Móvil |
 | :---: | :---: |
-| ![Escritorio Tareas](ruta/a/tu/imagen_desktop.png) | ![Móvil Tareas](ruta/a/tu/imagen_mobile.png) |
-| ![Escritorio Estadísticas](ruta/a/tu/estadisticas_desktop.png) | ![Móvil Pomodoro](ruta/a/tu/pomodoro_mobile.png) |
+| ![Escritorio Tareas](/docs/images/VistaTareasEscritorio.png) | ![Móvil Tareas](/docs/images/VistaTareasMovil.png) |
+| ![Escritorio Estadísticas](/docs/images/VistaAnalisisEscritorio.png) | ![Móvil Pomodoro](/docs/images/VistaAnalisisMovil.png) |
 
 ## 👨‍💻 Autor
 
-* **[Tu Nombre]** - *Desarrollo UI/UX y Backend Local* - [Tu GitHub/LinkedIn]
+* **Hugo Juan Gómez** - *Desarrollo UI/UX y Backend Local*
