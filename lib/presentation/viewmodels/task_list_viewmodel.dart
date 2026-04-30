@@ -6,6 +6,8 @@ import 'package:flutter_riverpod/legacy.dart';
 import '../../core/providers/repository_providers.dart';
 import '../../data/local/database/app_database.dart';
 import '../../data/repositories/task_repository.dart';
+import '../../core/services/notification_service.dart';
+import '../../core/utils/notification_id_manager.dart';
 
 class TaskChecklistItem {
   final int? id;
@@ -85,7 +87,7 @@ class TaskListViewModel extends StreamNotifier<List<Task>> {
     List<int> tagIds = const [],
     List<TaskChecklistItem> checklist = const [],
     String? notes,
-  }) {
+  }) async {
     final taskCompanion = TasksCompanion.insert(
       title: title,
       description: Value(description ?? ''),
@@ -107,18 +109,31 @@ class TaskListViewModel extends StreamNotifier<List<Task>> {
       );
     }).toList();
 
-    return _repository.insertTask(
+    final taskId = await _repository.insertTask(
       taskCompanion,
       tagIds: tagIds,
       subtasks: subtasksCompanions,
     );
+
+    if (notificationAt != null && notificationAt.isAfter(DateTime.now())) {
+      await NotificationService.scheduleNotification(
+        id: NotificationIdManager.getTaskId(taskId),
+        title: '📋 Tarea: $title',
+        body: description?.isNotEmpty == true
+            ? description!
+            : 'Tienes una tarea pendiente programada',
+        scheduledDate: notificationAt,
+      );
+    }
+
+    return taskId;
   }
 
   Future<void> updateTask({
     required Task task,
     List<int> tagIds = const [],
     List<TaskChecklistItem> checklist = const [],
-  }) {
+  }) async {
     final subtasksCompanions = checklist.asMap().entries.map((entry) {
       return SubtasksCompanion(
         id: entry.value.id != null
@@ -130,26 +145,65 @@ class TaskListViewModel extends StreamNotifier<List<Task>> {
       );
     }).toList();
 
-    return _repository.updateTask(task,
+    await _repository.updateTask(task,
         tagIds: tagIds, subtasks: subtasksCompanions);
+
+    final notifId = NotificationIdManager.getTaskId(task.id);
+    if (task.completedAt == null &&
+        task.notificationAt != null &&
+        task.notificationAt!.isAfter(DateTime.now())) {
+      await NotificationService.scheduleNotification(
+        id: notifId,
+        title: '📋 Tarea: ${task.title}',
+        body: task.description?.isNotEmpty == true
+            ? task.description!
+            : 'Tienes una tarea pendiente programada',
+        scheduledDate: task.notificationAt!,
+      );
+    } else {
+      await NotificationService.cancelNotification(notifId);
+    }
   }
 
-  Future<int> deleteTask(Task task) {
-    return _repository.deleteTask(task);
+  Future<int> deleteTask(Task task) async {
+    await NotificationService.cancelNotification(
+        NotificationIdManager.getTaskId(task.id));
+    return await _repository.deleteTask(task);
   }
 
-  Future<int> deleteTaskById(int id) {
-    return _repository.deleteTaskById(id);
+  Future<int> deleteTaskById(int id) async {
+    await NotificationService.cancelNotification(
+        NotificationIdManager.getTaskId(id));
+    return await _repository.deleteTaskById(id);
   }
 
-  Future<bool> toggleTaskCompletion(Task task) {
+  Future<bool> toggleTaskCompletion(Task task) async {
     final isCurrentlyCompleted = task.completedAt != null;
     final updatedTask = task.copyWith(
       completedAt:
           isCurrentlyCompleted ? const Value(null) : Value(DateTime.now()),
     );
 
-    return _repository.updateTaskBasic(updatedTask);
+    final result = await _repository.updateTaskBasic(updatedTask);
+    final notifId = NotificationIdManager.getTaskId(task.id);
+
+    if (isCurrentlyCompleted) {
+      if (task.notificationAt != null &&
+          task.notificationAt!.isAfter(DateTime.now())) {
+        await NotificationService.scheduleNotification(
+          id: notifId,
+          title: '📋 Tarea: ${task.title}',
+          body: task.description?.isNotEmpty == true
+              ? task.description!
+              : 'Tienes una tarea pendiente programada',
+          scheduledDate: task.notificationAt!,
+        );
+      }
+    } else {
+      await NotificationService.cancelNotification(notifId);
+    }
+
+    return result;
   }
 }
 

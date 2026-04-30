@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:ui';
+import 'package:aegis/core/services/notification_service.dart';
 import 'package:aegis/presentation/screens/main_desktop_layout.dart';
 import 'package:aegis/presentation/screens/main_mobile_layout.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +17,7 @@ void main() async {
 
   if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
     await windowManager.ensureInitialized();
+    await NotificationService.init();
 
     // Configuración de la ventana para escritorio
     WindowOptions windowOptions = const WindowOptions(

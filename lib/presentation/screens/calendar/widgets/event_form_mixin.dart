@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:drift/drift.dart' as drift;
 import 'package:aegis/data/local/database/app_database.dart';
+import 'package:aegis/core/services/notification_service.dart';
+import 'package:aegis/core/utils/notification_id_manager.dart';
 
 mixin EventFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
   Event? get initialEvent;
@@ -145,8 +147,10 @@ mixin EventFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
 
     try {
       final repo = ref.read(eventsRepositoryProvider);
+      int eventId;
 
       if (initialEvent != null) {
+        eventId = initialEvent!.id;
         final updated = initialEvent!.copyWith(
           title: titleController.text.trim(),
           isAllDay: isAllDay,
@@ -159,7 +163,7 @@ mixin EventFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
           _showSnackBar('Evento actualizado');
         }
       } else {
-        await repo.addEvent(
+        eventId = await repo.addEvent(
           titleController.text.trim(),
           isAllDay,
           finalDate,
@@ -170,6 +174,21 @@ mixin EventFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
           _showSnackBar('Evento creado');
         }
       }
+
+      final notifId = NotificationIdManager.getEventId(eventId);
+      if (selectedNotificationDate != null &&
+          selectedNotificationDate!.isAfter(DateTime.now())) {
+        await NotificationService.scheduleNotification(
+          id: notifId,
+          title: '🗓️ Evento: ${titleController.text.trim()}',
+          body: isAllDay
+              ? 'Tienes un evento para hoy'
+              : 'Evento programado a las ${selectedTime?.format(context) ?? ""}',
+          scheduledDate: selectedNotificationDate!,
+        );
+      } else {
+        await NotificationService.cancelNotification(notifId);
+      }
     } catch (e) {
       _showSnackBar('Error al guardar el evento', isError: true);
     }
@@ -179,6 +198,10 @@ mixin EventFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
     if (initialEvent == null) return;
     try {
       await ref.read(eventsRepositoryProvider).deleteEvent(initialEvent!.id);
+
+      await NotificationService.cancelNotification(
+          NotificationIdManager.getEventId(initialEvent!.id));
+
       if (mounted) {
         Navigator.pop(context);
         _showSnackBar('Evento eliminado');
