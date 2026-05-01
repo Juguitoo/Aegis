@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
@@ -14,9 +15,11 @@ class NotificationService {
   static final FlutterLocalNotificationsPlugin _notificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
+  static final StreamController<String?> selectNotificationStream =
+      StreamController<String?>.broadcast();
+
   static Future<void> init() async {
     if (kIsWeb) return;
-
     tz.initializeTimeZones();
 
     try {
@@ -57,17 +60,26 @@ class NotificationService {
 
     await _notificationsPlugin.initialize(
       settings: initializationSettings,
+      onDidReceiveNotificationResponse: (NotificationResponse response) {
+        selectNotificationStream.add(response.payload);
+      },
     );
+
+    final NotificationAppLaunchDetails? notificationAppLaunchDetails =
+        await _notificationsPlugin.getNotificationAppLaunchDetails();
+
+    if (notificationAppLaunchDetails?.didNotificationLaunchApp ?? false) {
+      selectNotificationStream
+          .add(notificationAppLaunchDetails?.notificationResponse?.payload);
+    }
   }
 
   static Future<void> requestPermissions() async {
     if (kIsWeb) return;
-
     if (Platform.isAndroid) {
       final AndroidFlutterLocalNotificationsPlugin? androidImplementation =
           _notificationsPlugin.resolvePlatformSpecificImplementation<
               AndroidFlutterLocalNotificationsPlugin>();
-
       await androidImplementation?.requestNotificationsPermission();
       await androidImplementation?.requestExactAlarmsPermission();
     } else if (Platform.isIOS || Platform.isMacOS) {
@@ -95,6 +107,7 @@ class NotificationService {
     required String title,
     required String body,
     required DateTime scheduledDate,
+    String? payload,
   }) async {
     if (kIsWeb) return;
     if (scheduledDate.isBefore(DateTime.now())) return;
@@ -130,6 +143,7 @@ class NotificationService {
       scheduledDate: tzDate,
       notificationDetails: platformDetails,
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      payload: payload,
     );
   }
 
@@ -143,23 +157,21 @@ class NotificationService {
     await _notificationsPlugin.cancelAll();
   }
 
-  static Future<void> showImmediateNotification() async {
+  static Future<void> showImmediateNotification({String? payload}) async {
     if (kIsWeb) return;
-
     const WindowsNotificationDetails windowsDetails =
         WindowsNotificationDetails();
-
     const NotificationDetails platformDetails = NotificationDetails(
       windows: windowsDetails,
       android: AndroidNotificationDetails(
           'aegis_reminders_channel', 'Recordatorios'),
     );
-
     await _notificationsPlugin.show(
       id: 999,
       title: '¡Prueba instantánea!',
       body: 'Si ves esto, el motor de notificaciones funciona perfectamente.',
       notificationDetails: platformDetails,
+      payload: payload,
     );
   }
 }

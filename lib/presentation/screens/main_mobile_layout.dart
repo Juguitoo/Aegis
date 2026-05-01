@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'package:aegis/core/utils/native_app_monitor.dart';
+import 'package:aegis/core/services/notification_service.dart';
 import 'package:aegis/presentation/screens/blocker/block_overlay_screen.dart';
 import 'package:aegis/presentation/screens/calendar/calendar_screen_mobile.dart';
 import 'package:aegis/presentation/screens/diary/diary_screen_mobile.dart';
@@ -6,12 +8,14 @@ import 'package:aegis/presentation/screens/statistics/statistics_screen_mobile.d
 import 'package:aegis/presentation/screens/tasks/task_list_screen_mobile.dart';
 import 'package:aegis/presentation/screens/timer/timer_screen_mobile.dart';
 import 'package:aegis/presentation/viewmodels/timer_viewmodel.dart';
+import 'package:aegis/presentation/viewmodels/calendar_viewmodel.dart';
 import 'package:aegis/presentation/widgets/permission_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
 final navigationIndexProvider = StateProvider<int>((ref) => 2);
+final taskToOpenProvider = StateProvider<int?>((ref) => null);
 
 class MainMobileLayout extends ConsumerStatefulWidget {
   final Widget? floatingActionButton;
@@ -29,6 +33,8 @@ class MainMobileLayout extends ConsumerStatefulWidget {
 
 class _MainMobileLayoutState extends ConsumerState<MainMobileLayout>
     with WidgetsBindingObserver {
+  StreamSubscription<String?>? _notificationSubscription;
+
   @override
   void initState() {
     super.initState();
@@ -36,11 +42,19 @@ class _MainMobileLayoutState extends ConsumerState<MainMobileLayout>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       checkAndPromptPermissions(context, ref);
     });
+
+    _notificationSubscription =
+        NotificationService.selectNotificationStream.stream.listen((payload) {
+      if (payload != null) {
+        _handleNotificationClick(payload);
+      }
+    });
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _notificationSubscription?.cancel();
     super.dispose();
   }
 
@@ -48,6 +62,31 @@ class _MainMobileLayoutState extends ConsumerState<MainMobileLayout>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       checkAndPromptPermissions(context, ref);
+    }
+  }
+
+  void _handleNotificationClick(String payload) {
+    final parts = payload.split('|');
+    if (parts.isEmpty) return;
+
+    if (parts[0] == 'event') {
+      ref.read(navigationIndexProvider.notifier).state = 0;
+      if (parts.length >= 3) {
+        final date = DateTime.tryParse(parts[2]);
+        if (date != null) {
+          ref
+              .read(calendarViewModelProvider.notifier)
+              .onDaySelected(date, date);
+        }
+      }
+    } else if (parts[0] == 'task') {
+      ref.read(navigationIndexProvider.notifier).state = 2;
+      if (parts.length >= 2) {
+        final taskId = int.tryParse(parts[1]);
+        if (taskId != null) {
+          ref.read(taskToOpenProvider.notifier).state = taskId;
+        }
+      }
     }
   }
 

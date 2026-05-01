@@ -1,14 +1,11 @@
-import 'package:aegis/core/providers/repository_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:drift/drift.dart' as drift;
 import 'package:aegis/data/local/database/app_database.dart';
-import 'package:aegis/core/services/notification_service.dart';
-import 'package:aegis/core/utils/notification_id_manager.dart';
+import 'package:aegis/presentation/viewmodels/calendar_viewmodel.dart';
 
 mixin EventFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
   Event? get initialEvent;
-
   final titleController = TextEditingController();
   DateTime? selectedDate;
   TimeOfDay? selectedTime;
@@ -80,17 +77,21 @@ mixin EventFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
   }
 
   Future<void> pickNotificationDate() async {
+    final now = DateTime.now();
+    final initial = selectedNotificationDate ?? now;
+    final first = initial.isBefore(now) ? initial : now;
+
     final date = await showDatePicker(
       context: context,
-      initialDate: selectedNotificationDate ?? DateTime.now(),
-      firstDate: DateTime.now(),
+      initialDate: initial,
+      firstDate: first,
       lastDate: DateTime(2100),
     );
+
     if (date != null && mounted) {
       final time = await showTimePicker(
         context: context,
-        initialTime:
-            TimeOfDay.fromDateTime(selectedNotificationDate ?? DateTime.now()),
+        initialTime: TimeOfDay.fromDateTime(initial),
       );
       if (time != null && mounted) {
         setState(() {
@@ -146,48 +147,33 @@ mixin EventFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
     }
 
     try {
-      final repo = ref.read(eventsRepositoryProvider);
-      int eventId;
+      final viewModel = ref.read(calendarViewModelProvider.notifier);
 
       if (initialEvent != null) {
-        eventId = initialEvent!.id;
         final updated = initialEvent!.copyWith(
           title: titleController.text.trim(),
           isAllDay: isAllDay,
           date: finalDate,
           notificationAt: drift.Value(selectedNotificationDate),
         );
-        await repo.updateEvent(updated);
+        await viewModel.updateEvent(updated);
+
         if (mounted) {
           Navigator.pop(context);
           _showSnackBar('Evento actualizado');
         }
       } else {
-        eventId = await repo.addEvent(
-          titleController.text.trim(),
-          isAllDay,
-          finalDate,
-          selectedNotificationDate,
+        await viewModel.addEvent(
+          title: titleController.text.trim(),
+          isAllDay: isAllDay,
+          date: finalDate,
+          notificationAt: selectedNotificationDate,
         );
+
         if (mounted) {
           Navigator.pop(context);
           _showSnackBar('Evento creado');
         }
-      }
-
-      final notifId = NotificationIdManager.getEventId(eventId);
-      if (selectedNotificationDate != null &&
-          selectedNotificationDate!.isAfter(DateTime.now())) {
-        await NotificationService.scheduleNotification(
-          id: notifId,
-          title: '🗓️ Evento: ${titleController.text.trim()}',
-          body: isAllDay
-              ? 'Tienes un evento para hoy'
-              : 'Evento programado a las ${selectedTime?.format(context) ?? ""}',
-          scheduledDate: selectedNotificationDate!,
-        );
-      } else {
-        await NotificationService.cancelNotification(notifId);
       }
     } catch (e) {
       _showSnackBar('Error al guardar el evento', isError: true);
@@ -197,11 +183,9 @@ mixin EventFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
   Future<void> deleteEvent() async {
     if (initialEvent == null) return;
     try {
-      await ref.read(eventsRepositoryProvider).deleteEvent(initialEvent!.id);
-
-      await NotificationService.cancelNotification(
-          NotificationIdManager.getEventId(initialEvent!.id));
-
+      await ref
+          .read(calendarViewModelProvider.notifier)
+          .deleteEvent(initialEvent!.id);
       if (mounted) {
         Navigator.pop(context);
         _showSnackBar('Evento eliminado');

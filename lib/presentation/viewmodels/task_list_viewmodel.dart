@@ -123,6 +123,7 @@ class TaskListViewModel extends StreamNotifier<List<Task>> {
             ? description!
             : 'Tienes una tarea pendiente programada',
         scheduledDate: notificationAt,
+        payload: 'task|$taskId',
       );
     }
 
@@ -159,6 +160,7 @@ class TaskListViewModel extends StreamNotifier<List<Task>> {
             ? task.description!
             : 'Tienes una tarea pendiente programada',
         scheduledDate: task.notificationAt!,
+        payload: 'task|${task.id}',
       );
     } else {
       await NotificationService.cancelNotification(notifId);
@@ -197,6 +199,7 @@ class TaskListViewModel extends StreamNotifier<List<Task>> {
               ? task.description!
               : 'Tienes una tarea pendiente programada',
           scheduledDate: task.notificationAt!,
+          payload: 'task|${task.id}',
         );
       }
     } else {

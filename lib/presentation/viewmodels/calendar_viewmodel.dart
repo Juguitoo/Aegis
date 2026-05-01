@@ -3,6 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:aegis/data/local/database/app_database.dart';
 import 'package:aegis/presentation/viewmodels/task_list_viewmodel.dart';
 import 'package:flutter_riverpod/legacy.dart';
+import 'package:intl/intl.dart';
+import 'package:aegis/core/services/notification_service.dart';
+import 'package:aegis/core/utils/notification_id_manager.dart';
+import 'package:aegis/data/repositories/events_repository.dart';
 
 enum CalendarItemType { task, event }
 
@@ -92,7 +96,9 @@ class CalendarState {
 }
 
 class CalendarViewModel extends StateNotifier<CalendarState> {
-  CalendarViewModel()
+  final EventsRepository _repository;
+
+  CalendarViewModel(this._repository)
       : super(CalendarState(
           selectedDay: DateTime.now(),
           focusedDay: DateTime.now(),
@@ -108,9 +114,71 @@ class CalendarViewModel extends StateNotifier<CalendarState> {
   void onPageChanged(DateTime focusedDay) {
     state = state.copyWith(focusedDay: focusedDay);
   }
+
+  Future<int> addEvent({
+    required String title,
+    required bool isAllDay,
+    required DateTime date,
+    DateTime? notificationAt,
+  }) async {
+    final eventId = await _repository.addEvent(
+      title,
+      isAllDay,
+      date,
+      notificationAt,
+    );
+
+    if (notificationAt != null && notificationAt.isAfter(DateTime.now())) {
+      final notifId = NotificationIdManager.getEventId(eventId);
+      final payload = 'event|$eventId|${date.toIso8601String()}';
+      final body = isAllDay
+          ? 'Tienes un evento para hoy'
+          : 'Evento programado a las ${DateFormat('HH:mm').format(date)}';
+
+      await NotificationService.scheduleNotification(
+        id: notifId,
+        title: '📅 Evento: $title',
+        body: body,
+        scheduledDate: notificationAt,
+        payload: payload,
+      );
+    }
+
+    return eventId;
+  }
+
+  Future<void> updateEvent(Event event) async {
+    await _repository.updateEvent(event);
+
+    final notifId = NotificationIdManager.getEventId(event.id);
+
+    if (event.notificationAt != null &&
+        event.notificationAt!.isAfter(DateTime.now())) {
+      final payload = 'event|${event.id}|${event.date.toIso8601String()}';
+      final body = event.isAllDay
+          ? 'Tienes un evento para hoy'
+          : 'Evento programado a las ${DateFormat('HH:mm').format(event.date)}';
+
+      await NotificationService.scheduleNotification(
+        id: notifId,
+        title: '📅 Evento: ${event.title}',
+        body: body,
+        scheduledDate: event.notificationAt!,
+        payload: payload,
+      );
+    } else {
+      await NotificationService.cancelNotification(notifId);
+    }
+  }
+
+  Future<void> deleteEvent(int eventId) async {
+    await NotificationService.cancelNotification(
+        NotificationIdManager.getEventId(eventId));
+    await _repository.deleteEvent(eventId);
+  }
 }
 
 final calendarViewModelProvider =
     StateNotifierProvider<CalendarViewModel, CalendarState>((ref) {
-  return CalendarViewModel();
+  return CalendarViewModel(ref.read(eventsRepositoryProvider));
 });

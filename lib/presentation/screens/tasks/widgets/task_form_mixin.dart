@@ -107,17 +107,21 @@ mixin TaskFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
   }
 
   Future<void> pickNotificationDate() async {
+    final now = DateTime.now();
+    final initial = selectedNotificationDate ?? now;
+    final first = initial.isBefore(now) ? initial : now;
+
     final date = await showDatePicker(
       context: context,
-      initialDate: selectedNotificationDate ?? DateTime.now(),
-      firstDate: DateTime.now(),
+      initialDate: initial,
+      firstDate: first,
       lastDate: DateTime(2100),
     );
+
     if (date != null && mounted) {
       final time = await showTimePicker(
         context: context,
-        initialTime:
-            TimeOfDay.fromDateTime(selectedNotificationDate ?? DateTime.now()),
+        initialTime: TimeOfDay.fromDateTime(initial),
       );
       if (time != null && mounted) {
         setState(() {

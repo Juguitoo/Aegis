@@ -1,3 +1,4 @@
+import 'package:aegis/presentation/screens/main_mobile_layout.dart';
 import 'package:aegis/presentation/screens/projects/widgets/manage_projects_bottom_sheet.dart';
 import 'package:aegis/presentation/screens/settings/settings_screen_mobile.dart';
 import 'package:aegis/presentation/screens/tags/widgets/manage_tags_bottom_sheet.dart';
@@ -47,6 +48,44 @@ class _TaskListScreenMobileState extends ConsumerState<TaskListScreenMobile> {
   @override
   Widget build(BuildContext context) {
     final tasksAsync = ref.watch(taskListViewModelProvider);
+
+    ref.listen(taskToOpenProvider, (previous, next) {
+      if (next != null) {
+        final taskList = ref.read(taskListViewModelProvider).value;
+        if (taskList != null) {
+          final taskToOpen = taskList.where((t) => t.id == next).firstOrNull;
+          if (taskToOpen != null) {
+            showModalBottomSheet(
+              context: context,
+              isScrollControlled: true,
+              backgroundColor: Colors.transparent,
+              builder: (context) => TaskFormMobile(task: taskToOpen),
+            );
+          }
+        }
+        ref.read(taskToOpenProvider.notifier).state = null;
+      }
+    });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final pendingTaskId = ref.read(taskToOpenProvider);
+      if (pendingTaskId != null) {
+        final taskList = ref.read(taskListViewModelProvider).value;
+        if (taskList != null) {
+          final taskToOpen =
+              taskList.where((t) => t.id == pendingTaskId).firstOrNull;
+          if (taskToOpen != null) {
+            showModalBottomSheet(
+              context: context,
+              isScrollControlled: true,
+              backgroundColor: Colors.transparent,
+              builder: (context) => TaskFormMobile(task: taskToOpen),
+            );
+          }
+        }
+        ref.read(taskToOpenProvider.notifier).state = null;
+      }
+    });
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
