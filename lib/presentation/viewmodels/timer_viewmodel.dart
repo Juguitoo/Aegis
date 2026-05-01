@@ -13,6 +13,7 @@ import 'package:flutter_riverpod/legacy.dart';
 import 'timer_state.dart';
 import 'package:aegis/data/local/database/app_database.dart';
 import 'package:aegis/presentation/viewmodels/settings_viewmodel.dart';
+import 'package:aegis/core/services/notification_service.dart';
 
 final audioPlayerProvider = Provider.autoDispose<AudioPlayer?>((ref) {
   final player = AudioPlayer();
@@ -49,6 +50,52 @@ class TimerViewmodel extends Notifier<TimerState> with WidgetsBindingObserver {
     _blacklistRepository = ref.read(blacklistRepositoryProvider);
     _appMonitorSubscription = _monitor.onAppChanged
         .listen((packageName) => _handleForegroundAppChange(packageName));
+
+    ref.listen(settingsViewModelProvider, (previous, next) {
+      if (previous?.value != null && next.value != null) {
+        final prevSettings = previous!.value!;
+        final nextSettings = next.value!;
+
+        bool hasChanged = false;
+        int newBaseSeconds = state.initialSeconds;
+
+        if (state.mode == TimerMode.focus &&
+            prevSettings.pomodoroDuration != nextSettings.pomodoroDuration) {
+          hasChanged = true;
+          newBaseSeconds = nextSettings.pomodoroDuration * 60;
+        } else if (state.mode == TimerMode.shortBreak &&
+            prevSettings.shortBreakDuration !=
+                nextSettings.shortBreakDuration) {
+          hasChanged = true;
+          newBaseSeconds = nextSettings.shortBreakDuration * 60;
+        } else if (state.mode == TimerMode.longBreak &&
+            prevSettings.longBreakDuration != nextSettings.longBreakDuration) {
+          hasChanged = true;
+          newBaseSeconds = nextSettings.longBreakDuration * 60;
+        }
+
+        if (hasChanged) {
+          _monitor.stopMonitoring();
+          _saveSessionRecord();
+          _timer?.cancel();
+          _timer = null;
+          _pausedTime = null;
+          _manualPauseTime = null;
+
+          state = state.copyWith(
+            remainingSeconds: newBaseSeconds,
+            initialSeconds: newBaseSeconds,
+            status: TimerStatus.idle,
+            pauseCount: 0,
+            totalPauseDuration: 0,
+            addedTime: 0,
+            blocklistAttempts: 0,
+            pendingSuggestion: null,
+            clearSuggestion: true,
+          );
+        }
+      }
+    });
 
     ref.onDispose(() {
       WidgetsBinding.instance.removeObserver(this);
@@ -97,6 +144,7 @@ class TimerViewmodel extends Notifier<TimerState> with WidgetsBindingObserver {
           _timer?.cancel();
           state = state.copyWith(remainingSeconds: 0);
           _playSound();
+          _showSessionCompleteNotification();
           _handleSessionComplete();
         } else {
           state = state.copyWith(remainingSeconds: newRemaining);
@@ -113,6 +161,7 @@ class TimerViewmodel extends Notifier<TimerState> with WidgetsBindingObserver {
     } else {
       _timer?.cancel();
       _playSound();
+      _showSessionCompleteNotification();
       _handleSessionComplete();
     }
   }
@@ -423,6 +472,21 @@ class TimerViewmodel extends Notifier<TimerState> with WidgetsBindingObserver {
       blocklistAttempts: 0,
       pendingSuggestion: null,
       clearSuggestion: true,
+    );
+  }
+
+  Future<void> _showSessionCompleteNotification() async {
+    final title = state.mode == TimerMode.focus
+        ? '¡Fase de concentración terminada!'
+        : '¡Descanso finalizado!';
+    final body = state.mode == TimerMode.focus
+        ? 'Tómate un descanso, te lo has ganado.'
+        : 'Vuelta al trabajo.';
+
+    await NotificationService.showImmediateNotification(
+      title,
+      body,
+      payload: 'timer',
     );
   }
 }

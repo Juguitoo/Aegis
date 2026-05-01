@@ -87,6 +87,8 @@ class _MainMobileLayoutState extends ConsumerState<MainMobileLayout>
           ref.read(taskToOpenProvider.notifier).state = taskId;
         }
       }
+    } else if (parts[0] == 'timer') {
+      ref.read(navigationIndexProvider.notifier).state = 1;
     }
   }
 

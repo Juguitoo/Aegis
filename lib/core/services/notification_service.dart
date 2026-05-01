@@ -157,7 +157,8 @@ class NotificationService {
     await _notificationsPlugin.cancelAll();
   }
 
-  static Future<void> showImmediateNotification({String? payload}) async {
+  static Future<void> showImmediateNotification(String? title, String? body,
+      {String? payload}) async {
     if (kIsWeb) return;
     const WindowsNotificationDetails windowsDetails =
         WindowsNotificationDetails();
@@ -168,8 +169,9 @@ class NotificationService {
     );
     await _notificationsPlugin.show(
       id: 999,
-      title: '¡Prueba instantánea!',
-      body: 'Si ves esto, el motor de notificaciones funciona perfectamente.',
+      title: title ?? '¡Prueba instantánea!',
+      body: body ??
+          'Si ves esto, el motor de notificaciones funciona perfectamente.',
       notificationDetails: platformDetails,
       payload: payload,
     );
