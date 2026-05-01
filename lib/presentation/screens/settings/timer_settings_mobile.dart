@@ -58,7 +58,7 @@ class _TimerSettingsMobileState extends ConsumerState<TimerSettingsMobile> {
               _buildSliderSection(
                 label: 'Tiempo de Foco',
                 value: _pomodoro!,
-                min: 1,
+                min: 5,
                 max: 90,
                 onChanged: (val) => setState(() => _pomodoro = val),
                 onChangeEnd: (val) {
