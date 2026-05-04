@@ -1,9 +1,9 @@
-import 'package:aegis/core/theme/app_theme.dart';
-import 'package:aegis/presentation/widgets/aegis_buttons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:aegis/data/local/database/app_database.dart';
+import 'package:aegis/presentation/widgets/aegis_buttons.dart';
+import 'package:aegis/presentation/widgets/aegis_inputs.dart';
 import 'event_form_mixin.dart';
 
 class EventFormDesktop extends ConsumerStatefulWidget {
@@ -22,6 +22,8 @@ class _EventFormDesktopState extends ConsumerState<EventFormDesktop>
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Dialog(
       backgroundColor: Colors.transparent,
       elevation: 0,
@@ -29,11 +31,11 @@ class _EventFormDesktopState extends ConsumerState<EventFormDesktop>
         width: 500,
         padding: const EdgeInsets.all(32),
         decoration: BoxDecoration(
-          color: AppTheme.pureWhite,
+          color: colorScheme.surface,
           borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
-              color: AppTheme.ebony.withValues(alpha: 0.1),
+              color: colorScheme.onSurface.withValues(alpha: 0.1),
               blurRadius: 20,
               offset: const Offset(0, 10),
             ),
@@ -53,34 +55,17 @@ class _EventFormDesktopState extends ConsumerState<EventFormDesktop>
                       ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.close, color: AppTheme.gullGray),
+                  icon: Icon(Icons.close, color: colorScheme.outline),
                   onPressed: () => Navigator.pop(context),
                 ),
               ],
             ),
             const SizedBox(height: 24),
-            TextField(
+            AegisTextField(
               controller: titleController,
-              autofocus: initialEvent == null,
+              labelText: 'Título',
+              hintText: 'Ej. Reunión de TFG',
               textCapitalization: TextCapitalization.sentences,
-              style: Theme.of(context).textTheme.bodyLarge,
-              decoration: InputDecoration(
-                labelText: 'Título',
-                labelStyle: Theme.of(context).textTheme.bodyMedium,
-                hintText: 'Ej. Reunión de TFG',
-                hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: AppTheme.gullGray,
-                    ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: AppTheme.gullGray),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide:
-                      const BorderSide(color: AppTheme.royalBlue, width: 2),
-                ),
-              ),
             ),
             const SizedBox(height: 24),
             Row(
@@ -95,10 +80,10 @@ class _EventFormDesktopState extends ConsumerState<EventFormDesktop>
                 Switch(
                   value: isAllDay,
                   onChanged: toggleAllDay,
-                  activeThumbColor: AppTheme.pureWhite,
-                  activeTrackColor: AppTheme.royalBlue,
-                  inactiveThumbColor: AppTheme.gullGray,
-                  inactiveTrackColor: AppTheme.whiteZyrcon,
+                  activeThumbColor: colorScheme.onPrimary,
+                  activeTrackColor: colorScheme.primary,
+                  inactiveThumbColor: colorScheme.outline,
+                  inactiveTrackColor: colorScheme.surface,
                 ),
               ],
             ),
@@ -106,128 +91,51 @@ class _EventFormDesktopState extends ConsumerState<EventFormDesktop>
             Row(
               children: [
                 Expanded(
-                  child: InkWell(
+                  child: AegisTextField(
+                    hintText: selectedDate != null
+                        ? DateFormat('dd MMM yyyy', 'es').format(selectedDate!)
+                        : 'Fecha',
+                    prefixIcon: Icons.calendar_today,
+                    readOnly: true,
                     onTap: pickDate,
-                    borderRadius: BorderRadius.circular(12),
-                    child: Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                            color: AppTheme.gullGray.withValues(alpha: 0.3)),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.calendar_today,
-                              size: 20, color: AppTheme.fiord),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              selectedDate != null
-                                  ? DateFormat('dd MMM yyyy', 'es')
-                                      .format(selectedDate!)
-                                  : 'Fecha',
-                              style: Theme.of(context).textTheme.bodyLarge,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
                   ),
                 ),
                 if (!isAllDay) ...[
                   const SizedBox(width: 16),
                   Expanded(
-                    child: InkWell(
+                    child: AegisTextField(
+                      hintText: selectedTime != null
+                          ? selectedTime!.format(context)
+                          : 'Hora',
+                      prefixIcon: Icons.access_time,
+                      readOnly: true,
                       onTap: pickTime,
-                      borderRadius: BorderRadius.circular(12),
-                      child: Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                              color: AppTheme.gullGray.withValues(alpha: 0.3)),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Row(
-                          children: [
-                            const Icon(Icons.access_time,
-                                size: 20, color: AppTheme.fiord),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Text(
-                                selectedTime != null
-                                    ? selectedTime!.format(context)
-                                    : 'Hora',
-                                style: Theme.of(context).textTheme.bodyLarge,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
                     ),
                   ),
                 ],
               ],
             ),
             const SizedBox(height: 24),
-            InkWell(
+            AegisTextField(
+              hintText: selectedNotificationDate != null
+                  ? DateFormat('dd MMM HH:mm', 'es')
+                      .format(selectedNotificationDate!)
+                  : 'Añadir Recordatorio',
+              prefixIcon: Icons.notifications_active_outlined,
+              suffixIcon: selectedNotificationDate != null
+                  ? IconButton(
+                      icon: Icon(Icons.close, color: colorScheme.primary),
+                      onPressed: clearNotificationDate,
+                    )
+                  : null,
+              readOnly: true,
               onTap: pickNotificationDate,
-              borderRadius: BorderRadius.circular(12),
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: selectedNotificationDate != null
-                      ? AppTheme.royalBlue10
-                      : Colors.transparent,
-                  border: Border.all(
-                    color: selectedNotificationDate != null
-                        ? AppTheme.royalBlue
-                        : AppTheme.gullGray.withValues(alpha: 0.3),
-                  ),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.notifications_active_outlined,
-                      size: 20,
-                      color: selectedNotificationDate != null
-                          ? AppTheme.royalBlue
-                          : AppTheme.fiord,
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        selectedNotificationDate != null
-                            ? DateFormat('dd MMM HH:mm', 'es')
-                                .format(selectedNotificationDate!)
-                            : 'Añadir Recordatorio',
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                              color: selectedNotificationDate != null
-                                  ? AppTheme.royalBlue
-                                  : AppTheme.fiord,
-                              fontWeight: selectedNotificationDate != null
-                                  ? FontWeight.bold
-                                  : FontWeight.normal,
-                            ),
-                      ),
-                    ),
-                    if (selectedNotificationDate != null)
-                      GestureDetector(
-                        onTap: clearNotificationDate,
-                        child: const Icon(Icons.close,
-                            size: 20, color: AppTheme.royalBlue),
-                      ),
-                  ],
-                ),
-              ),
             ),
             const SizedBox(height: 32),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                SizedBox(
-                  width: 160,
+                Expanded(
                   child: AegisButton(
                     text: initialEvent == null ? 'Limpiar' : 'Eliminar',
                     type: initialEvent == null
@@ -237,8 +145,7 @@ class _EventFormDesktopState extends ConsumerState<EventFormDesktop>
                   ),
                 ),
                 const SizedBox(width: 16),
-                SizedBox(
-                  width: 160,
+                Expanded(
                   child: AegisButton(
                     text: initialEvent == null ? 'Guardar' : 'Actualizar',
                     type: ButtonType.primary,

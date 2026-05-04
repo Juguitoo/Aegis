@@ -39,11 +39,11 @@ mixin EventFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
 
   void _showSnackBar(String message, {bool isError = false}) {
     if (!mounted) return;
+    final colorScheme = Theme.of(context).colorScheme;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor:
-            isError ? const Color(0xFFDC2626) : const Color(0xFF10B981),
+        backgroundColor: isError ? colorScheme.error : const Color(0xFF10B981),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
@@ -56,6 +56,23 @@ mixin EventFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
       initialDate: selectedDate ?? DateTime.now(),
       firstDate: DateTime(2000),
       lastDate: DateTime(2100),
+      locale: const Locale('es', 'ES'),
+      cancelText: 'Cancelar',
+      confirmText: 'Aceptar',
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: Theme.of(context).colorScheme.copyWith(
+                  primary: Theme.of(context).colorScheme.primary,
+                ),
+          ),
+          child: Localizations.override(
+            context: context,
+            locale: const Locale('es', 'ES'),
+            child: child!,
+          ),
+        );
+      },
     );
     if (date != null && mounted) {
       setState(() {
@@ -68,6 +85,19 @@ mixin EventFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
     final time = await showTimePicker(
       context: context,
       initialTime: selectedTime ?? TimeOfDay.now(),
+      initialEntryMode: TimePickerEntryMode.dialOnly,
+      cancelText: 'Cancelar',
+      confirmText: 'Aceptar',
+      builder: (context, child) {
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+          child: Localizations.override(
+            context: context,
+            locale: const Locale('es', 'ES'),
+            child: child!,
+          ),
+        );
+      },
     );
     if (time != null && mounted) {
       setState(() {
@@ -86,12 +116,42 @@ mixin EventFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
       initialDate: initial,
       firstDate: first,
       lastDate: DateTime(2100),
+      locale: const Locale('es', 'ES'),
+      cancelText: 'Cancelar',
+      confirmText: 'Aceptar',
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: Theme.of(context).colorScheme.copyWith(
+                  primary: Theme.of(context).colorScheme.primary,
+                ),
+          ),
+          child: Localizations.override(
+            context: context,
+            locale: const Locale('es', 'ES'),
+            child: child!,
+          ),
+        );
+      },
     );
 
     if (date != null && mounted) {
       final time = await showTimePicker(
         context: context,
         initialTime: TimeOfDay.fromDateTime(initial),
+        initialEntryMode: TimePickerEntryMode.dialOnly,
+        cancelText: 'Cancelar',
+        confirmText: 'Aceptar',
+        builder: (context, child) {
+          return MediaQuery(
+            data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+            child: Localizations.override(
+              context: context,
+              locale: const Locale('es', 'ES'),
+              child: child!,
+            ),
+          );
+        },
       );
       if (time != null && mounted) {
         setState(() {

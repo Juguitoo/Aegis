@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:aegis/data/local/database/app_database.dart';
+import 'package:aegis/presentation/widgets/aegis_buttons.dart';
+import 'package:aegis/presentation/widgets/aegis_inputs.dart';
 import 'event_form_mixin.dart';
 
 class EventFormMobile extends ConsumerStatefulWidget {
@@ -22,13 +24,14 @@ class _EventFormMobileState extends ConsumerState<EventFormMobile>
   Widget build(BuildContext context) {
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
     final safeBottom = MediaQuery.of(context).padding.bottom;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Padding(
       padding: EdgeInsets.only(bottom: bottomInset),
       child: Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        decoration: BoxDecoration(
+          color: colorScheme.surface,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         ),
         padding: EdgeInsets.fromLTRB(
             20, 24, 20, safeBottom > 0 ? safeBottom + 16 : 32),
@@ -42,56 +45,43 @@ class _EventFormMobileState extends ConsumerState<EventFormMobile>
                 children: [
                   Text(
                     initialEvent == null ? 'Nuevo Evento' : 'Editar Evento',
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF0F172A),
-                    ),
+                    style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.close, color: Color(0xFF64748B)),
+                    icon:
+                        Icon(Icons.close, color: colorScheme.onSurfaceVariant),
                     onPressed: () => Navigator.pop(context),
                   ),
                 ],
               ),
               const SizedBox(height: 16),
-              TextField(
+              AegisTextField(
                 controller: titleController,
-                autofocus: initialEvent == null,
+                labelText: 'Título del evento',
+                hintText: 'Ej. Cita médica',
                 textCapitalization: TextCapitalization.sentences,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF1E293B),
-                ),
-                decoration: const InputDecoration(
-                  hintText: 'Título del evento',
-                  hintStyle: TextStyle(
-                    color: Color(0xFF94A3B8),
-                    fontWeight: FontWeight.normal,
-                  ),
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.zero,
-                ),
               ),
-              const SizedBox(height: 16),
-              const Divider(color: Color(0xFFF1F5F9)),
-              const SizedBox(height: 16),
+              const SizedBox(height: 8),
+              Divider(color: colorScheme.secondary),
+              const SizedBox(height: 8),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                  Text(
                     'Todo el día',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: Color(0xFF334155),
-                    ),
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
                   ),
                   Switch(
                     value: isAllDay,
                     onChanged: toggleAllDay,
-                    activeThumbColor: const Color(0xFF6366F1),
+                    activeThumbColor: colorScheme.onPrimary,
+                    activeTrackColor: colorScheme.primary,
+                    inactiveThumbColor: colorScheme.outline,
+                    inactiveTrackColor: colorScheme.surface,
                   ),
                 ],
               ),
@@ -99,165 +89,67 @@ class _EventFormMobileState extends ConsumerState<EventFormMobile>
               Row(
                 children: [
                   Expanded(
-                    child: InkWell(
+                    child: AegisTextField(
+                      hintText: selectedDate != null
+                          ? DateFormat('dd MMM yyyy', 'es')
+                              .format(selectedDate!)
+                          : 'Fecha',
+                      prefixIcon: Icons.calendar_today,
+                      readOnly: true,
                       onTap: pickDate,
-                      borderRadius: BorderRadius.circular(12),
-                      child: Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: const Color(0xFFE2E8F0)),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Row(
-                          children: [
-                            const Icon(Icons.calendar_today,
-                                size: 20, color: Color(0xFF64748B)),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Text(
-                                selectedDate != null
-                                    ? DateFormat('dd MMM yyyy', 'es')
-                                        .format(selectedDate!)
-                                    : 'Fecha',
-                                style: const TextStyle(
-                                    color: Color(0xFF1E293B), fontSize: 15),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
                     ),
                   ),
                   if (!isAllDay) ...[
                     const SizedBox(width: 12),
                     Expanded(
-                      child: InkWell(
+                      child: AegisTextField(
+                        hintText: selectedTime != null
+                            ? selectedTime!.format(context)
+                            : 'Hora',
+                        prefixIcon: Icons.access_time,
+                        readOnly: true,
                         onTap: pickTime,
-                        borderRadius: BorderRadius.circular(12),
-                        child: Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: const Color(0xFFE2E8F0)),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Row(
-                            children: [
-                              const Icon(Icons.access_time,
-                                  size: 20, color: Color(0xFF64748B)),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Text(
-                                  selectedTime != null
-                                      ? selectedTime!.format(context)
-                                      : 'Hora',
-                                  style: const TextStyle(
-                                      color: Color(0xFF1E293B), fontSize: 15),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
                       ),
                     ),
                   ],
                 ],
               ),
               const SizedBox(height: 16),
-              InkWell(
+              AegisTextField(
+                hintText: selectedNotificationDate != null
+                    ? DateFormat('dd MMM HH:mm', 'es')
+                        .format(selectedNotificationDate!)
+                    : 'Añadir Recordatorio',
+                prefixIcon: Icons.notifications_active_outlined,
+                suffixIcon: selectedNotificationDate != null
+                    ? IconButton(
+                        icon: Icon(Icons.close, color: colorScheme.primary),
+                        onPressed: clearNotificationDate,
+                      )
+                    : null,
+                readOnly: true,
                 onTap: pickNotificationDate,
-                borderRadius: BorderRadius.circular(12),
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: selectedNotificationDate != null
-                        ? const Color(0xFFEEF2FF)
-                        : Colors.transparent,
-                    border: Border.all(
-                      color: selectedNotificationDate != null
-                          ? const Color(0xFF6366F1)
-                          : const Color(0xFFE2E8F0),
-                    ),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(Icons.notifications_active_outlined,
-                          size: 20,
-                          color: selectedNotificationDate != null
-                              ? const Color(0xFF6366F1)
-                              : const Color(0xFF64748B)),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          selectedNotificationDate != null
-                              ? DateFormat('dd MMM HH:mm', 'es')
-                                  .format(selectedNotificationDate!)
-                              : 'Añadir Recordatorio',
-                          style: TextStyle(
-                            color: selectedNotificationDate != null
-                                ? const Color(0xFF6366F1)
-                                : const Color(0xFF475569),
-                            fontWeight: selectedNotificationDate != null
-                                ? FontWeight.bold
-                                : FontWeight.normal,
-                          ),
-                        ),
-                      ),
-                      if (selectedNotificationDate != null)
-                        GestureDetector(
-                          onTap: clearNotificationDate,
-                          child: const Icon(Icons.close,
-                              size: 20, color: Color(0xFF6366F1)),
-                        ),
-                    ],
-                  ),
-                ),
               ),
               const SizedBox(height: 32),
               Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  if (initialEvent != null) ...[
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: deleteEvent,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFFEE2E2),
-                          foregroundColor: const Color(0xFFDC2626),
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          elevation: 0,
-                        ),
-                        child: const Text(
-                          'Eliminar',
-                          style: TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                  ],
                   Expanded(
-                    flex: 2,
-                    child: ElevatedButton(
+                    child: AegisButton(
+                      text: initialEvent == null ? 'Limpiar' : 'Eliminar',
+                      type: initialEvent == null
+                          ? ButtonType.secondary
+                          : ButtonType.destructive,
+                      onPressed:
+                          initialEvent == null ? clearEvent : deleteEvent,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: AegisButton(
+                      text: initialEvent == null ? 'Guardar' : 'Actualizar',
+                      type: ButtonType.primary,
                       onPressed: saveEvent,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF6366F1),
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        elevation: 0,
-                      ),
-                      child: Text(
-                        initialEvent == null ? 'Crear Evento' : 'Actualizar',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
                     ),
                   ),
                 ],
