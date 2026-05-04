@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:ui';
 import 'package:aegis/core/services/notification_service.dart';
+import 'package:aegis/core/theme/app_theme.dart';
 import 'package:aegis/presentation/screens/main_desktop_layout.dart';
 import 'package:aegis/presentation/screens/main_mobile_layout.dart';
 import 'package:flutter/material.dart';
@@ -58,13 +59,7 @@ class AegisApp extends ConsumerWidget {
           PointerDeviceKind.trackpad,
         },
       ),
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF006A6A),
-          brightness: Brightness.light,
-        ),
-        useMaterial3: true,
-      ),
+      theme: AppTheme.lightTheme,
       darkTheme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
           seedColor: const Color(0xFF006A6A),
