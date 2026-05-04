@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class AegisTextField extends StatelessWidget {
   final String? hintText;
@@ -8,12 +9,17 @@ class AegisTextField extends StatelessWidget {
   final Widget? suffixIcon;
   final bool readOnly;
   final VoidCallback? onTap;
-  final int maxLines;
+  final int? maxLines;
+  final int? minLines;
+  final int? maxLength;
+  final bool expands;
   final TextInputType keyboardType;
   final TextCapitalization textCapitalization;
   final ValueChanged<String>? onChanged;
   final bool autofocus;
   final ValueChanged<String>? onSubmitted;
+  final List<TextInputFormatter>? inputFormatters;
+  final TextAlignVertical? textAlignVertical;
 
   const AegisTextField({
     super.key,
@@ -25,11 +31,16 @@ class AegisTextField extends StatelessWidget {
     this.readOnly = false,
     this.onTap,
     this.maxLines = 1,
+    this.minLines,
+    this.maxLength,
+    this.expands = false,
     this.keyboardType = TextInputType.text,
     this.textCapitalization = TextCapitalization.none,
     this.onChanged,
     this.autofocus = false,
     this.onSubmitted,
+    this.inputFormatters,
+    this.textAlignVertical,
   });
 
   @override
@@ -41,16 +52,22 @@ class AegisTextField extends StatelessWidget {
       controller: controller,
       readOnly: readOnly,
       onTap: onTap,
-      maxLines: maxLines,
+      maxLines: expands ? null : maxLines,
+      minLines: minLines,
+      maxLength: maxLength,
+      expands: expands,
       keyboardType: keyboardType,
       textCapitalization: textCapitalization,
       onChanged: onChanged,
       autofocus: autofocus,
       onSubmitted: onSubmitted,
+      inputFormatters: inputFormatters,
+      textAlignVertical: textAlignVertical,
       style: textTheme.bodyLarge?.copyWith(
         color: colorScheme.onSurface,
       ),
       decoration: InputDecoration(
+        counterText: "",
         labelText: labelText,
         labelStyle: textTheme.bodyMedium?.copyWith(
           color: colorScheme.onSurfaceVariant,

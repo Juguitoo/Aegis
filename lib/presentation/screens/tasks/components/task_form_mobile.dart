@@ -3,6 +3,8 @@ import 'package:aegis/data/local/database/app_database.dart';
 import 'package:aegis/presentation/screens/tasks/components/task_form_mixin.dart';
 import 'package:aegis/presentation/viewmodels/project_list_viewmodel.dart';
 import 'package:aegis/presentation/viewmodels/task_list_viewmodel.dart';
+import 'package:aegis/presentation/widgets/aegis_buttons.dart';
+import 'package:aegis/presentation/widgets/aegis_inputs.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -27,6 +29,8 @@ class _TaskFormMobileState extends ConsumerState<TaskFormMobile>
   Widget build(BuildContext context) {
     final projectsAsync = ref.watch(projectListViewModelProvider);
     final screenHeight = MediaQuery.of(context).size.height;
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
 
     return Padding(
       padding: EdgeInsets.only(
@@ -34,9 +38,9 @@ class _TaskFormMobileState extends ConsumerState<TaskFormMobile>
       ),
       child: Container(
         height: screenHeight * 0.85,
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        decoration: BoxDecoration(
+          color: colorScheme.surface,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         ),
         child: DefaultTabController(
           length: 3,
@@ -47,19 +51,16 @@ class _TaskFormMobileState extends ConsumerState<TaskFormMobile>
                 padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
                 child: Text(
                   widget.task == null ? "Crear Nueva Tarea" : "Editar Tarea",
-                  style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF1E293B)),
+                  style: textTheme.displayMedium?.copyWith(fontSize: 20),
                 ),
               ),
               const SizedBox(height: 16),
-              const TabBar(
-                labelColor: Color(0xFF6366F1),
-                unselectedLabelColor: Color(0xFF94A3B8),
-                indicatorColor: Color(0xFF6366F1),
-                dividerColor: Color(0xFFE2E8F0),
-                tabs: [
+              TabBar(
+                labelColor: colorScheme.primary,
+                unselectedLabelColor: colorScheme.outline,
+                indicatorColor: colorScheme.primary,
+                dividerColor: colorScheme.outline.withValues(alpha: 0.2),
+                tabs: const [
                   Tab(text: 'Detalles'),
                   Tab(text: 'Subtareas'),
                   Tab(text: 'Notas'),
@@ -100,58 +101,33 @@ class _TaskFormMobileState extends ConsumerState<TaskFormMobile>
               ),
               Container(
                 padding: const EdgeInsets.all(16),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
+                decoration: BoxDecoration(
+                  color: colorScheme.surface,
                   border: Border(
-                    top: BorderSide(color: Color(0xFFE2E8F0)),
+                    top: BorderSide(
+                        color: colorScheme.outline.withValues(alpha: 0.2)),
                   ),
                 ),
                 child: SafeArea(
                   child: Row(
-                    spacing: 16,
                     children: [
                       Expanded(
-                        child: ElevatedButton(
+                        child: AegisButton(
+                          text: widget.task != null ? 'Eliminar' : 'Limpiar',
+                          type: widget.task != null
+                              ? ButtonType.destructive
+                              : ButtonType.secondary,
                           onPressed:
                               widget.task != null ? deleteTask : clearTask,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: widget.task != null
-                                ? const Color(0xFFFEE2E2)
-                                : const Color(0xFFF1F5F9),
-                            foregroundColor: widget.task != null
-                                ? const Color(0xFFDC2626)
-                                : const Color(0xFF475569),
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            elevation: 0,
-                          ),
-                          child: Text(
-                            widget.task != null ? 'Eliminar' : 'Limpiar',
-                            style: const TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.bold),
-                          ),
                         ),
                       ),
+                      const SizedBox(width: 16),
                       Expanded(
-                        child: ElevatedButton(
+                        child: AegisButton(
+                          text: widget.task == null ? 'Guardar' : 'Actualizar',
+                          type: ButtonType.primary,
                           onPressed:
                               widget.task == null ? saveTask : updateTask,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF6366F1),
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            elevation: 0,
-                          ),
-                          child: Text(
-                            widget.task == null ? 'Guardar' : 'Actualizar',
-                            style: const TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.bold),
-                          ),
                         ),
                       ),
                     ],
@@ -201,157 +177,63 @@ class _TaskDetailsTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          TextField(
+          AegisTextField(
             controller: titleController,
             autofocus: true,
             textCapitalization: TextCapitalization.sentences,
             maxLength: 80,
-            decoration: InputDecoration(
-              labelText: 'Título',
-              hintText: '¿Qué quieres hacer?',
-              counterText: "",
-              hintStyle: const TextStyle(color: Color(0xFF94A3B8)),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide:
-                    const BorderSide(color: Color(0xFF6366F1), width: 2),
-              ),
-            ),
+            labelText: 'Título',
+            hintText: '¿Qué quieres hacer?',
           ),
           const SizedBox(height: 16),
-          TextField(
+          AegisTextField(
             controller: descriptionController,
             textCapitalization: TextCapitalization.sentences,
             maxLines: 3,
             minLines: 1,
             maxLength: 500,
-            decoration: InputDecoration(
-              labelText: 'Descripción',
-              hintText: 'Añade detalles sobre la tarea',
-              hintStyle: const TextStyle(color: Color(0xFF94A3B8)),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide:
-                    const BorderSide(color: Color(0xFF6366F1), width: 2),
-              ),
-            ),
+            labelText: 'Descripción',
+            hintText: 'Añade detalles sobre la tarea',
           ),
           const SizedBox(height: 16),
-          TextField(
+          AegisTextField(
             controller: estimatedDurationController,
             keyboardType: TextInputType.number,
-            inputFormatters: [
-              FilteringTextInputFormatter.digitsOnly,
-            ],
-            decoration: InputDecoration(
-              labelText: 'Estimación (min)',
-              hintText: 'Ej: 30',
-              hintStyle: const TextStyle(color: Color(0xFF94A3B8)),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide:
-                    const BorderSide(color: Color(0xFF6366F1), width: 2),
-              ),
-            ),
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            labelText: 'Estimación (min)',
+            hintText: 'Ej: 30',
           ),
           const SizedBox(height: 16),
           Row(
             children: [
               Expanded(
-                child: InkWell(
+                child: AegisTextField(
+                  readOnly: true,
                   onTap: onPickDueDate,
-                  borderRadius: BorderRadius.circular(12),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 16),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: const Color(0xFFCBD5E1)),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.calendar_today,
-                            size: 20, color: Color(0xFF64748B)),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            selectedDueDate == null
-                                ? 'Sin fecha'
-                                : '${selectedDueDate!.day}/${selectedDueDate!.month}/${selectedDueDate!.year}',
-                            style: TextStyle(
-                              color: selectedDueDate == null
-                                  ? const Color(0xFF94A3B8)
-                                  : const Color(0xFF1E293B),
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                  hintText: selectedDueDate == null
+                      ? 'Sin fecha'
+                      : '${selectedDueDate!.day}/${selectedDueDate!.month}/${selectedDueDate!.year}',
+                  prefixIcon: Icons.calendar_today,
                 ),
               ),
               const SizedBox(width: 16),
               Expanded(
-                child: InkWell(
+                child: AegisTextField(
+                  readOnly: true,
                   onTap: onPickNotificationDate,
-                  borderRadius: BorderRadius.circular(12),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 16),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: const Color(0xFFCBD5E1)),
-                      borderRadius: BorderRadius.circular(12),
-                      color: selectedNotificationDate != null
-                          ? const Color(0xFFEEF2FF)
-                          : Colors.transparent,
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(Icons.notifications_active_outlined,
-                            size: 20,
-                            color: selectedNotificationDate != null
-                                ? const Color(0xFF6366F1)
-                                : const Color(0xFF64748B)),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            selectedNotificationDate == null
-                                ? 'Recordatorio'
-                                : DateFormat('dd/MM HH:mm')
-                                    .format(selectedNotificationDate!),
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: selectedNotificationDate == null
-                                  ? const Color(0xFF94A3B8)
-                                  : const Color(0xFF6366F1),
-                              fontWeight: selectedNotificationDate != null
-                                  ? FontWeight.bold
-                                  : FontWeight.normal,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                  hintText: selectedNotificationDate == null
+                      ? 'Recordatorio'
+                      : DateFormat('dd/MM HH:mm')
+                          .format(selectedNotificationDate!),
+                  prefixIcon: Icons.notifications_active_outlined,
                 ),
               ),
             ],
@@ -359,36 +241,14 @@ class _TaskDetailsTab extends StatelessWidget {
           const SizedBox(height: 16),
           projectsAsync.when(
             data: (projectsList) {
-              return DropdownButtonFormField<int?>(
-                initialValue: selectedProjectId,
-                decoration: InputDecoration(
-                  labelText: 'Proyecto',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide:
-                        const BorderSide(color: Color(0xFF6366F1), width: 2),
-                  ),
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                ),
-                icon: const Icon(Icons.keyboard_arrow_down,
-                    color: Color(0xFF64748B)),
+              return AegisDropdown<int?>(
+                value: selectedProjectId,
+                labelText: 'Proyecto',
+                prefixIcon: Icons.folder_outlined,
                 items: [
                   const DropdownMenuItem<int?>(
                     value: null,
-                    child: Row(
-                      children: [
-                        Icon(Icons.folder_outlined,
-                            size: 18, color: Color(0xFF94A3B8)),
-                        SizedBox(width: 12),
-                        Text('Seleccionar proyecto',
-                            style: TextStyle(color: Color(0xFF64748B))),
-                      ],
-                    ),
+                    child: Text('Seleccionar proyecto'),
                   ),
                   ...projectsList.map((p) => DropdownMenuItem<int?>(
                         value: p.id,
@@ -403,9 +263,7 @@ class _TaskDetailsTab extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(width: 12),
-                            Text(p.name,
-                                style:
-                                    const TextStyle(color: Color(0xFF1E293B))),
+                            Text(p.name),
                           ],
                         ),
                       )),
@@ -417,12 +275,10 @@ class _TaskDetailsTab extends StatelessWidget {
             error: (err, stack) => Text('Error al cargar proyectos: $err'),
           ),
           const SizedBox(height: 16),
-          const Text(
+          Text(
             'Prioridad',
-            style: TextStyle(
-              fontSize: 14,
+            style: textTheme.bodyMedium?.copyWith(
               fontWeight: FontWeight.w600,
-              color: Color(0xFF64748B),
             ),
           ),
           const SizedBox(height: 8),
@@ -433,11 +289,11 @@ class _TaskDetailsTab extends StatelessWidget {
                 label: const Text('Ninguna'),
                 selected: selectedPriority == 0,
                 onSelected: (selected) => onPriorityChanged(0),
-                selectedColor: const Color(0xFFE0F2FE),
-                labelStyle: TextStyle(
+                selectedColor: colorScheme.secondary,
+                labelStyle: textTheme.bodyMedium?.copyWith(
                   color: selectedPriority == 0
-                      ? const Color(0xFF0284C7)
-                      : const Color(0xFF64748B),
+                      ? colorScheme.primary
+                      : colorScheme.outline,
                   fontWeight: selectedPriority == 0
                       ? FontWeight.bold
                       : FontWeight.normal,
@@ -445,7 +301,7 @@ class _TaskDetailsTab extends StatelessWidget {
                 side: BorderSide(
                   color: selectedPriority == 0
                       ? Colors.transparent
-                      : const Color(0xFFCBD5E1),
+                      : colorScheme.outline.withValues(alpha: 0.3),
                 ),
               ),
               ChoiceChip(
@@ -453,10 +309,10 @@ class _TaskDetailsTab extends StatelessWidget {
                 selected: selectedPriority == 1,
                 onSelected: (selected) => onPriorityChanged(1),
                 selectedColor: const Color(0xFFDCFCE7),
-                labelStyle: TextStyle(
+                labelStyle: textTheme.bodyMedium?.copyWith(
                   color: selectedPriority == 1
                       ? const Color(0xFF16A34A)
-                      : const Color(0xFF64748B),
+                      : colorScheme.outline,
                   fontWeight: selectedPriority == 1
                       ? FontWeight.bold
                       : FontWeight.normal,
@@ -464,7 +320,7 @@ class _TaskDetailsTab extends StatelessWidget {
                 side: BorderSide(
                   color: selectedPriority == 1
                       ? Colors.transparent
-                      : const Color(0xFFCBD5E1),
+                      : colorScheme.outline.withValues(alpha: 0.3),
                 ),
               ),
               ChoiceChip(
@@ -472,10 +328,10 @@ class _TaskDetailsTab extends StatelessWidget {
                 selected: selectedPriority == 2,
                 onSelected: (selected) => onPriorityChanged(2),
                 selectedColor: const Color(0xFFFEF9C3),
-                labelStyle: TextStyle(
+                labelStyle: textTheme.bodyMedium?.copyWith(
                   color: selectedPriority == 2
                       ? const Color(0xFFCA8A04)
-                      : const Color(0xFF64748B),
+                      : colorScheme.outline,
                   fontWeight: selectedPriority == 2
                       ? FontWeight.bold
                       : FontWeight.normal,
@@ -483,18 +339,18 @@ class _TaskDetailsTab extends StatelessWidget {
                 side: BorderSide(
                   color: selectedPriority == 2
                       ? Colors.transparent
-                      : const Color(0xFFCBD5E1),
+                      : colorScheme.outline.withValues(alpha: 0.3),
                 ),
               ),
               ChoiceChip(
                 label: const Text('Alta'),
                 selected: selectedPriority == 3,
                 onSelected: (selected) => onPriorityChanged(3),
-                selectedColor: const Color(0xFFFEE2E2),
-                labelStyle: TextStyle(
+                selectedColor: colorScheme.onError,
+                labelStyle: textTheme.bodyMedium?.copyWith(
                   color: selectedPriority == 3
-                      ? const Color(0xFFDC2626)
-                      : const Color(0xFF64748B),
+                      ? colorScheme.error
+                      : colorScheme.outline,
                   fontWeight: selectedPriority == 3
                       ? FontWeight.bold
                       : FontWeight.normal,
@@ -502,18 +358,16 @@ class _TaskDetailsTab extends StatelessWidget {
                 side: BorderSide(
                   color: selectedPriority == 3
                       ? Colors.transparent
-                      : const Color(0xFFCBD5E1),
+                      : colorScheme.outline.withValues(alpha: 0.3),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 16),
-          const Text(
+          Text(
             'Etiquetas',
-            style: TextStyle(
-              fontSize: 14,
+            style: textTheme.bodyMedium?.copyWith(
               fontWeight: FontWeight.w600,
-              color: Color(0xFF64748B),
             ),
           ),
           const SizedBox(height: 8),
@@ -549,6 +403,7 @@ class _TaskChecklistTab extends StatelessWidget {
     final total = validItems.length;
     final completed = validItems.where((item) => item.isCompleted).length;
     final progress = total == 0 ? 0.0 : completed / total;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -567,10 +422,10 @@ class _TaskChecklistTab extends StatelessWidget {
                       curve: Curves.easeInOut,
                       builder: (context, value, _) => LinearProgressIndicator(
                         value: value,
-                        backgroundColor: const Color(0xFFE2E8F0),
+                        backgroundColor: colorScheme.secondary,
                         color: value == 1.0
                             ? const Color(0xFF10B981)
-                            : const Color(0xFF6366F1),
+                            : colorScheme.primary,
                         minHeight: 8,
                       ),
                     ),
@@ -584,13 +439,13 @@ class _TaskChecklistTab extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                     color: progress == 1.0
                         ? const Color(0xFF10B981)
-                        : const Color(0xFF64748B),
+                        : colorScheme.outline,
                   ),
                 ),
               ],
             ),
           ),
-          const Divider(color: Color(0xFFE2E8F0), height: 1),
+          Divider(color: colorScheme.outline.withValues(alpha: 0.2), height: 1),
         ],
         Expanded(
           child: ReorderableListView.builder(
@@ -688,15 +543,19 @@ class _InlineChecklistRowState extends State<_InlineChecklistRow> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return Card(
       elevation: 0,
       margin: const EdgeInsets.only(bottom: 8),
-      color: widget.isLastEmpty ? Colors.transparent : Colors.white,
+      color: widget.isLastEmpty ? Colors.transparent : colorScheme.surface,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
         side: BorderSide(
-          color:
-              widget.isLastEmpty ? Colors.transparent : const Color(0xFFE2E8F0),
+          color: widget.isLastEmpty
+              ? Colors.transparent
+              : colorScheme.outline.withValues(alpha: 0.2),
         ),
       ),
       child: Padding(
@@ -707,15 +566,15 @@ class _InlineChecklistRowState extends State<_InlineChecklistRow> {
               Checkbox(
                 value: widget.item.isCompleted,
                 onChanged: (_) => widget.onToggle(),
-                activeColor: const Color(0xFF6366F1),
+                activeColor: colorScheme.primary,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(4),
                 ),
               )
             else
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.0),
-                child: Icon(Icons.add, color: Color(0xFF94A3B8), size: 20),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Icon(Icons.add, color: colorScheme.outline, size: 20),
               ),
             Expanded(
               child: TextField(
@@ -727,10 +586,10 @@ class _InlineChecklistRowState extends State<_InlineChecklistRow> {
                     if (mounted) FocusScope.of(context).nextFocus();
                   });
                 },
-                style: TextStyle(
+                style: textTheme.bodyLarge?.copyWith(
                   color: widget.item.isCompleted
-                      ? const Color(0xFF94A3B8)
-                      : const Color(0xFF1E293B),
+                      ? colorScheme.outline
+                      : colorScheme.onSurface,
                   decoration: widget.item.isCompleted
                       ? TextDecoration.lineThrough
                       : null,
@@ -738,7 +597,8 @@ class _InlineChecklistRowState extends State<_InlineChecklistRow> {
                 decoration: InputDecoration(
                   counterText: "",
                   hintText: widget.isLastEmpty ? "Añadir subpaso..." : "",
-                  hintStyle: const TextStyle(color: Color(0xFF94A3B8)),
+                  hintStyle: textTheme.bodyMedium
+                      ?.copyWith(color: colorScheme.outline),
                   border: InputBorder.none,
                   isDense: true,
                 ),
@@ -746,16 +606,18 @@ class _InlineChecklistRowState extends State<_InlineChecklistRow> {
             ),
             if (!widget.isLastEmpty)
               IconButton(
-                icon:
-                    const Icon(Icons.close, color: Color(0xFFCBD5E1), size: 20),
+                icon: Icon(Icons.close,
+                    color: colorScheme.outline.withValues(alpha: 0.5),
+                    size: 20),
                 onPressed: widget.onRemove,
               ),
             if (!widget.isLastEmpty)
               ReorderableDragStartListener(
                 index: widget.index,
-                child: const Padding(
-                  padding: EdgeInsets.fromLTRB(8, 8, 12, 8),
-                  child: Icon(Icons.drag_indicator, color: Color(0xFFE2E8F0)),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(8, 8, 12, 8),
+                  child: Icon(Icons.drag_indicator,
+                      color: colorScheme.outline.withValues(alpha: 0.3)),
                 ),
               ),
           ],
@@ -773,26 +635,14 @@ class _TaskNotesTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-        padding: const EdgeInsets.all(16),
-        child: TextField(
-          controller: notesController,
-          textCapitalization: TextCapitalization.sentences,
-          maxLines: null,
-          expands: true,
-          textAlignVertical: TextAlignVertical.top,
-          decoration: InputDecoration(
-            hintText: 'Añade cualquier información adicional sobre la tarea',
-            hintStyle: const TextStyle(color: Color(0xFF94A3B8)),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Color(0xFF6366F1), width: 2),
-            ),
-            contentPadding: const EdgeInsets.all(16),
-          ),
-        ));
+      padding: const EdgeInsets.all(16),
+      child: AegisTextField(
+        controller: notesController,
+        textCapitalization: TextCapitalization.sentences,
+        expands: true,
+        textAlignVertical: TextAlignVertical.top,
+        hintText: 'Añade cualquier información adicional sobre la tarea',
+      ),
+    );
   }
 }
