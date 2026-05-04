@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../core/theme/app_theme.dart';
 
 enum ButtonType {
   primary,
@@ -25,25 +24,26 @@ class AegisButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     Color backgroundColor;
     Color textColor;
     Color iconColor;
 
     switch (type) {
       case ButtonType.primary:
-        backgroundColor = AppTheme.royalBlue;
-        textColor = AppTheme.pureWhite;
-        iconColor = AppTheme.pureWhite;
+        backgroundColor = colorScheme.primary;
+        textColor = colorScheme.onPrimary;
+        iconColor = colorScheme.onPrimary;
         break;
       case ButtonType.secondary:
-        backgroundColor = AppTheme.royalBlue10;
-        textColor = AppTheme.fiord;
-        iconColor = AppTheme.fiord;
+        backgroundColor = colorScheme.secondary;
+        textColor = colorScheme.onSecondary;
+        iconColor = colorScheme.onSecondary;
         break;
       case ButtonType.destructive:
-        backgroundColor = const Color(0xFFFEE2E2);
-        textColor = const Color(0xFFDC2626);
-        iconColor = const Color(0xFFDC2626);
+        backgroundColor = colorScheme.onError;
+        textColor = colorScheme.error;
+        iconColor = colorScheme.error;
         break;
     }
 

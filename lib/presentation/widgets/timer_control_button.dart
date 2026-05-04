@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../core/theme/app_theme.dart';
 
 class TimerControlButton extends StatelessWidget {
   final Widget child;
@@ -19,12 +18,15 @@ class TimerControlButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Container(
       width: size,
       height: size,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: isPrimary ? AppTheme.royalBlue : AppTheme.gullGray.withAlpha(50),
+        color:
+            isPrimary ? colorScheme.primary : colorScheme.outline.withAlpha(50),
         boxShadow: hasShadow
             ? [
                 const BoxShadow(
