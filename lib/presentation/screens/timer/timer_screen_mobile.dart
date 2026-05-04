@@ -1,8 +1,10 @@
+import 'package:aegis/core/theme/app_theme.dart';
 import 'package:aegis/core/utils/format_utils.dart';
 import 'package:aegis/presentation/screens/settings/settings_screen_mobile.dart';
 import 'package:aegis/presentation/screens/timer/components/tasks_panel_mobile.dart';
 import 'package:aegis/presentation/viewmodels/timer_state.dart';
 import 'package:aegis/presentation/viewmodels/timer_viewmodel.dart';
+import 'package:aegis/presentation/widgets/timer_control_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
@@ -209,7 +211,7 @@ class TimerScreenMobile extends ConsumerWidget {
               child: TasksPanelMobile(),
             ),
             const Spacer(flex: 2),
-            _buildControls(ref, timerState),
+            _buildControls(context, ref, timerState),
             const Spacer(flex: 1),
           ],
         ),
@@ -306,7 +308,7 @@ class TimerScreenMobile extends ConsumerWidget {
     );
   }
 
-  Widget _buildControls(WidgetRef ref, dynamic state) {
+  Widget _buildControls(BuildContext context, WidgetRef ref, dynamic state) {
     final timerNotifier = ref.read(timerViewModelProvider.notifier);
     final isRunning = state.status == TimerStatus.running;
 
@@ -315,60 +317,43 @@ class TimerScreenMobile extends ConsumerWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          GestureDetector(
-            onTap: () => timerNotifier.reset(),
-            child: Container(
-              padding: const EdgeInsets.all(16),
-              decoration: const BoxDecoration(
-                color: Color(0xFFE2E8F0),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Icons.stop, color: Color(0xFF94A3B8), size: 28),
+          TimerControlButton(
+            isPrimary: false,
+            size: 60.0,
+            onPressed: () => timerNotifier.reset(),
+            child: const Icon(
+              Icons.stop,
+              color: AppTheme.gullGray,
+              size: 28,
             ),
           ),
-          GestureDetector(
-            onTap: () {
+          TimerControlButton(
+            isPrimary: true,
+            size: 84.0,
+            hasShadow: true,
+            onPressed: () {
               if (isRunning) {
                 timerNotifier.pause();
               } else {
                 timerNotifier.start();
               }
             },
-            child: Container(
-              padding: const EdgeInsets.all(12),
-              decoration: const BoxDecoration(
-                color: Color(0xFF828BFA),
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black12,
-                    blurRadius: 10,
-                    offset: Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Icon(
-                isRunning ? Icons.pause_rounded : Icons.play_arrow_rounded,
-                color: Colors.white,
-                size: 60,
-              ),
+            child: Icon(
+              isRunning ? Icons.pause_rounded : Icons.play_arrow_rounded,
+              color: AppTheme.pureWhite,
+              size: 50,
             ),
           ),
-          GestureDetector(
-            onTap: () {
-              timerNotifier.add5Minutes();
-            },
-            child: Container(
-              padding: const EdgeInsets.all(16),
-              decoration: const BoxDecoration(
-                color: Color(0xFFE2E8F0),
-                shape: BoxShape.circle,
-              ),
-              child: const Text(
-                "+5m",
-                style: TextStyle(
-                    color: Color(0xFF94A3B8), fontWeight: FontWeight.bold),
-              ),
+          TimerControlButton(
+            isPrimary: false,
+            size: 60.0,
+            onPressed: () => timerNotifier.add5Minutes(),
+            child: Text(
+              "+5m",
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    color: AppTheme.gullGray,
+                    fontWeight: FontWeight.bold,
+                  ),
             ),
           ),
         ],
