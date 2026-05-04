@@ -12,15 +12,16 @@ class TaskTableView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tasksAsync = ref.watch(taskListViewModelProvider);
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: colorScheme.outline.withValues(alpha: 0.2)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(5),
+            color: colorScheme.onSurface.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -33,15 +34,15 @@ class TaskTableView extends ConsumerWidget {
             child: tasksAsync.when(
               data: (tasks) {
                 if (tasks.isEmpty) {
-                  return const Center(
+                  return Center(
                     child: Text('Sin tareas para este filtro.',
-                        style: TextStyle(color: Color(0xFF94A3B8))),
+                        style: TextStyle(color: colorScheme.outline)),
                   );
                 }
                 return ListView.separated(
                   itemCount: tasks.length,
                   separatorBuilder: (_, __) =>
-                      const Divider(height: 1, color: Color(0xFFF1F5F9)),
+                      Divider(height: 1, color: colorScheme.secondary),
                   itemBuilder: (context, index) {
                     return TaskRow(task: tasks[index]);
                   },
@@ -68,46 +69,48 @@ class _TaskTableHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textStyle = Theme.of(context).textTheme.bodyMedium?.copyWith(
+          fontWeight: FontWeight.bold,
+          color: colorScheme.onSurface,
+        );
+
     return Container(
       padding: const EdgeInsets.only(left: 4, right: 16, top: 16, bottom: 16),
-      decoration: const BoxDecoration(
-        color: Color(0xFFEEF2FF),
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      decoration: BoxDecoration(
+        color: colorScheme.secondary,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
-      child: const Row(
+      child: Row(
         children: [
-          SizedBox(width: 48),
+          const SizedBox(width: 48),
           Expanded(
             flex: 4,
             child: Row(
               children: [
-                Text('Nombre',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold, color: Color(0xFF1E293B))),
-                Icon(Icons.arrow_drop_down, color: Color(0xFF64748B), size: 18),
+                Text('Nombre', style: textStyle),
+                Icon(Icons.arrow_drop_down,
+                    color: colorScheme.onSurfaceVariant, size: 18),
               ],
             ),
           ),
-          SizedBox(width: 16),
+          const SizedBox(width: 16),
           Expanded(
             flex: 4,
-            child: Text('Etiquetas',
-                style: TextStyle(
-                    fontWeight: FontWeight.bold, color: Color(0xFF1E293B))),
+            child: Text('Etiquetas', style: textStyle),
           ),
-          SizedBox(width: 16),
+          const SizedBox(width: 16),
           Expanded(
             flex: 2,
             child: Row(
               children: [
-                Text('Fecha',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold, color: Color(0xFF1E293B))),
-                Icon(Icons.arrow_drop_down, color: Color(0xFF64748B), size: 18),
+                Text('Fecha', style: textStyle),
+                Icon(Icons.arrow_drop_down,
+                    color: colorScheme.onSurfaceVariant, size: 18),
               ],
             ),
           ),
-          SizedBox(width: 40),
+          const SizedBox(width: 40),
         ],
       ),
     );
@@ -140,11 +143,13 @@ class TaskRow extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
     final bool isCompleted = task.completedAt != null;
 
     Color flagColor = Colors.transparent;
     if (task.priority == 3) {
-      flagColor = const Color(0xFFEF4444);
+      flagColor = colorScheme.error;
     } else if (task.priority == 2) {
       flagColor = const Color(0xFFEAB308);
     } else if (task.priority == 1) {
@@ -164,7 +169,7 @@ class TaskRow extends ConsumerWidget {
           );
         },
         child: Container(
-          color: Colors.white,
+          color: colorScheme.surface,
           child: IntrinsicHeight(
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -196,7 +201,7 @@ class TaskRow extends ConsumerWidget {
                                 );
                               }
                             },
-                            activeColor: const Color(0xFF6366F1),
+                            activeColor: colorScheme.primary,
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(4)),
                           ),
@@ -207,10 +212,10 @@ class TaskRow extends ConsumerWidget {
                             task.title,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
+                            style: textTheme.bodyMedium?.copyWith(
                               color: isCompleted
-                                  ? const Color(0xFF94A3B8)
-                                  : const Color(0xFF334155),
+                                  ? colorScheme.outline
+                                  : colorScheme.onSurface,
                               decoration: isCompleted
                                   ? TextDecoration.lineThrough
                                   : null,
@@ -230,9 +235,9 @@ class TaskRow extends ConsumerWidget {
                                       .where((t) => tagIds.contains(t.id))
                                       .toList();
                                   if (taskTags.isEmpty) {
-                                    return const Text('-',
+                                    return Text('-',
                                         style: TextStyle(
-                                            color: Color(0xFF94A3B8)));
+                                            color: colorScheme.outline));
                                   }
                                   return SingleChildScrollView(
                                     scrollDirection: Axis.horizontal,
@@ -244,9 +249,9 @@ class TaskRow extends ConsumerWidget {
                                           padding:
                                               const EdgeInsets.only(right: 8.0),
                                           child: TagPill(
-                                            label: tag.name,
+                                            label: tag.name.toUpperCase(),
                                             backgroundColor:
-                                                tagColor.withAlpha(20),
+                                                tagColor.withValues(alpha: 0.2),
                                             textColor: tagColor,
                                           ),
                                         );
@@ -275,16 +280,17 @@ class TaskRow extends ConsumerWidget {
                           flex: 2,
                           child: Text(
                             _formatDate(task.dueDate),
-                            style: const TextStyle(
-                                color: Color(0xFF64748B), fontSize: 13),
+                            style: textTheme.bodySmall?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
+                            ),
                           ),
                         ),
                         SizedBox(
                           width: 40,
                           child: PopupMenuButton(
-                            icon: const Icon(Icons.more_vert,
-                                color: Color(0xFF94A3B8)),
-                            color: Colors.white,
+                            icon: Icon(Icons.more_vert,
+                                color: colorScheme.outline),
+                            color: colorScheme.surface,
                             surfaceTintColor: Colors.transparent,
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12)),
@@ -302,7 +308,7 @@ class TaskRow extends ConsumerWidget {
                                       .deleteTask(task);
                                 } catch (e) {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
+                                    const SnackBar(
                                         content:
                                             Text('Error al eliminar tarea.')),
                                   );
@@ -311,29 +317,30 @@ class TaskRow extends ConsumerWidget {
                               }
                             },
                             itemBuilder: (context) => [
-                              const PopupMenuItem(
+                              PopupMenuItem(
                                 value: 0,
                                 child: Row(
                                   children: [
                                     Icon(Icons.edit_outlined,
-                                        color: Color(0xFF64748B), size: 20),
-                                    SizedBox(width: 12),
+                                        color: colorScheme.onSurfaceVariant,
+                                        size: 20),
+                                    const SizedBox(width: 12),
                                     Text('Editar',
                                         style: TextStyle(
-                                            color: Color(0xFF1E293B))),
+                                            color: colorScheme.onSurface)),
                                   ],
                                 ),
                               ),
-                              const PopupMenuItem(
+                              PopupMenuItem(
                                 value: 1,
                                 child: Row(
                                   children: [
                                     Icon(Icons.delete_outline,
-                                        color: Color(0xFFEF4444), size: 20),
-                                    SizedBox(width: 12),
+                                        color: colorScheme.error, size: 20),
+                                    const SizedBox(width: 12),
                                     Text('Eliminar',
                                         style: TextStyle(
-                                            color: Color(0xFFEF4444))),
+                                            color: colorScheme.error)),
                                   ],
                                 ),
                               ),
@@ -393,19 +400,23 @@ class _TableFooter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-      decoration: const BoxDecoration(
-        color: Color(0xFFEEF2FF),
-        borderRadius: BorderRadius.vertical(bottom: Radius.circular(24)),
+      decoration: BoxDecoration(
+        color: colorScheme.secondary,
+        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(24)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
             'Mostrando $taskCount Tareas',
-            style: const TextStyle(
-                color: Color(0xFF64748B), fontWeight: FontWeight.w500),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                  fontWeight: FontWeight.w600,
+                ),
           ),
         ],
       ),

@@ -19,21 +19,23 @@ class TaskCard extends ConsumerWidget {
     required this.onDelete,
   });
 
-  Color _getFlagColor() {
+  Color _getFlagColor(ColorScheme colorScheme) {
     if (task.priority == 3) {
-      return const Color(0xFFEF4444);
+      return colorScheme.error;
     } else if (task.priority == 2) {
       return const Color(0xFFEAB308);
     } else if (task.priority == 1) {
       return const Color(0xFF22C55E);
     }
-    return const Color(0xFFCBD5E1);
+    return colorScheme.outline.withValues(alpha: 0.3);
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tagIdsAsync = ref.watch(taskTagsProvider(task.id));
     final allTagsAsync = ref.watch(tagListViewModelProvider);
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -41,7 +43,7 @@ class TaskCard extends ConsumerWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(7),
+            color: colorScheme.onSurface.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -55,22 +57,22 @@ class TaskCard extends ConsumerWidget {
           onDismissed: (_) => onDelete(),
           background: Container(
             padding: const EdgeInsets.symmetric(horizontal: 24),
-            color: const Color(0xFFFEE2E2),
+            color: colorScheme.onError,
             alignment: Alignment.centerRight,
-            child: const Icon(Icons.delete_outline,
-                color: Color(0xFFDC2626), size: 28),
+            child:
+                Icon(Icons.delete_outline, color: colorScheme.error, size: 28),
           ),
           child: GestureDetector(
             onTap: onTap,
             child: Container(
-              color: Colors.white,
+              color: colorScheme.surface,
               child: IntrinsicHeight(
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Container(
                       width: 4,
-                      color: _getFlagColor(),
+                      color: _getFlagColor(colorScheme),
                     ),
                     Expanded(
                       child: Padding(
@@ -86,17 +88,18 @@ class TaskCard extends ConsumerWidget {
                                   shape: BoxShape.circle,
                                   border: Border.all(
                                     color: task.completedAt != null
-                                        ? const Color(0xFF94A3B8)
-                                        : const Color(0xFFCBD5E1),
+                                        ? colorScheme.outline
+                                        : colorScheme.outline
+                                            .withValues(alpha: 0.3),
                                     width: 2,
                                   ),
                                   color: task.completedAt != null
-                                      ? const Color(0xFF94A3B8)
+                                      ? colorScheme.outline
                                       : Colors.transparent,
                                 ),
                                 child: task.completedAt != null
-                                    ? const Icon(Icons.check,
-                                        size: 16, color: Colors.white)
+                                    ? Icon(Icons.check,
+                                        size: 16, color: colorScheme.surface)
                                     : null,
                               ),
                             ),
@@ -115,15 +118,14 @@ class TaskCard extends ConsumerWidget {
                                           task.title,
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w500,
+                                          style: textTheme.bodyLarge?.copyWith(
                                             color: task.completedAt != null
-                                                ? const Color(0xFF94A3B8)
-                                                : const Color(0xFF1E293B),
+                                                ? colorScheme.outline
+                                                : colorScheme.onSurface,
                                             decoration: task.completedAt != null
                                                 ? TextDecoration.lineThrough
                                                 : null,
+                                            fontWeight: FontWeight.w600,
                                           ),
                                         ),
                                       ),
@@ -135,17 +137,18 @@ class TaskCard extends ConsumerWidget {
                                           child: Row(
                                             mainAxisSize: MainAxisSize.min,
                                             children: [
-                                              const Icon(
+                                              Icon(
                                                   Icons.calendar_today_outlined,
                                                   size: 14,
-                                                  color: Color(0xFF94A3B8)),
+                                                  color: colorScheme.outline),
                                               const SizedBox(width: 4),
                                               Text(
                                                 '${task.dueDate!.day}/${task.dueDate!.month}/${task.dueDate!.year}',
-                                                style: const TextStyle(
-                                                  fontSize: 12,
-                                                  color: Color(0xFF64748B),
-                                                  fontWeight: FontWeight.w500,
+                                                style: textTheme.bodySmall
+                                                    ?.copyWith(
+                                                  color: colorScheme
+                                                      .onSurfaceVariant,
+                                                  fontWeight: FontWeight.w600,
                                                 ),
                                               ),
                                             ],
@@ -181,18 +184,17 @@ class TaskCard extends ConsumerWidget {
                                                       horizontal: 8,
                                                       vertical: 4),
                                                   decoration: BoxDecoration(
-                                                    color:
-                                                        tagColor.withAlpha(20),
+                                                    color: tagColor.withValues(
+                                                        alpha: 0.2),
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                             8),
                                                   ),
                                                   child: Text(
-                                                    tag.name,
-                                                    style: TextStyle(
+                                                    tag.name.toUpperCase(),
+                                                    style: textTheme.bodySmall
+                                                        ?.copyWith(
                                                       fontSize: 10,
-                                                      fontWeight:
-                                                          FontWeight.bold,
                                                       color: tagColor,
                                                     ),
                                                   ),
@@ -202,18 +204,21 @@ class TaskCard extends ConsumerWidget {
                                           ),
                                         );
                                       },
-                                      loading: () => SizedBox(height: 26),
-                                      error: (_, __) => SizedBox(height: 26),
+                                      loading: () => const SizedBox(height: 26),
+                                      error: (_, __) =>
+                                          const SizedBox(height: 26),
                                     ),
-                                    loading: () => SizedBox(height: 26),
-                                    error: (_, __) => SizedBox(height: 26),
+                                    loading: () => const SizedBox(height: 26),
+                                    error: (_, __) =>
+                                        const SizedBox(height: 26),
                                   ),
                                 ],
                               ),
                             ),
                             const SizedBox(width: 8),
-                            const Icon(Icons.chevron_right,
-                                color: Color(0xFFCBD5E1)),
+                            Icon(Icons.chevron_right,
+                                color:
+                                    colorScheme.outline.withValues(alpha: 0.3)),
                           ],
                         ),
                       ),

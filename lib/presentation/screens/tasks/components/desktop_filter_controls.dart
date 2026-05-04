@@ -1,4 +1,6 @@
 import 'package:aegis/presentation/screens/tasks/components/manage_habits_bottom_sheet.dart';
+import 'package:aegis/presentation/widgets/aegis_buttons.dart';
+import 'package:aegis/presentation/widgets/aegis_inputs.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:aegis/core/utils/color_utils.dart';
@@ -17,6 +19,8 @@ class DesktopFilterControls extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedProjectId = ref.watch(projectFilterProvider);
     final selectedTagIds = ref.watch(tagFilterProvider);
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
 
     final projectsAsync = ref.watch(projectListViewModelProvider);
     final tagsAsync = ref.watch(tagListViewModelProvider);
@@ -26,7 +30,7 @@ class DesktopFilterControls extends ConsumerWidget {
 
     if (selectedProjectId == -1) {
       activeProjectName = 'Bandeja de entrada';
-      activeProjectColor = const Color(0xFF64748B);
+      activeProjectColor = colorScheme.onSurfaceVariant;
     } else if (selectedProjectId != null) {
       final projectVal = projectsAsync.value
           ?.where((p) => p.id == selectedProjectId)
@@ -63,12 +67,12 @@ class DesktopFilterControls extends ConsumerWidget {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
-                        color: activeProjectColor?.withAlpha(20) ??
-                            const Color(0xFFF1F5F9),
+                        color: activeProjectColor?.withValues(alpha: 0.1) ??
+                            colorScheme.secondary,
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: activeProjectColor?.withAlpha(100) ??
-                              const Color(0xFFCBD5E1),
+                          color: activeProjectColor?.withValues(alpha: 0.4) ??
+                              colorScheme.outline.withValues(alpha: 0.3),
                         ),
                       ),
                       child: Row(
@@ -76,11 +80,9 @@ class DesktopFilterControls extends ConsumerWidget {
                         children: [
                           Text(
                             'Proyecto: $activeProjectName',
-                            style: TextStyle(
-                              color:
-                                  activeProjectColor ?? const Color(0xFF475569),
-                              fontWeight: FontWeight.bold,
-                              fontSize: 13,
+                            style: textTheme.bodySmall?.copyWith(
+                              color: activeProjectColor ??
+                                  colorScheme.onSurfaceVariant,
                             ),
                           ),
                           const SizedBox(width: 8),
@@ -95,7 +97,7 @@ class DesktopFilterControls extends ConsumerWidget {
                                 Icons.close,
                                 size: 16,
                                 color: activeProjectColor ??
-                                    const Color(0xFF475569),
+                                    colorScheme.onSurfaceVariant,
                               ),
                             ),
                           ),
@@ -113,10 +115,10 @@ class DesktopFilterControls extends ConsumerWidget {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 12, vertical: 6),
                             decoration: BoxDecoration(
-                              color: tagColor.withAlpha(20),
+                              color: tagColor.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(12),
-                              border:
-                                  Border.all(color: tagColor.withAlpha(100)),
+                              border: Border.all(
+                                  color: tagColor.withValues(alpha: 0.4)),
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
@@ -126,11 +128,8 @@ class DesktopFilterControls extends ConsumerWidget {
                                 const SizedBox(width: 6),
                                 Text(
                                   tag.name,
-                                  style: TextStyle(
-                                    color: tagColor,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 13,
-                                  ),
+                                  style: textTheme.bodySmall
+                                      ?.copyWith(color: tagColor),
                                 ),
                                 const SizedBox(width: 8),
                                 MouseRegion(
@@ -171,39 +170,37 @@ class _ActionButtonsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        ElevatedButton.icon(
-          onPressed: () {
-            showDialog(
-              context: context,
-              builder: (context) => const TaskFormDesktop(),
-            );
-          },
-          icon: const Icon(Icons.add, color: Colors.white),
-          label: const Text('Nueva Tarea',
-              style:
-                  TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF6366F1),
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-            elevation: 4,
-            shadowColor: const Color(0xFF6366F1).withAlpha(100),
+        SizedBox(
+          width: 180,
+          child: AegisButton(
+            text: 'Nueva Tarea',
+            icon: Icons.add,
+            type: ButtonType.primary,
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) => const TaskFormDesktop(),
+              );
+            },
           ),
         ),
         const SizedBox(width: 12),
         Container(
+          height: 56,
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: colorScheme.surface,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: const Color(0xFFE2E8F0)),
+            border:
+                Border.all(color: colorScheme.outline.withValues(alpha: 0.2)),
           ),
           child: PopupMenuButton(
-            icon: const Icon(Icons.more_vert, color: Color(0xFF94A3B8)),
-            color: Colors.white,
+            icon: Icon(Icons.more_vert, color: colorScheme.onSurfaceVariant),
+            color: colorScheme.surface,
             surfaceTintColor: Colors.transparent,
             position: PopupMenuPosition.under,
             elevation: 4,
@@ -234,39 +231,39 @@ class _ActionButtonsRow extends StatelessWidget {
               }
             },
             itemBuilder: (context) => [
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 1,
                 child: Row(
                   children: [
                     Icon(Icons.folder_open_outlined,
-                        color: Color(0xFF64748B), size: 20),
-                    SizedBox(width: 12),
+                        color: colorScheme.onSurfaceVariant, size: 20),
+                    const SizedBox(width: 12),
                     Text('Gestionar Proyectos',
-                        style: TextStyle(color: Color(0xFF1E293B))),
+                        style: TextStyle(color: colorScheme.onSurface)),
                   ],
                 ),
               ),
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 2,
                 child: Row(
                   children: [
                     Icon(Icons.label_outlined,
-                        color: Color(0xFF64748B), size: 20),
-                    SizedBox(width: 12),
+                        color: colorScheme.onSurfaceVariant, size: 20),
+                    const SizedBox(width: 12),
                     Text('Gestionar Etiquetas',
-                        style: TextStyle(color: Color(0xFF1E293B))),
+                        style: TextStyle(color: colorScheme.onSurface)),
                   ],
                 ),
               ),
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 3,
                 child: Row(
                   children: [
                     Icon(Icons.auto_graph_outlined,
-                        color: Color(0xFF64748B), size: 20),
-                    SizedBox(width: 12),
+                        color: colorScheme.onSurfaceVariant, size: 20),
+                    const SizedBox(width: 12),
                     Text('Gestionar Hábitos',
-                        style: TextStyle(color: Color(0xFF1E293B))),
+                        style: TextStyle(color: colorScheme.onSurface)),
                   ],
                 ),
               ),
@@ -290,6 +287,8 @@ class _FilterIconButtonState extends State<FilterIconButton> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
@@ -306,20 +305,19 @@ class _FilterIconButtonState extends State<FilterIconButton> {
           height: 48,
           width: 48,
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: colorScheme.surface,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: const Color(0xFFF1F5F9), width: 1),
+            border: Border.all(color: colorScheme.secondary, width: 1),
             boxShadow: [
               BoxShadow(
-                color: _isHovered
-                    ? Colors.black.withAlpha(25)
-                    : Colors.black.withAlpha(10),
+                color: colorScheme.onSurface
+                    .withValues(alpha: _isHovered ? 0.1 : 0.05),
                 blurRadius: _isHovered ? 15 : 8,
                 offset: _isHovered ? const Offset(0, 8) : const Offset(0, 4),
               ),
             ],
           ),
-          child: const Icon(Icons.tune, color: Color(0xFF6366F1)),
+          child: Icon(Icons.tune, color: colorScheme.primary),
         ),
       ),
     );
@@ -334,14 +332,16 @@ class TaskFiltersDialog extends ConsumerWidget {
     final projectsAsync = ref.watch(projectListViewModelProvider);
     final selectedProjectId = ref.watch(projectFilterProvider);
     final selectedTagIds = ref.watch(tagFilterProvider);
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
 
     return AlertDialog(
-      backgroundColor: Colors.white,
+      backgroundColor: colorScheme.surface,
       surfaceTintColor: Colors.transparent,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-      title: const Text(
+      title: Text(
         'Filtros Avanzados',
-        style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF1E293B)),
+        style: textTheme.displayMedium,
       ),
       content: SizedBox(
         width: 400,
@@ -349,46 +349,31 @@ class TaskFiltersDialog extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Proyecto',
-              style: TextStyle(
-                  fontWeight: FontWeight.w600, color: Color(0xFF64748B)),
+              style:
+                  textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 8),
             projectsAsync.when(
               data: (projects) {
-                return DropdownButtonFormField<int?>(
-                  initialValue: selectedProjectId,
-                  dropdownColor: Colors.white,
-                  icon: const Icon(Icons.keyboard_arrow_down,
-                      color: Color(0xFF94A3B8)),
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide:
-                          const BorderSide(color: Color(0xFF6366F1), width: 2),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 12),
-                  ),
+                return AegisDropdown<int?>(
+                  value: selectedProjectId,
                   items: [
                     const DropdownMenuItem<int?>(
                       value: null,
                       child: Text('Todos los proyectos'),
                     ),
-                    const DropdownMenuItem<int?>(
+                    DropdownMenuItem<int?>(
                       value: -1,
                       child: Row(
                         children: [
                           Icon(Icons.inbox_outlined,
-                              size: 18, color: Color(0xFF64748B)),
-                          SizedBox(width: 8),
+                              size: 18, color: colorScheme.onSurfaceVariant),
+                          const SizedBox(width: 8),
                           Text('Bandeja de entrada',
-                              style: TextStyle(color: Color(0xFF64748B))),
+                              style: TextStyle(
+                                  color: colorScheme.onSurfaceVariant)),
                         ],
                       ),
                     ),
@@ -415,14 +400,14 @@ class TaskFiltersDialog extends ConsumerWidget {
                   },
                 );
               },
-              loading: () => const CircularProgressIndicator(),
+              loading: () => const Center(child: CircularProgressIndicator()),
               error: (e, s) => Text('Error: $e'),
             ),
             const SizedBox(height: 24),
-            const Text(
+            Text(
               'Etiquetas',
-              style: TextStyle(
-                  fontWeight: FontWeight.w600, color: Color(0xFF64748B)),
+              style:
+                  textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 8),
             TagMultiSelector(
@@ -435,23 +420,27 @@ class TaskFiltersDialog extends ConsumerWidget {
         ),
       ),
       actions: [
-        TextButton(
-          onPressed: () {
-            ref.read(projectFilterProvider.notifier).state = null;
-            ref.read(tagFilterProvider.notifier).state = [];
-          },
-          child: const Text('Limpiar filtros',
-              style: TextStyle(color: Color(0xFF64748B))),
-        ),
-        ElevatedButton(
-          onPressed: () => Navigator.pop(context),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF6366F1),
-            foregroundColor: Colors.white,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          ),
-          child: const Text('Aplicar y Cerrar'),
+        Row(
+          children: [
+            Expanded(
+              child: AegisButton(
+                text: 'Limpiar',
+                type: ButtonType.secondary,
+                onPressed: () {
+                  ref.read(projectFilterProvider.notifier).state = null;
+                  ref.read(tagFilterProvider.notifier).state = [];
+                },
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: AegisButton(
+                text: 'Aplicar y Cerrar',
+                type: ButtonType.primary,
+                onPressed: () => Navigator.pop(context),
+              ),
+            ),
+          ],
         ),
       ],
     );
@@ -480,13 +469,16 @@ class _DesktopSearchBarState extends ConsumerState<_DesktopSearchBar> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return Container(
       height: 48,
       padding: const EdgeInsets.only(left: 16, right: 8),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFF1F5F9)),
+        border: Border.all(color: colorScheme.secondary),
       ),
       child: Row(
         children: [
@@ -495,15 +487,18 @@ class _DesktopSearchBarState extends ConsumerState<_DesktopSearchBar> {
               controller: _controller,
               textInputAction: TextInputAction.search,
               onSubmitted: (_) => _search(),
-              decoration: const InputDecoration(
+              style:
+                  textTheme.bodyLarge?.copyWith(color: colorScheme.onSurface),
+              decoration: InputDecoration(
                 hintText: 'Buscar tarea...',
-                hintStyle: TextStyle(color: Color(0xFF94A3B8)),
+                hintStyle:
+                    textTheme.bodyMedium?.copyWith(color: colorScheme.outline),
                 border: InputBorder.none,
               ),
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.search, color: Color(0xFF6366F1)),
+            icon: Icon(Icons.search, color: colorScheme.primary),
             onPressed: _search,
           ),
         ],

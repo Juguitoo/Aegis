@@ -5,6 +5,8 @@ import 'package:aegis/presentation/viewmodels/project_list_viewmodel.dart';
 import 'package:aegis/presentation/viewmodels/task_list_viewmodel.dart';
 import 'package:aegis/presentation/viewmodels/tag_list_viewmodel.dart';
 import 'package:aegis/presentation/screens/tags/components/tag_multi_selector.dart';
+import 'package:aegis/presentation/widgets/aegis_inputs.dart';
+import 'package:aegis/presentation/widgets/aegis_buttons.dart';
 
 class MobileFilterControls extends ConsumerWidget {
   const MobileFilterControls({super.key});
@@ -13,6 +15,8 @@ class MobileFilterControls extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedProjectId = ref.watch(projectFilterProvider);
     final selectedTagIds = ref.watch(tagFilterProvider);
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
 
     final projectsAsync = ref.watch(projectListViewModelProvider);
     final tagsAsync = ref.watch(tagListViewModelProvider);
@@ -22,7 +26,7 @@ class MobileFilterControls extends ConsumerWidget {
 
     if (selectedProjectId == -1) {
       activeProjectName = 'Bandeja de entrada';
-      activeProjectColor = const Color(0xFF64748B);
+      activeProjectColor = colorScheme.onSurfaceVariant;
     } else if (selectedProjectId != null) {
       final projectVal = projectsAsync.value
           ?.where((p) => p.id == selectedProjectId)
@@ -57,17 +61,17 @@ class MobileFilterControls extends ConsumerWidget {
                   height: 48,
                   width: 48,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: colorScheme.surface,
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withAlpha(7),
+                        color: colorScheme.onSurface.withValues(alpha: 0.05),
                         blurRadius: 10,
                         offset: const Offset(0, 4),
                       ),
                     ],
                   ),
-                  child: const Icon(Icons.tune, color: Color(0xFF6366F1)),
+                  child: Icon(Icons.tune, color: colorScheme.primary),
                 ),
               ),
             ],
@@ -85,12 +89,12 @@ class MobileFilterControls extends ConsumerWidget {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
-                        color: activeProjectColor?.withAlpha(20) ??
-                            const Color(0xFFF1F5F9),
+                        color: activeProjectColor?.withValues(alpha: 0.1) ??
+                            colorScheme.secondary,
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: activeProjectColor?.withAlpha(100) ??
-                              const Color(0xFFCBD5E1),
+                          color: activeProjectColor?.withValues(alpha: 0.4) ??
+                              colorScheme.outline.withValues(alpha: 0.3),
                         ),
                       ),
                       child: Row(
@@ -98,11 +102,9 @@ class MobileFilterControls extends ConsumerWidget {
                         children: [
                           Text(
                             'Proyecto: $activeProjectName',
-                            style: TextStyle(
-                              color:
-                                  activeProjectColor ?? const Color(0xFF475569),
-                              fontWeight: FontWeight.bold,
-                              fontSize: 13,
+                            style: textTheme.bodySmall?.copyWith(
+                              color: activeProjectColor ??
+                                  colorScheme.onSurfaceVariant,
                             ),
                           ),
                           const SizedBox(width: 8),
@@ -114,8 +116,8 @@ class MobileFilterControls extends ConsumerWidget {
                             child: Icon(
                               Icons.close,
                               size: 16,
-                              color:
-                                  activeProjectColor ?? const Color(0xFF475569),
+                              color: activeProjectColor ??
+                                  colorScheme.onSurfaceVariant,
                             ),
                           ),
                         ],
@@ -133,10 +135,10 @@ class MobileFilterControls extends ConsumerWidget {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 12, vertical: 6),
                             decoration: BoxDecoration(
-                              color: tagColor.withAlpha(20),
+                              color: tagColor.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(12),
-                              border:
-                                  Border.all(color: tagColor.withAlpha(100)),
+                              border: Border.all(
+                                  color: tagColor.withValues(alpha: 0.4)),
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
@@ -146,11 +148,8 @@ class MobileFilterControls extends ConsumerWidget {
                                 const SizedBox(width: 6),
                                 Text(
                                   tag.name,
-                                  style: TextStyle(
-                                    color: tagColor,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 13,
-                                  ),
+                                  style: textTheme.bodySmall
+                                      ?.copyWith(color: tagColor),
                                 ),
                                 const SizedBox(width: 8),
                                 GestureDetector(
@@ -188,11 +187,13 @@ class MobileTaskFiltersBottomSheet extends ConsumerWidget {
     final projectsAsync = ref.watch(projectListViewModelProvider);
     final selectedProjectId = ref.watch(projectFilterProvider);
     final selectedTagIds = ref.watch(tagFilterProvider);
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
 
     return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       padding: EdgeInsets.only(
         left: 24,
@@ -207,61 +208,41 @@ class MobileTaskFiltersBottomSheet extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 'Filtros',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF1E293B),
-                ),
+                style: textTheme.displayMedium?.copyWith(fontSize: 20),
               ),
               IconButton(
-                icon: const Icon(Icons.close, color: Color(0xFF94A3B8)),
+                icon: Icon(Icons.close, color: colorScheme.onSurfaceVariant),
                 onPressed: () => Navigator.pop(context),
               ),
             ],
           ),
           const SizedBox(height: 16),
-          const Text(
+          Text(
             'Proyecto',
-            style: TextStyle(
-                fontWeight: FontWeight.w600, color: Color(0xFF64748B)),
+            style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 8),
           projectsAsync.when(
             data: (projects) {
-              return DropdownButtonFormField<int?>(
-                initialValue: selectedProjectId,
-                dropdownColor: Colors.white,
-                icon: const Icon(Icons.keyboard_arrow_down,
-                    color: Color(0xFF94A3B8)),
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide:
-                        const BorderSide(color: Color(0xFF6366F1), width: 2),
-                  ),
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                ),
+              return AegisDropdown<int?>(
+                value: selectedProjectId,
                 items: [
                   const DropdownMenuItem<int?>(
                     value: null,
                     child: Text('Todos los proyectos'),
                   ),
-                  const DropdownMenuItem<int?>(
+                  DropdownMenuItem<int?>(
                     value: -1,
                     child: Row(
                       children: [
                         Icon(Icons.inbox_outlined,
-                            size: 18, color: Color(0xFF64748B)),
-                        SizedBox(width: 8),
+                            size: 18, color: colorScheme.onSurfaceVariant),
+                        const SizedBox(width: 8),
                         Text('Bandeja de entrada',
-                            style: TextStyle(color: Color(0xFF64748B))),
+                            style:
+                                TextStyle(color: colorScheme.onSurfaceVariant)),
                       ],
                     ),
                   ),
@@ -288,14 +269,13 @@ class MobileTaskFiltersBottomSheet extends ConsumerWidget {
                 },
               );
             },
-            loading: () => const CircularProgressIndicator(),
+            loading: () => const Center(child: CircularProgressIndicator()),
             error: (e, s) => Text('Error: $e'),
           ),
           const SizedBox(height: 24),
-          const Text(
+          Text(
             'Etiquetas',
-            style: TextStyle(
-                fontWeight: FontWeight.w600, color: Color(0xFF64748B)),
+            style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 8),
           TagMultiSelector(
@@ -308,27 +288,22 @@ class MobileTaskFiltersBottomSheet extends ConsumerWidget {
           Row(
             children: [
               Expanded(
-                child: TextButton(
+                child: AegisButton(
+                  text: 'Limpiar',
+                  type: ButtonType.secondary,
                   onPressed: () {
                     ref.read(projectFilterProvider.notifier).state = null;
                     ref.read(tagFilterProvider.notifier).state = [];
                     Navigator.pop(context);
                   },
-                  child: const Text('Limpiar',
-                      style: TextStyle(color: Color(0xFF64748B))),
                 ),
               ),
+              const SizedBox(width: 16),
               Expanded(
-                child: ElevatedButton(
+                child: AegisButton(
+                  text: 'Aplicar',
+                  type: ButtonType.primary,
                   onPressed: () => Navigator.pop(context),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF6366F1),
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                  ),
-                  child: const Text('Aplicar'),
                 ),
               ),
             ],
@@ -361,15 +336,18 @@ class _MobileSearchBarState extends ConsumerState<_MobileSearchBar> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return Container(
       padding: const EdgeInsets.only(left: 16, right: 8),
       height: 48,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(7),
+            color: colorScheme.onSurface.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -382,15 +360,18 @@ class _MobileSearchBarState extends ConsumerState<_MobileSearchBar> {
               controller: _controller,
               textInputAction: TextInputAction.search,
               onSubmitted: (_) => _search(),
-              decoration: const InputDecoration(
+              style:
+                  textTheme.bodyLarge?.copyWith(color: colorScheme.onSurface),
+              decoration: InputDecoration(
                 hintText: 'Buscar tarea...',
-                hintStyle: TextStyle(color: Color(0xFF94A3B8)),
+                hintStyle:
+                    textTheme.bodyMedium?.copyWith(color: colorScheme.outline),
                 border: InputBorder.none,
               ),
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.search, color: Color(0xFF6366F1)),
+            icon: Icon(Icons.search, color: colorScheme.primary),
             onPressed: _search,
           ),
         ],

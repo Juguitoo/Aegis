@@ -1,5 +1,7 @@
 import 'package:aegis/presentation/screens/timer/immersive_timer_screen_desktop.dart';
 import 'package:aegis/presentation/viewmodels/habits_viewmodel.dart';
+import 'package:aegis/presentation/widgets/aegis_buttons.dart';
+import 'package:aegis/presentation/widgets/aegis_inputs.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -30,6 +32,8 @@ class _DesktopHabitsWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final habitsAsync = ref.watch(habitsViewModelProvider);
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
 
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
@@ -41,11 +45,11 @@ class _DesktopHabitsWidget extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
+            color: colorScheme.onSurface.withValues(alpha: 0.02),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -57,17 +61,13 @@ class _DesktopHabitsWidget extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 "Hábitos",
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF0F172A),
-                ),
+                style: textTheme.displayLarge?.copyWith(fontSize: 24),
               ),
               IconButton(
                 icon: const Icon(Icons.add_circle_outline),
-                color: const Color(0xFF6366F1),
+                color: colorScheme.primary,
                 iconSize: 28,
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
@@ -75,48 +75,60 @@ class _DesktopHabitsWidget extends ConsumerWidget {
                 onPressed: () {
                   showDialog(
                     context: context,
-                    builder: (context) {
+                    builder: (dialogContext) {
                       final controller = TextEditingController();
-                      return AlertDialog(
-                        backgroundColor: Colors.white,
-                        surfaceTintColor: Colors.transparent,
-                        title: const Text('Nuevo hábito',
-                            style: TextStyle(fontSize: 18)),
-                        content: TextField(
-                          controller: controller,
-                          decoration: const InputDecoration(
-                            hintText: 'Ej. Beber 2L de agua',
-                            focusedBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Color(0xFF6366F1)),
+
+                      void submitHabit(String value) {
+                        if (value.trim().isEmpty) {
+                          ScaffoldMessenger.of(dialogContext).showSnackBar(
+                            SnackBar(
+                              content: const Text(
+                                  'El nombre del hábito no puede estar vacío'),
+                              backgroundColor: colorScheme.error,
+                              behavior: SnackBarBehavior.floating,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8)),
                             ),
-                          ),
+                          );
+                          return;
+                        }
+                        ref
+                            .read(habitsViewModelProvider.notifier)
+                            .addHabit(value.trim());
+                        Navigator.pop(dialogContext);
+                      }
+
+                      return AlertDialog(
+                        backgroundColor: colorScheme.surface,
+                        surfaceTintColor: Colors.transparent,
+                        title: Text('Nuevo hábito',
+                            style: textTheme.displayMedium
+                                ?.copyWith(fontSize: 18)),
+                        content: AegisTextField(
+                          controller: controller,
+                          hintText: 'Ej. Beber 2L de agua',
                           autofocus: true,
-                          onSubmitted: (value) {
-                            ref
-                                .read(habitsViewModelProvider.notifier)
-                                .addHabit(value);
-                            Navigator.pop(context);
-                          },
+                          onSubmitted: submitHabit,
                         ),
                         actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: const Text('Cancelar',
-                                style: TextStyle(color: Color(0xFF94A3B8))),
-                          ),
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF6366F1),
-                              foregroundColor: Colors.white,
-                              elevation: 0,
-                            ),
-                            onPressed: () {
-                              ref
-                                  .read(habitsViewModelProvider.notifier)
-                                  .addHabit(controller.text);
-                              Navigator.pop(context);
-                            },
-                            child: const Text('Añadir'),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: AegisButton(
+                                  text: 'Cancelar',
+                                  type: ButtonType.secondary,
+                                  onPressed: () => Navigator.pop(dialogContext),
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: AegisButton(
+                                  text: 'Añadir',
+                                  type: ButtonType.primary,
+                                  onPressed: () => submitHabit(controller.text),
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       );
@@ -127,23 +139,23 @@ class _DesktopHabitsWidget extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: 8),
-          const Divider(color: Color(0xFFF1F5F9), height: 1),
+          Divider(color: colorScheme.secondary, height: 1),
           const SizedBox(height: 8),
           Expanded(
             child: habitsAsync.when(
               skipLoadingOnReload: true,
-              loading: () => const Center(
-                child: CircularProgressIndicator(color: Color(0xFF6366F1)),
+              loading: () => Center(
+                child: CircularProgressIndicator(color: colorScheme.primary),
               ),
               error: (error, stack) => Center(
                 child: Text('Error: $error'),
               ),
               data: (habits) {
                 if (habits.isEmpty) {
-                  return const Center(
+                  return Center(
                     child: Text(
                       'No tienes hábitos creados.',
-                      style: TextStyle(color: Color(0xFF94A3B8)),
+                      style: TextStyle(color: colorScheme.outline),
                     ),
                   );
                 }
@@ -191,19 +203,17 @@ class _DesktopHabitsWidget extends ConsumerWidget {
                                       height: 28,
                                       alignment: Alignment.center,
                                       decoration: isToday
-                                          ? const BoxDecoration(
-                                              color: Color(0xFF6366F1),
+                                          ? BoxDecoration(
+                                              color: colorScheme.primary,
                                               shape: BoxShape.circle,
                                             )
                                           : null,
                                       child: Text(
                                         dayInitials,
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.bold,
+                                        style: textTheme.bodySmall?.copyWith(
                                           color: isToday
-                                              ? Colors.white
-                                              : const Color(0xFF64748B),
+                                              ? colorScheme.onPrimary
+                                              : colorScheme.onSurfaceVariant,
                                         ),
                                       ),
                                     ),
@@ -232,10 +242,9 @@ class _DesktopHabitsWidget extends ConsumerWidget {
                                 flex: 3,
                                 child: Text(
                                   habitData.habit.name,
-                                  style: const TextStyle(
+                                  style: textTheme.bodyLarge?.copyWith(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w600,
-                                    color: Color(0xFF334155),
                                   ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
@@ -284,22 +293,22 @@ class _DesktopHabitsWidget extends ConsumerWidget {
                                                         BorderRadius.circular(
                                                             6),
                                                     color: isCompleted
-                                                        ? const Color(
-                                                            0xFF6366F1)
+                                                        ? colorScheme.primary
                                                         : Colors.transparent,
                                                     border: Border.all(
                                                       color: isCompleted
-                                                          ? const Color(
-                                                              0xFF6366F1)
-                                                          : const Color(
-                                                              0xFF94A3B8),
+                                                          ? colorScheme.primary
+                                                          : colorScheme.outline
+                                                              .withValues(
+                                                                  alpha: 0.3),
                                                       width: 1.5,
                                                     ),
                                                   ),
                                                   child: isCompleted
-                                                      ? const Icon(Icons.check,
+                                                      ? Icon(Icons.check,
                                                           size: 16,
-                                                          color: Colors.white)
+                                                          color: colorScheme
+                                                              .onPrimary)
                                                       : null,
                                                 ),
                                               ),
@@ -317,14 +326,13 @@ class _DesktopHabitsWidget extends ConsumerWidget {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    const Divider(color: Color(0xFFF1F5F9), height: 1),
+                    Divider(color: colorScheme.secondary, height: 1),
                     const SizedBox(height: 8),
-                    const Text(
+                    Text(
                       "Progreso",
-                      style: TextStyle(
+                      style: textTheme.bodyLarge?.copyWith(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF0F172A),
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -333,17 +341,17 @@ class _DesktopHabitsWidget extends ConsumerWidget {
                       child: LinearProgressIndicator(
                         value: progress,
                         minHeight: 6,
-                        backgroundColor: const Color(0xFFEEF2FF),
-                        valueColor: const AlwaysStoppedAnimation<Color>(
-                            Color(0xFF6366F1)),
+                        backgroundColor: colorScheme.secondary,
+                        valueColor:
+                            AlwaysStoppedAnimation<Color>(colorScheme.primary),
                       ),
                     ),
                     const SizedBox(height: 8),
                     Text(
                       "Has completado el $progressPercentage% de tus hábitos hasta hoy",
-                      style: const TextStyle(
+                      style: textTheme.bodySmall?.copyWith(
                         fontSize: 12,
-                        color: Color(0xFF94A3B8),
+                        fontWeight: FontWeight.normal,
                       ),
                     ),
                   ],
@@ -362,6 +370,8 @@ class _PomodoroPromoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
@@ -376,15 +386,15 @@ class _PomodoroPromoCard extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(32),
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [Color(0xFF6366F1), Color(0xFF4F46E5)],
+            gradient: LinearGradient(
+              colors: [colorScheme.primary, const Color(0xFF4F46E5)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
             borderRadius: BorderRadius.circular(24),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF6366F1).withValues(alpha: 0.3),
+                color: colorScheme.primary.withValues(alpha: 0.3),
                 blurRadius: 15,
                 offset: const Offset(0, 8),
               ),
@@ -396,19 +406,19 @@ class _PomodoroPromoCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text(
+                  Text(
                     'Mantente Enfocado',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: colorScheme.onPrimary,
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   const SizedBox(height: 12),
-                  const Text(
+                  Text(
                     'Recuerda tomar descansos largos\ndespués de cada hora de trabajo.',
                     style: TextStyle(
-                      color: Colors.white70,
+                      color: colorScheme.onPrimary.withValues(alpha: 0.7),
                       fontSize: 14,
                       height: 1.5,
                     ),
@@ -418,13 +428,13 @@ class _PomodoroPromoCard extends StatelessWidget {
                     padding:
                         const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: colorScheme.onPrimary,
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Text(
+                    child: Text(
                       'Iniciar Pomodoro',
                       style: TextStyle(
-                        color: Color(0xFF4F46E5),
+                        color: colorScheme.primary,
                         fontWeight: FontWeight.bold,
                       ),
                     ),

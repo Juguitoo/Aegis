@@ -1,4 +1,6 @@
 import 'package:aegis/presentation/viewmodels/habits_viewmodel.dart';
+import 'package:aegis/presentation/widgets/aegis_buttons.dart';
+import 'package:aegis/presentation/widgets/aegis_inputs.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -15,59 +17,64 @@ class _ManageHabitsBottomSheetState
   void _showHabitDialog({int? habitId, String currentName = ''}) {
     final controller = TextEditingController(text: currentName);
     final isEditing = habitId != null;
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    void submitHabit(String value) {
+      if (value.trim().isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('El nombre del hábito no puede estar vacío'),
+            backgroundColor: colorScheme.error,
+            behavior: SnackBarBehavior.floating,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          ),
+        );
+        return;
+      }
+      if (isEditing) {
+        ref
+            .read(habitsViewModelProvider.notifier)
+            .updateHabit(habitId, value.trim());
+      } else {
+        ref.read(habitsViewModelProvider.notifier).addHabit(value.trim());
+      }
+      Navigator.pop(context);
+    }
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: Colors.white,
+        backgroundColor: colorScheme.surface,
         surfaceTintColor: Colors.transparent,
         title: Text(isEditing ? 'Editar hábito' : 'Nuevo hábito',
-            style: const TextStyle(fontSize: 18)),
-        content: TextField(
+            style: textTheme.displayMedium?.copyWith(fontSize: 18)),
+        content: AegisTextField(
           controller: controller,
-          decoration: const InputDecoration(
-            hintText: 'Ej. Beber 2L de agua',
-            focusedBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: Color(0xFF6366F1)),
-            ),
-          ),
+          hintText: 'Ej. Beber 2L de agua',
           autofocus: true,
-          onSubmitted: (value) {
-            if (isEditing) {
-              ref
-                  .read(habitsViewModelProvider.notifier)
-                  .updateHabit(habitId, value);
-            } else {
-              ref.read(habitsViewModelProvider.notifier).addHabit(value);
-            }
-            Navigator.pop(context);
-          },
+          onSubmitted: submitHabit,
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancelar',
-                style: TextStyle(color: Color(0xFF94A3B8))),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF6366F1),
-              foregroundColor: Colors.white,
-              elevation: 0,
-            ),
-            onPressed: () {
-              if (isEditing) {
-                ref
-                    .read(habitsViewModelProvider.notifier)
-                    .updateHabit(habitId, controller.text);
-              } else {
-                ref
-                    .read(habitsViewModelProvider.notifier)
-                    .addHabit(controller.text);
-              }
-              Navigator.pop(context);
-            },
-            child: Text(isEditing ? 'Guardar' : 'Añadir'),
+          Row(
+            children: [
+              Expanded(
+                child: AegisButton(
+                  text: 'Cancelar',
+                  type: ButtonType.secondary,
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: AegisButton(
+                  text: isEditing ? 'Guardar' : 'Añadir',
+                  type: ButtonType.primary,
+                  onPressed: () => submitHabit(controller.text),
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -78,6 +85,8 @@ class _ManageHabitsBottomSheetState
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
     final habitsAsync = ref.watch(habitsViewModelProvider);
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
 
     return Container(
       constraints: BoxConstraints(
@@ -87,9 +96,9 @@ class _ManageHabitsBottomSheetState
         bottom: MediaQuery.of(context).viewInsets.bottom +
             MediaQuery.of(context).padding.bottom,
       ),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -101,33 +110,29 @@ class _ManageHabitsBottomSheetState
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                Text(
                   'Gestionar Hábitos',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF1E293B),
-                  ),
+                  style: textTheme.displayMedium?.copyWith(fontSize: 20),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.close, color: Color(0xFF94A3B8)),
+                  icon: Icon(Icons.close, color: colorScheme.onSurfaceVariant),
                   onPressed: () => Navigator.pop(context),
                 ),
               ],
             ),
           ),
-          const Divider(height: 1, color: Color(0xFFE2E8F0)),
+          Divider(height: 1, color: colorScheme.outline.withValues(alpha: 0.2)),
           Flexible(
             child: habitsAsync.when(
               skipLoadingOnReload: true,
               data: (habits) {
                 if (habits.isEmpty) {
-                  return const Padding(
-                    padding: EdgeInsets.all(32.0),
+                  return Padding(
+                    padding: const EdgeInsets.all(32.0),
                     child: Center(
                       child: Text(
                         'No tienes hábitos activos.',
-                        style: TextStyle(color: Color(0xFF94A3B8)),
+                        style: TextStyle(color: colorScheme.outline),
                       ),
                     ),
                   );
@@ -142,51 +147,60 @@ class _ManageHabitsBottomSheetState
                           horizontal: 24, vertical: 4),
                       title: Text(
                         habit.name,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: Color(0xFF1E293B),
+                        style: textTheme.bodyLarge?.copyWith(
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           IconButton(
-                            icon: const Icon(Icons.edit_outlined,
-                                color: Color(0xFF64748B), size: 20),
+                            icon: Icon(Icons.edit_outlined,
+                                color: colorScheme.onSurfaceVariant, size: 20),
                             onPressed: () => _showHabitDialog(
                                 habitId: habit.id, currentName: habit.name),
                           ),
                           IconButton(
-                            icon: const Icon(Icons.delete_outline,
-                                color: Color(0xFFEF4444), size: 20),
+                            icon: Icon(Icons.delete_outline,
+                                color: colorScheme.error, size: 20),
                             onPressed: () {
                               showDialog(
                                 context: context,
                                 builder: (context) => AlertDialog(
-                                  backgroundColor: Colors.white,
+                                  backgroundColor: colorScheme.surface,
                                   surfaceTintColor: Colors.transparent,
-                                  title: const Text('Eliminar hábito'),
+                                  title: Text('Eliminar hábito',
+                                      style: textTheme.displayMedium
+                                          ?.copyWith(fontSize: 18)),
                                   content: Text(
-                                      '¿Seguro que quieres eliminar "${habit.name}"? Perderás su historial.'),
+                                      '¿Seguro que quieres eliminar "${habit.name}"? Perderás su historial.',
+                                      style: textTheme.bodyMedium),
                                   actions: [
-                                    TextButton(
-                                      onPressed: () => Navigator.pop(context),
-                                      child: const Text('Cancelar',
-                                          style: TextStyle(
-                                              color: Color(0xFF94A3B8))),
-                                    ),
-                                    TextButton(
-                                      onPressed: () {
-                                        ref
-                                            .read(habitsViewModelProvider
-                                                .notifier)
-                                            .deleteHabit(habit.id);
-                                        Navigator.pop(context);
-                                      },
-                                      child: const Text('Eliminar',
-                                          style: TextStyle(
-                                              color: Color(0xFFEF4444))),
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: AegisButton(
+                                            text: 'Cancelar',
+                                            type: ButtonType.secondary,
+                                            onPressed: () =>
+                                                Navigator.pop(context),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 16),
+                                        Expanded(
+                                          child: AegisButton(
+                                            text: 'Eliminar',
+                                            type: ButtonType.destructive,
+                                            onPressed: () {
+                                              ref
+                                                  .read(habitsViewModelProvider
+                                                      .notifier)
+                                                  .deleteHabit(habit.id);
+                                              Navigator.pop(context);
+                                            },
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ],
                                 ),
@@ -199,33 +213,28 @@ class _ManageHabitsBottomSheetState
                   },
                 );
               },
-              loading: () => const Padding(
-                padding: EdgeInsets.all(32.0),
+              loading: () => Padding(
+                padding: const EdgeInsets.all(32.0),
                 child: Center(
-                    child: CircularProgressIndicator(color: Color(0xFF6366F1))),
+                    child:
+                        CircularProgressIndicator(color: colorScheme.primary)),
               ),
               error: (err, stack) => Padding(
                 padding: const EdgeInsets.all(32.0),
-                child: Center(child: Text('Error: $err')),
+                child: Center(
+                    child: Text('Error: $err',
+                        style: TextStyle(color: colorScheme.error))),
               ),
             ),
           ),
-          const Divider(height: 1, color: Color(0xFFE2E8F0)),
+          Divider(height: 1, color: colorScheme.outline.withValues(alpha: 0.2)),
           Padding(
             padding: const EdgeInsets.all(24.0),
-            child: ElevatedButton.icon(
+            child: AegisButton(
+              text: 'Crear nuevo hábito',
+              icon: Icons.add,
+              type: ButtonType.secondary,
               onPressed: () => _showHabitDialog(),
-              icon: const Icon(Icons.add),
-              label: const Text('Crear nuevo hábito'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFF1F5F9),
-                foregroundColor: const Color(0xFF0F172A),
-                elevation: 0,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
             ),
           ),
         ],

@@ -12,6 +12,8 @@ class AegisTextField extends StatelessWidget {
   final TextInputType keyboardType;
   final TextCapitalization textCapitalization;
   final ValueChanged<String>? onChanged;
+  final bool autofocus;
+  final ValueChanged<String>? onSubmitted;
 
   const AegisTextField({
     super.key,
@@ -26,6 +28,8 @@ class AegisTextField extends StatelessWidget {
     this.keyboardType = TextInputType.text,
     this.textCapitalization = TextCapitalization.none,
     this.onChanged,
+    this.autofocus = false,
+    this.onSubmitted,
   });
 
   @override
@@ -41,6 +45,8 @@ class AegisTextField extends StatelessWidget {
       keyboardType: keyboardType,
       textCapitalization: textCapitalization,
       onChanged: onChanged,
+      autofocus: autofocus,
+      onSubmitted: onSubmitted,
       style: textTheme.bodyLarge?.copyWith(
         color: colorScheme.onSurface,
       ),

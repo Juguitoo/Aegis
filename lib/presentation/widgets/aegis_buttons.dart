@@ -48,7 +48,7 @@ class AegisButton extends StatelessWidget {
     }
 
     return SizedBox(
-      height: 56,
+      height: 48,
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(

@@ -1,4 +1,6 @@
 import 'package:aegis/presentation/viewmodels/habits_viewmodel.dart';
+import 'package:aegis/presentation/widgets/aegis_buttons.dart';
+import 'package:aegis/presentation/widgets/aegis_inputs.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -9,6 +11,8 @@ class MobileHabitsSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final habitsAsync = ref.watch(habitsViewModelProvider);
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
 
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
@@ -31,64 +35,73 @@ class MobileHabitsSection extends ConsumerWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 "Hábitos",
-                style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF1E293B)),
+                style: textTheme.displayMedium?.copyWith(fontSize: 20),
               ),
               IconButton(
                 icon: const Icon(Icons.add_circle_outline),
-                color: const Color(0xFF6366F1),
+                color: colorScheme.primary,
                 iconSize: 24,
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
                 onPressed: () {
                   showDialog(
                     context: context,
-                    builder: (context) {
+                    builder: (dialogContext) {
                       final controller = TextEditingController();
-                      return AlertDialog(
-                        backgroundColor: Colors.white,
-                        surfaceTintColor: Colors.transparent,
-                        title: const Text('Nuevo hábito',
-                            style: TextStyle(fontSize: 18)),
-                        content: TextField(
-                          controller: controller,
-                          decoration: const InputDecoration(
-                            hintText: 'Ej. Beber 2L de agua',
-                            focusedBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Color(0xFF6366F1)),
+
+                      void submitHabit(String value) {
+                        if (value.trim().isEmpty) {
+                          ScaffoldMessenger.of(dialogContext).showSnackBar(
+                            SnackBar(
+                              content: const Text(
+                                  'El nombre del hábito no puede estar vacío'),
+                              backgroundColor: colorScheme.error,
+                              behavior: SnackBarBehavior.floating,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8)),
                             ),
-                          ),
+                          );
+                          return;
+                        }
+                        ref
+                            .read(habitsViewModelProvider.notifier)
+                            .addHabit(value.trim());
+                        Navigator.pop(dialogContext);
+                      }
+
+                      return AlertDialog(
+                        backgroundColor: colorScheme.surface,
+                        surfaceTintColor: Colors.transparent,
+                        title: Text('Nuevo hábito',
+                            style:
+                                textTheme.displayLarge?.copyWith(fontSize: 18)),
+                        content: AegisTextField(
+                          controller: controller,
+                          hintText: 'Ej. Beber 2L de agua',
                           autofocus: true,
-                          onSubmitted: (value) {
-                            ref
-                                .read(habitsViewModelProvider.notifier)
-                                .addHabit(value);
-                            Navigator.pop(context);
-                          },
+                          onSubmitted: submitHabit,
                         ),
                         actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: const Text('Cancelar',
-                                style: TextStyle(color: Color(0xFF94A3B8))),
-                          ),
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF6366F1),
-                              foregroundColor: Colors.white,
-                              elevation: 0,
-                            ),
-                            onPressed: () {
-                              ref
-                                  .read(habitsViewModelProvider.notifier)
-                                  .addHabit(controller.text);
-                              Navigator.pop(context);
-                            },
-                            child: const Text('Añadir'),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: AegisButton(
+                                  text: 'Cancelar',
+                                  type: ButtonType.secondary,
+                                  onPressed: () => Navigator.pop(dialogContext),
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: AegisButton(
+                                  text: 'Añadir',
+                                  type: ButtonType.primary,
+                                  onPressed: () => submitHabit(controller.text),
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       );
@@ -103,11 +116,11 @@ class MobileHabitsSection extends ConsumerWidget {
           margin: const EdgeInsets.symmetric(horizontal: 16),
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: colorScheme.surface,
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.02),
+                color: colorScheme.onSurface.withValues(alpha: 0.02),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -115,22 +128,22 @@ class MobileHabitsSection extends ConsumerWidget {
           ),
           child: habitsAsync.when(
             skipLoadingOnReload: true,
-            loading: () => const Center(
+            loading: () => Center(
               child: Padding(
-                padding: EdgeInsets.all(16.0),
-                child: CircularProgressIndicator(color: Color(0xFF6366F1)),
+                padding: const EdgeInsets.all(16.0),
+                child: CircularProgressIndicator(color: colorScheme.primary),
               ),
             ),
             error: (error, stack) => Center(child: Text('Error: $error')),
             data: (habits) {
               if (habits.isEmpty) {
-                return const Center(
+                return Center(
                   child: Padding(
-                    padding: EdgeInsets.all(16.0),
+                    padding: const EdgeInsets.all(16.0),
                     child: Text(
                       'No tienes hábitos activos.\n¡Añade uno para empezar!',
                       textAlign: TextAlign.center,
-                      style: TextStyle(color: Color(0xFF94A3B8)),
+                      style: TextStyle(color: colorScheme.outline),
                     ),
                   ),
                 );
@@ -144,10 +157,8 @@ class MobileHabitsSection extends ConsumerWidget {
                         flex: 3,
                         child: Text(
                           currentMonthStr,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF94A3B8),
+                          style: textTheme.bodySmall?.copyWith(
+                            color: colorScheme.outline,
                             letterSpacing: 0.5,
                           ),
                         ),
@@ -170,20 +181,18 @@ class MobileHabitsSection extends ConsumerWidget {
                               height: 24,
                               alignment: Alignment.center,
                               decoration: isToday
-                                  ? const BoxDecoration(
-                                      color: Color(0xFF6366F1),
+                                  ? BoxDecoration(
+                                      color: colorScheme.primary,
                                       shape: BoxShape.circle,
                                     )
                                   : null,
                               child: Text(
                                 dayInitials,
                                 textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
+                                style: textTheme.bodySmall?.copyWith(
                                   color: isToday
-                                      ? Colors.white
-                                      : const Color(0xFF64748B),
+                                      ? colorScheme.onPrimary
+                                      : colorScheme.onSurfaceVariant,
                                 ),
                               ),
                             );
@@ -216,69 +225,81 @@ class MobileHabitsSection extends ConsumerWidget {
                                       onTap: () {
                                         showDialog(
                                           context: context,
-                                          builder: (context) {
+                                          builder: (dialogContext) {
                                             final controller =
                                                 TextEditingController(
                                                     text: habitData.habit.name);
+
+                                            void submitHabit(String value) {
+                                              if (value.trim().isEmpty) {
+                                                ScaffoldMessenger.of(
+                                                        dialogContext)
+                                                    .showSnackBar(
+                                                  SnackBar(
+                                                    content: const Text(
+                                                        'El nombre del hábito no puede estar vacío'),
+                                                    backgroundColor:
+                                                        colorScheme.error,
+                                                    behavior: SnackBarBehavior
+                                                        .floating,
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        8)),
+                                                  ),
+                                                );
+                                                return;
+                                              }
+                                              ref
+                                                  .read(habitsViewModelProvider
+                                                      .notifier)
+                                                  .updateHabit(
+                                                      habitData.habit.id,
+                                                      value.trim());
+                                              Navigator.pop(dialogContext);
+                                            }
+
                                             return AlertDialog(
-                                              backgroundColor: Colors.white,
+                                              backgroundColor:
+                                                  colorScheme.surface,
                                               surfaceTintColor:
                                                   Colors.transparent,
-                                              title: const Text('Editar hábito',
-                                                  style:
-                                                      TextStyle(fontSize: 18)),
-                                              content: TextField(
+                                              title: Text('Editar hábito',
+                                                  style: textTheme.displayMedium
+                                                      ?.copyWith(fontSize: 18)),
+                                              content: AegisTextField(
                                                 controller: controller,
-                                                decoration:
-                                                    const InputDecoration(
-                                                  focusedBorder:
-                                                      UnderlineInputBorder(
-                                                    borderSide: BorderSide(
-                                                        color:
-                                                            Color(0xFF6366F1)),
-                                                  ),
-                                                ),
                                                 autofocus: true,
-                                                onSubmitted: (value) {
-                                                  ref
-                                                      .read(
-                                                          habitsViewModelProvider
-                                                              .notifier)
-                                                      .updateHabit(
-                                                          habitData.habit.id,
-                                                          value);
-                                                  Navigator.pop(context);
-                                                },
+                                                onSubmitted: submitHabit,
                                               ),
                                               actions: [
-                                                TextButton(
-                                                  onPressed: () =>
-                                                      Navigator.pop(context),
-                                                  child: const Text('Cancelar',
-                                                      style: TextStyle(
-                                                          color: Color(
-                                                              0xFF94A3B8))),
-                                                ),
-                                                ElevatedButton(
-                                                  style:
-                                                      ElevatedButton.styleFrom(
-                                                    backgroundColor:
-                                                        const Color(0xFF6366F1),
-                                                    foregroundColor:
-                                                        Colors.white,
-                                                    elevation: 0,
-                                                  ),
-                                                  onPressed: () {
-                                                    ref
-                                                        .read(
-                                                            habitsViewModelProvider
-                                                                .notifier)
-                                                        .updateHabit(
-                                                            habitData.habit.id,
-                                                            controller.text);
-                                                    Navigator.pop(context);
-                                                  },
-                                                  child: const Text('Guardar'),
+                                                Row(
+                                                  children: [
+                                                    Expanded(
+                                                      child: AegisButton(
+                                                        text: 'Cancelar',
+                                                        type: ButtonType
+                                                            .secondary,
+                                                        onPressed: () =>
+                                                            Navigator.pop(
+                                                                dialogContext),
+                                                      ),
+                                                    ),
+                                                    const SizedBox(width: 16),
+                                                    Expanded(
+                                                      child: AegisButton(
+                                                        text: 'Guardar',
+                                                        type:
+                                                            ButtonType.primary,
+                                                        onPressed: () =>
+                                                            submitHabit(
+                                                                controller
+                                                                    .text),
+                                                      ),
+                                                    ),
+                                                  ],
                                                 ),
                                               ],
                                             );
@@ -287,10 +308,9 @@ class MobileHabitsSection extends ConsumerWidget {
                                       },
                                       child: Text(
                                         habitData.habit.name,
-                                        style: const TextStyle(
+                                        style: textTheme.bodyLarge?.copyWith(
                                           fontSize: 14,
                                           fontWeight: FontWeight.w600,
-                                          color: Color(0xFF334155),
                                         ),
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
@@ -329,18 +349,20 @@ class MobileHabitsSection extends ConsumerWidget {
                                           borderRadius:
                                               BorderRadius.circular(6),
                                           color: isCompleted
-                                              ? const Color(0xFF6366F1)
-                                              : const Color(0xFFF8FAFC),
+                                              ? colorScheme.primary
+                                              : colorScheme.secondary,
                                           border: Border.all(
                                             color: isCompleted
-                                                ? const Color(0xFF6366F1)
-                                                : const Color(0xFFE2E8F0),
+                                                ? colorScheme.primary
+                                                : colorScheme.outline
+                                                    .withValues(alpha: 0.2),
                                             width: 1.5,
                                           ),
                                         ),
                                         child: isCompleted
-                                            ? const Icon(Icons.check,
-                                                size: 14, color: Colors.white)
+                                            ? Icon(Icons.check,
+                                                size: 14,
+                                                color: colorScheme.onPrimary)
                                             : null,
                                       ),
                                     ),
