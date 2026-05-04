@@ -194,4 +194,14 @@ mixin EventFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
       _showSnackBar('Error al eliminar', isError: true);
     }
   }
+
+  void clearEvent() {
+    setState(() {
+      titleController.clear();
+      isAllDay = false;
+      selectedDate = null;
+      selectedTime = null;
+      selectedNotificationDate = null;
+    });
+  }
 }

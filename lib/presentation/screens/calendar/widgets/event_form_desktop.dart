@@ -1,3 +1,5 @@
+import 'package:aegis/core/theme/app_theme.dart';
+import 'package:aegis/presentation/widgets/aegis_buttons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -27,11 +29,11 @@ class _EventFormDesktopState extends ConsumerState<EventFormDesktop>
         width: 500,
         padding: const EdgeInsets.all(32),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppTheme.pureWhite,
           borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.1),
+              color: AppTheme.ebony.withValues(alpha: 0.1),
               blurRadius: 20,
               offset: const Offset(0, 10),
             ),
@@ -46,14 +48,12 @@ class _EventFormDesktopState extends ConsumerState<EventFormDesktop>
               children: [
                 Text(
                   initialEvent == null ? 'Nuevo Evento' : 'Editar Evento',
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF0F172A),
-                  ),
+                  style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.close, color: Color(0xFF64748B)),
+                  icon: const Icon(Icons.close, color: AppTheme.gullGray),
                   onPressed: () => Navigator.pop(context),
                 ),
               ],
@@ -63,17 +63,22 @@ class _EventFormDesktopState extends ConsumerState<EventFormDesktop>
               controller: titleController,
               autofocus: initialEvent == null,
               textCapitalization: TextCapitalization.sentences,
+              style: Theme.of(context).textTheme.bodyLarge,
               decoration: InputDecoration(
                 labelText: 'Título',
+                labelStyle: Theme.of(context).textTheme.bodyMedium,
                 hintText: 'Ej. Reunión de TFG',
+                hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: AppTheme.gullGray,
+                    ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
+                  borderSide: const BorderSide(color: AppTheme.gullGray),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide:
-                      const BorderSide(color: Color(0xFF6366F1), width: 2),
+                      const BorderSide(color: AppTheme.royalBlue, width: 2),
                 ),
               ),
             ),
@@ -81,18 +86,19 @@ class _EventFormDesktopState extends ConsumerState<EventFormDesktop>
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                Text(
                   'Todo el día',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: Color(0xFF334155),
-                  ),
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
                 ),
                 Switch(
                   value: isAllDay,
                   onChanged: toggleAllDay,
-                  activeThumbColor: const Color(0xFF6366F1),
+                  activeThumbColor: AppTheme.pureWhite,
+                  activeTrackColor: AppTheme.royalBlue,
+                  inactiveThumbColor: AppTheme.gullGray,
+                  inactiveTrackColor: AppTheme.whiteZyrcon,
                 ),
               ],
             ),
@@ -106,13 +112,14 @@ class _EventFormDesktopState extends ConsumerState<EventFormDesktop>
                     child: Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        border: Border.all(color: const Color(0xFFE2E8F0)),
+                        border: Border.all(
+                            color: AppTheme.gullGray.withValues(alpha: 0.3)),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(
                         children: [
                           const Icon(Icons.calendar_today,
-                              size: 20, color: Color(0xFF64748B)),
+                              size: 20, color: AppTheme.fiord),
                           const SizedBox(width: 12),
                           Expanded(
                             child: Text(
@@ -120,8 +127,7 @@ class _EventFormDesktopState extends ConsumerState<EventFormDesktop>
                                   ? DateFormat('dd MMM yyyy', 'es')
                                       .format(selectedDate!)
                                   : 'Fecha',
-                              style: const TextStyle(
-                                  color: Color(0xFF1E293B), fontSize: 15),
+                              style: Theme.of(context).textTheme.bodyLarge,
                             ),
                           ),
                         ],
@@ -138,21 +144,21 @@ class _EventFormDesktopState extends ConsumerState<EventFormDesktop>
                       child: Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          border: Border.all(color: const Color(0xFFE2E8F0)),
+                          border: Border.all(
+                              color: AppTheme.gullGray.withValues(alpha: 0.3)),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Row(
                           children: [
                             const Icon(Icons.access_time,
-                                size: 20, color: Color(0xFF64748B)),
+                                size: 20, color: AppTheme.fiord),
                             const SizedBox(width: 12),
                             Expanded(
                               child: Text(
                                 selectedTime != null
                                     ? selectedTime!.format(context)
                                     : 'Hora',
-                                style: const TextStyle(
-                                    color: Color(0xFF1E293B), fontSize: 15),
+                                style: Theme.of(context).textTheme.bodyLarge,
                               ),
                             ),
                           ],
@@ -171,22 +177,24 @@ class _EventFormDesktopState extends ConsumerState<EventFormDesktop>
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: selectedNotificationDate != null
-                      ? const Color(0xFFEEF2FF)
+                      ? AppTheme.royalBlue10
                       : Colors.transparent,
                   border: Border.all(
                     color: selectedNotificationDate != null
-                        ? const Color(0xFF6366F1)
-                        : const Color(0xFFE2E8F0),
+                        ? AppTheme.royalBlue
+                        : AppTheme.gullGray.withValues(alpha: 0.3),
                   ),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.notifications_active_outlined,
-                        size: 20,
-                        color: selectedNotificationDate != null
-                            ? const Color(0xFF6366F1)
-                            : const Color(0xFF64748B)),
+                    Icon(
+                      Icons.notifications_active_outlined,
+                      size: 20,
+                      color: selectedNotificationDate != null
+                          ? AppTheme.royalBlue
+                          : AppTheme.fiord,
+                    ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
@@ -194,21 +202,21 @@ class _EventFormDesktopState extends ConsumerState<EventFormDesktop>
                             ? DateFormat('dd MMM HH:mm', 'es')
                                 .format(selectedNotificationDate!)
                             : 'Añadir Recordatorio',
-                        style: TextStyle(
-                          color: selectedNotificationDate != null
-                              ? const Color(0xFF6366F1)
-                              : const Color(0xFF475569),
-                          fontWeight: selectedNotificationDate != null
-                              ? FontWeight.bold
-                              : FontWeight.normal,
-                        ),
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                              color: selectedNotificationDate != null
+                                  ? AppTheme.royalBlue
+                                  : AppTheme.fiord,
+                              fontWeight: selectedNotificationDate != null
+                                  ? FontWeight.bold
+                                  : FontWeight.normal,
+                            ),
                       ),
                     ),
                     if (selectedNotificationDate != null)
                       GestureDetector(
                         onTap: clearNotificationDate,
                         child: const Icon(Icons.close,
-                            size: 20, color: Color(0xFF6366F1)),
+                            size: 20, color: AppTheme.royalBlue),
                       ),
                   ],
                 ),
@@ -218,37 +226,23 @@ class _EventFormDesktopState extends ConsumerState<EventFormDesktop>
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                if (initialEvent != null)
-                  TextButton(
-                    onPressed: deleteEvent,
-                    style: TextButton.styleFrom(
-                      foregroundColor: const Color(0xFFDC2626),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 24, vertical: 16),
-                    ),
-                    child: const Text(
-                      'Eliminar Evento',
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
+                SizedBox(
+                  width: 160,
+                  child: AegisButton(
+                    text: initialEvent == null ? 'Limpiar' : 'Eliminar',
+                    type: initialEvent == null
+                        ? ButtonType.secondary
+                        : ButtonType.destructive,
+                    onPressed: initialEvent == null ? clearEvent : deleteEvent,
                   ),
+                ),
                 const SizedBox(width: 16),
-                ElevatedButton(
-                  onPressed: saveEvent,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF6366F1),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 32, vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    elevation: 0,
-                  ),
-                  child: Text(
-                    initialEvent == null ? 'Guardar' : 'Actualizar',
-                    style: const TextStyle(
-                        fontSize: 16, fontWeight: FontWeight.bold),
+                SizedBox(
+                  width: 160,
+                  child: AegisButton(
+                    text: initialEvent == null ? 'Guardar' : 'Actualizar',
+                    type: ButtonType.primary,
+                    onPressed: saveEvent,
                   ),
                 ),
               ],
