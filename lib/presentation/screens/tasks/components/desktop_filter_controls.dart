@@ -1,14 +1,14 @@
-import 'package:aegis/presentation/screens/tasks/widgets/manage_habits_bottom_sheet.dart';
+import 'package:aegis/presentation/screens/tasks/components/manage_habits_bottom_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:aegis/core/utils/color_utils.dart';
 import 'package:aegis/presentation/viewmodels/project_list_viewmodel.dart';
 import 'package:aegis/presentation/viewmodels/task_list_viewmodel.dart';
 import 'package:aegis/presentation/viewmodels/tag_list_viewmodel.dart';
-import 'package:aegis/presentation/screens/tasks/widgets/task_form_desktop.dart';
-import 'package:aegis/presentation/screens/projects/widgets/manage_projects_bottom_sheet.dart';
-import 'package:aegis/presentation/screens/tags/widgets/manage_tags_bottom_sheet.dart';
-import 'package:aegis/presentation/screens/tags/widgets/tag_multi_selector.dart';
+import 'package:aegis/presentation/screens/tasks/components/task_form_desktop.dart';
+import 'package:aegis/presentation/screens/projects/components/manage_projects_bottom_sheet.dart';
+import 'package:aegis/presentation/screens/tags/components/manage_tags_bottom_sheet.dart';
+import 'package:aegis/presentation/screens/tags/components/tag_multi_selector.dart';
 
 class DesktopFilterControls extends ConsumerWidget {
   const DesktopFilterControls({super.key});

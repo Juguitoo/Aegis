@@ -5,8 +5,8 @@ import 'package:intl/intl.dart';
 import 'package:aegis/presentation/viewmodels/calendar_viewmodel.dart';
 import 'package:aegis/presentation/viewmodels/task_list_viewmodel.dart';
 import 'package:aegis/presentation/screens/tasks/components/task_card.dart';
-import 'package:aegis/presentation/screens/tasks/widgets/task_form_mobile.dart';
-import 'package:aegis/presentation/screens/calendar/widgets/event_form_mobile.dart';
+import 'package:aegis/presentation/screens/tasks/components/task_form_mobile.dart';
+import 'package:aegis/presentation/screens/calendar/components/event_form_mobile.dart';
 import 'package:aegis/presentation/screens/settings/settings_screen_mobile.dart';
 
 class CalendarScreenMobile extends ConsumerWidget {

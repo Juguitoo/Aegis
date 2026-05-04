@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:aegis/data/local/database/app_database.dart';
 import 'package:aegis/presentation/viewmodels/task_list_viewmodel.dart';
-import 'package:aegis/presentation/screens/tasks/widgets/task_form_desktop.dart';
+import 'package:aegis/presentation/screens/tasks/components/task_form_desktop.dart';
 
 class TaskTableView extends ConsumerWidget {
   const TaskTableView({super.key});

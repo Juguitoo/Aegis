@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:aegis/data/repositories/tag_repository.dart';
 import 'package:aegis/data/local/database/app_database.dart';
 import 'package:aegis/core/providers/repository_providers.dart';
-import 'package:aegis/presentation/screens/tags/widgets/tag_form_dialog.dart';
+import 'package:aegis/presentation/screens/tags/components/tag_form_dialog.dart';
 
 class MockTagRepository extends Mock implements TagRepository {}
 

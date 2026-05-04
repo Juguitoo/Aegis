@@ -1,24 +1,24 @@
 import 'package:aegis/core/utils/color_utils.dart';
 import 'package:aegis/data/local/database/app_database.dart';
-import 'package:aegis/presentation/screens/tasks/widgets/task_form_mixin.dart';
+import 'package:aegis/presentation/screens/tasks/components/task_form_mixin.dart';
 import 'package:aegis/presentation/viewmodels/project_list_viewmodel.dart';
 import 'package:aegis/presentation/viewmodels/task_list_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import '../../tags/widgets/tag_multi_selector.dart';
+import '../../tags/components/tag_multi_selector.dart';
 
-class TaskFormDesktop extends ConsumerStatefulWidget {
+class TaskFormMobile extends ConsumerStatefulWidget {
   final Task? task;
 
-  const TaskFormDesktop({super.key, this.task});
+  const TaskFormMobile({super.key, this.task});
 
   @override
-  ConsumerState<TaskFormDesktop> createState() => _TaskFormDesktopState();
+  ConsumerState<TaskFormMobile> createState() => _TaskFormMobileState();
 }
 
-class _TaskFormDesktopState extends ConsumerState<TaskFormDesktop>
+class _TaskFormMobileState extends ConsumerState<TaskFormMobile>
     with TaskFormMixin {
   @override
   Task? get initialTask => widget.task;
@@ -26,233 +26,139 @@ class _TaskFormDesktopState extends ConsumerState<TaskFormDesktop>
   @override
   Widget build(BuildContext context) {
     final projectsAsync = ref.watch(projectListViewModelProvider);
+    final screenHeight = MediaQuery.of(context).size.height;
 
-    return Scaffold(
-      backgroundColor: const Color.fromARGB(104, 226, 232, 240),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(
-            maxWidth: 1100,
-            maxHeight: 850,
-          ),
-          child: Material(
-            elevation: 4,
-            shadowColor: Colors.black12,
-            color: const Color(0xFFF8FAFC),
-            borderRadius: BorderRadius.circular(16),
-            clipBehavior: Clip.antiAlias,
-            child: Container(
-              padding: const EdgeInsets.all(32),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        widget.task == null
-                            ? "Crear Nueva Tarea"
-                            : "Editar Tarea",
-                        style: const TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF1E293B)),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.close, color: Color(0xFF64748B)),
-                        onPressed: () {
-                          if (mounted) Navigator.of(context).pop();
-                        },
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 32),
-                  Expanded(
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Expanded(
-                          flex: 7,
-                          child: Container(
-                            padding: const EdgeInsets.all(24),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(12),
-                              border:
-                                  Border.all(color: const Color(0xFFE2E8F0)),
-                            ),
-                            child: _TaskDetailsColumn(
-                              titleController: titleController,
-                              descriptionController: descriptionController,
-                              estimatedDurationController:
-                                  estimatedDurationController,
-                              selectedDueDate: selectedDueDate,
-                              onPickDueDate: pickDueDate,
-                              selectedNotificationDate:
-                                  selectedNotificationDate,
-                              onPickNotificationDate: pickNotificationDate,
-                              projectsAsync: projectsAsync,
-                              selectedProjectId: selectedProjectId,
-                              onProjectChanged: (value) =>
-                                  setState(() => selectedProjectId = value),
-                              selectedPriority: selectedPriority,
-                              onPriorityChanged: (value) =>
-                                  setState(() => selectedPriority = value),
-                              selectedTagIds: selectedTagIds,
-                              onTagsChanged: (value) =>
-                                  setState(() => selectedTagIds = value),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 24),
-                        Expanded(
-                          flex: 4,
-                          child: Column(
-                            children: [
-                              Expanded(
-                                child: Container(
-                                  padding: const EdgeInsets.all(24),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(
-                                        color: const Color(0xFFE2E8F0)),
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.stretch,
-                                    children: [
-                                      const Text(
-                                        'Lista de Control',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                          color: Color(0xFF1E293B),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 16),
-                                      Expanded(
-                                        child: _TaskChecklistColumn(
-                                          checklist: currentChecklist,
-                                          onUpdate: updateChecklistItem,
-                                          onToggle: toggleChecklistItem,
-                                          onRemove: removeChecklistItem,
-                                          onReorder: reorderChecklist,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 24),
-                              Expanded(
-                                child: Container(
-                                  padding: const EdgeInsets.all(24),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(
-                                        color: const Color(0xFFE2E8F0)),
-                                  ),
-                                  child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.stretch,
-                                      children: [
-                                        const Text(
-                                          "Notas",
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                            color: Color(0xFF1E293B),
-                                          ),
-                                        ),
-                                        const SizedBox(height: 16),
-                                        Expanded(
-                                          child: TextField(
-                                            controller: notesController,
-                                            textCapitalization:
-                                                TextCapitalization.sentences,
-                                            maxLines: null,
-                                            expands: true,
-                                            textAlignVertical:
-                                                TextAlignVertical.top,
-                                            decoration: InputDecoration(
-                                              hintText:
-                                                  'Añade cualquier información adicional sobre la tarea',
-                                              hintStyle: const TextStyle(
-                                                  color: Color(0xFF94A3B8)),
-                                              border: OutlineInputBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(8),
-                                                borderSide: const BorderSide(
-                                                    color: Color(0xFFCBD5E1)),
-                                              ),
-                                              focusedBorder: OutlineInputBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(8),
-                                                borderSide: const BorderSide(
-                                                    color: Color(0xFF6366F1),
-                                                    width: 2),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ]),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 32),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      TextButton(
-                        onPressed: widget.task != null ? deleteTask : clearTask,
-                        style: TextButton.styleFrom(
-                          foregroundColor: widget.task != null
-                              ? const Color(0xFFDC2626)
-                              : const Color(0xFF475569),
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 24, vertical: 16),
-                        ),
-                        child: Text(
-                          widget.task != null
-                              ? 'Eliminar Tarea'
-                              : 'Limpiar Campos',
-                          style: const TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      ElevatedButton(
-                        onPressed: widget.task == null ? saveTask : updateTask,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF6366F1),
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 32, vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          elevation: 0,
-                        ),
-                        child: Text(
-                          widget.task == null
-                              ? 'Guardar Tarea'
-                              : 'Actualizar Tarea',
-                          style: const TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ],
-                  ),
+    return Padding(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
+      child: Container(
+        height: screenHeight * 0.85,
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: DefaultTabController(
+          length: 3,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
+                child: Text(
+                  widget.task == null ? "Crear Nueva Tarea" : "Editar Tarea",
+                  style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF1E293B)),
+                ),
+              ),
+              const SizedBox(height: 16),
+              const TabBar(
+                labelColor: Color(0xFF6366F1),
+                unselectedLabelColor: Color(0xFF94A3B8),
+                indicatorColor: Color(0xFF6366F1),
+                dividerColor: Color(0xFFE2E8F0),
+                tabs: [
+                  Tab(text: 'Detalles'),
+                  Tab(text: 'Subtareas'),
+                  Tab(text: 'Notas'),
                 ],
               ),
-            ),
+              Expanded(
+                child: TabBarView(
+                  children: [
+                    _TaskDetailsTab(
+                      titleController: titleController,
+                      descriptionController: descriptionController,
+                      estimatedDurationController: estimatedDurationController,
+                      selectedDueDate: selectedDueDate,
+                      onPickDueDate: pickDueDate,
+                      selectedNotificationDate: selectedNotificationDate,
+                      onPickNotificationDate: pickNotificationDate,
+                      projectsAsync: projectsAsync,
+                      selectedProjectId: selectedProjectId,
+                      onProjectChanged: (value) =>
+                          setState(() => selectedProjectId = value),
+                      selectedPriority: selectedPriority,
+                      onPriorityChanged: (value) =>
+                          setState(() => selectedPriority = value),
+                      selectedTagIds: selectedTagIds,
+                      onTagsChanged: (value) =>
+                          setState(() => selectedTagIds = value),
+                    ),
+                    _TaskChecklistTab(
+                      checklist: currentChecklist,
+                      onUpdate: updateChecklistItem,
+                      onToggle: toggleChecklistItem,
+                      onRemove: removeChecklistItem,
+                      onReorder: reorderChecklist,
+                    ),
+                    _TaskNotesTab(notesController: notesController),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  border: Border(
+                    top: BorderSide(color: Color(0xFFE2E8F0)),
+                  ),
+                ),
+                child: SafeArea(
+                  child: Row(
+                    spacing: 16,
+                    children: [
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed:
+                              widget.task != null ? deleteTask : clearTask,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: widget.task != null
+                                ? const Color(0xFFFEE2E2)
+                                : const Color(0xFFF1F5F9),
+                            foregroundColor: widget.task != null
+                                ? const Color(0xFFDC2626)
+                                : const Color(0xFF475569),
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            elevation: 0,
+                          ),
+                          child: Text(
+                            widget.task != null ? 'Eliminar' : 'Limpiar',
+                            style: const TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed:
+                              widget.task == null ? saveTask : updateTask,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF6366F1),
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            elevation: 0,
+                          ),
+                          child: Text(
+                            widget.task == null ? 'Guardar' : 'Actualizar',
+                            style: const TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -260,7 +166,7 @@ class _TaskFormDesktopState extends ConsumerState<TaskFormDesktop>
   }
 }
 
-class _TaskDetailsColumn extends StatelessWidget {
+class _TaskDetailsTab extends StatelessWidget {
   final TextEditingController titleController;
   final TextEditingController descriptionController;
   final TextEditingController estimatedDurationController;
@@ -276,7 +182,7 @@ class _TaskDetailsColumn extends StatelessWidget {
   final List<int> selectedTagIds;
   final ValueChanged<List<int>> onTagsChanged;
 
-  const _TaskDetailsColumn({
+  const _TaskDetailsTab({
     required this.titleController,
     required this.descriptionController,
     required this.estimatedDurationController,
@@ -296,6 +202,7 @@ class _TaskDetailsColumn extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -310,88 +217,85 @@ class _TaskDetailsColumn extends StatelessWidget {
               counterText: "",
               hintStyle: const TextStyle(color: Color(0xFF94A3B8)),
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(12),
                 borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
               ),
               focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(12),
                 borderSide:
                     const BorderSide(color: Color(0xFF6366F1), width: 2),
               ),
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
           TextField(
             controller: descriptionController,
             textCapitalization: TextCapitalization.sentences,
-            maxLines: 4,
-            minLines: 2,
+            maxLines: 3,
+            minLines: 1,
             maxLength: 500,
             decoration: InputDecoration(
               labelText: 'Descripción',
               hintText: 'Añade detalles sobre la tarea',
               hintStyle: const TextStyle(color: Color(0xFF94A3B8)),
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(12),
                 borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
               ),
               focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(12),
                 borderSide:
                     const BorderSide(color: Color(0xFF6366F1), width: 2),
               ),
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
+          TextField(
+            controller: estimatedDurationController,
+            keyboardType: TextInputType.number,
+            inputFormatters: [
+              FilteringTextInputFormatter.digitsOnly,
+            ],
+            decoration: InputDecoration(
+              labelText: 'Estimación (min)',
+              hintText: 'Ej: 30',
+              hintStyle: const TextStyle(color: Color(0xFF94A3B8)),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide:
+                    const BorderSide(color: Color(0xFF6366F1), width: 2),
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
           Row(
             children: [
               Expanded(
-                child: TextField(
-                  controller: estimatedDurationController,
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [
-                    FilteringTextInputFormatter.digitsOnly,
-                  ],
-                  decoration: InputDecoration(
-                    labelText: 'Estimación (min)',
-                    hintText: 'Ej: 30',
-                    hintStyle: const TextStyle(color: Color(0xFF94A3B8)),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide:
-                          const BorderSide(color: Color(0xFF6366F1), width: 2),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
                 child: InkWell(
                   onTap: onPickDueDate,
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(12),
                   child: Container(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 12),
+                        horizontal: 12, vertical: 16),
                     decoration: BoxDecoration(
                       border: Border.all(color: const Color(0xFFCBD5E1)),
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(
                       children: [
                         const Icon(Icons.calendar_today,
                             size: 20, color: Color(0xFF64748B)),
-                        const SizedBox(width: 12),
+                        const SizedBox(width: 8),
                         Expanded(
                           child: Text(
                             selectedDueDate == null
                                 ? 'Sin fecha'
                                 : '${selectedDueDate!.day}/${selectedDueDate!.month}/${selectedDueDate!.year}',
                             style: TextStyle(
-                              fontSize: 16,
                               color: selectedDueDate == null
                                   ? const Color(0xFF94A3B8)
                                   : const Color(0xFF1E293B),
@@ -408,13 +312,13 @@ class _TaskDetailsColumn extends StatelessWidget {
               Expanded(
                 child: InkWell(
                   onTap: onPickNotificationDate,
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(12),
                   child: Container(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 12),
+                        horizontal: 12, vertical: 16),
                     decoration: BoxDecoration(
                       border: Border.all(color: const Color(0xFFCBD5E1)),
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(12),
                       color: selectedNotificationDate != null
                           ? const Color(0xFFEEF2FF)
                           : Colors.transparent,
@@ -452,7 +356,7 @@ class _TaskDetailsColumn extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
           projectsAsync.when(
             data: (projectsList) {
               return DropdownButtonFormField<int?>(
@@ -460,14 +364,16 @@ class _TaskDetailsColumn extends StatelessWidget {
                 decoration: InputDecoration(
                   labelText: 'Proyecto',
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(12),
                     borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(12),
                     borderSide:
                         const BorderSide(color: Color(0xFF6366F1), width: 2),
                   ),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                 ),
                 icon: const Icon(Icons.keyboard_arrow_down,
                     color: Color(0xFF64748B)),
@@ -510,7 +416,7 @@ class _TaskDetailsColumn extends StatelessWidget {
             loading: () => const Center(child: CircularProgressIndicator()),
             error: (err, stack) => Text('Error al cargar proyectos: $err'),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
           const Text(
             'Prioridad',
             style: TextStyle(
@@ -519,9 +425,9 @@ class _TaskDetailsColumn extends StatelessWidget {
               color: Color(0xFF64748B),
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
           Wrap(
-            spacing: 12,
+            spacing: 8,
             children: [
               ChoiceChip(
                 label: const Text('Ninguna'),
@@ -601,7 +507,7 @@ class _TaskDetailsColumn extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
           const Text(
             'Etiquetas',
             style: TextStyle(
@@ -610,7 +516,7 @@ class _TaskDetailsColumn extends StatelessWidget {
               color: Color(0xFF64748B),
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
           TagMultiSelector(
             initialSelectedIds: selectedTagIds,
             onTagsChanged: onTagsChanged,
@@ -621,14 +527,14 @@ class _TaskDetailsColumn extends StatelessWidget {
   }
 }
 
-class _TaskChecklistColumn extends StatelessWidget {
+class _TaskChecklistTab extends StatelessWidget {
   final List<TaskChecklistItem> checklist;
   final void Function(int, String) onUpdate;
   final ValueChanged<int> onToggle;
   final ValueChanged<int> onRemove;
   final void Function(int oldIndex, int newIndex) onReorder;
 
-  const _TaskChecklistColumn({
+  const _TaskChecklistTab({
     required this.checklist,
     required this.onUpdate,
     required this.onToggle,
@@ -648,44 +554,48 @@ class _TaskChecklistColumn extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         if (total > 0) ...[
-          Row(
-            children: [
-              Expanded(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: TweenAnimationBuilder<double>(
-                    tween: Tween<double>(begin: 0, end: progress),
-                    duration: const Duration(milliseconds: 300),
-                    curve: Curves.easeInOut,
-                    builder: (context, value, _) => LinearProgressIndicator(
-                      value: value,
-                      backgroundColor: const Color(0xFFE2E8F0),
-                      color: value == 1.0
-                          ? const Color(0xFF10B981)
-                          : const Color(0xFF6366F1),
-                      minHeight: 8,
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+            child: Row(
+              children: [
+                Expanded(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: TweenAnimationBuilder<double>(
+                      tween: Tween<double>(begin: 0, end: progress),
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeInOut,
+                      builder: (context, value, _) => LinearProgressIndicator(
+                        value: value,
+                        backgroundColor: const Color(0xFFE2E8F0),
+                        color: value == 1.0
+                            ? const Color(0xFF10B981)
+                            : const Color(0xFF6366F1),
+                        minHeight: 8,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 16),
-              Text(
-                '$completed/$total',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: progress == 1.0
-                      ? const Color(0xFF10B981)
-                      : const Color(0xFF64748B),
+                const SizedBox(width: 16),
+                Text(
+                  '$completed/$total',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: progress == 1.0
+                        ? const Color(0xFF10B981)
+                        : const Color(0xFF64748B),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-          const SizedBox(height: 16),
+          const Divider(color: Color(0xFFE2E8F0), height: 1),
         ],
         Expanded(
           child: ReorderableListView.builder(
             itemCount: checklist.length,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             buildDefaultDragHandles: false,
             onReorder: (oldIndex, newIndex) {
               final lastIndex = checklist.length - 1;
@@ -852,5 +762,37 @@ class _InlineChecklistRowState extends State<_InlineChecklistRow> {
         ),
       ),
     );
+  }
+}
+
+class _TaskNotesTab extends StatelessWidget {
+  final TextEditingController notesController;
+
+  const _TaskNotesTab({required this.notesController});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+        padding: const EdgeInsets.all(16),
+        child: TextField(
+          controller: notesController,
+          textCapitalization: TextCapitalization.sentences,
+          maxLines: null,
+          expands: true,
+          textAlignVertical: TextAlignVertical.top,
+          decoration: InputDecoration(
+            hintText: 'Añade cualquier información adicional sobre la tarea',
+            hintStyle: const TextStyle(color: Color(0xFF94A3B8)),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Color(0xFF6366F1), width: 2),
+            ),
+            contentPadding: const EdgeInsets.all(16),
+          ),
+        ));
   }
 }

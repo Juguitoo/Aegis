@@ -5,8 +5,8 @@ import 'package:intl/intl.dart';
 import 'package:aegis/presentation/viewmodels/calendar_viewmodel.dart';
 import 'package:aegis/presentation/viewmodels/task_list_viewmodel.dart';
 import 'package:aegis/presentation/screens/tasks/components/task_card.dart';
-import 'package:aegis/presentation/screens/tasks/widgets/task_form_desktop.dart';
-import 'package:aegis/presentation/screens/calendar/widgets/event_form_desktop.dart';
+import 'package:aegis/presentation/screens/tasks/components/task_form_desktop.dart';
+import 'package:aegis/presentation/screens/calendar/components/event_form_desktop.dart';
 
 class CalendarScreenDesktop extends ConsumerWidget {
   const CalendarScreenDesktop({super.key});

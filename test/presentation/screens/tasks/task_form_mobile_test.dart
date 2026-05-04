@@ -7,7 +7,7 @@ import 'package:aegis/data/repositories/task_repository.dart';
 import 'package:aegis/data/repositories/project_repository.dart';
 import 'package:aegis/data/repositories/tag_repository.dart';
 import 'package:aegis/core/providers/repository_providers.dart';
-import 'package:aegis/presentation/screens/tasks/widgets/task_form_mobile.dart';
+import 'package:aegis/presentation/screens/tasks/components/task_form_mobile.dart';
 
 class MockTaskRepository extends Mock implements TaskRepository {}
 
