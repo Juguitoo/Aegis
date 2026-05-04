@@ -161,7 +161,7 @@ class TaskCard extends ConsumerWidget {
                                             .where((t) => tagIds.contains(t.id))
                                             .toList();
                                         if (taskTags.isEmpty) {
-                                          return const SizedBox();
+                                          return const SizedBox(height: 26);
                                         }
                                         return Padding(
                                           padding:
@@ -202,11 +202,11 @@ class TaskCard extends ConsumerWidget {
                                           ),
                                         );
                                       },
-                                      loading: () => const SizedBox(),
-                                      error: (_, __) => const SizedBox(),
+                                      loading: () => SizedBox(height: 26),
+                                      error: (_, __) => SizedBox(height: 26),
                                     ),
-                                    loading: () => const SizedBox(),
-                                    error: (_, __) => const SizedBox(),
+                                    loading: () => SizedBox(height: 26),
+                                    error: (_, __) => SizedBox(height: 26),
                                   ),
                                 ],
                               ),
