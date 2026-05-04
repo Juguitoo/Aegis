@@ -47,6 +47,7 @@ dependencies:
   # Iconos (defecto)
   cupertino_icons: ^1.0.8
 
+  # Componentes
   window_manager: ^0.5.1
   flutter_speed_dial: ^7.0.0
   flutter_colorpicker: ^1.1.0
@@ -76,6 +77,9 @@ dependencies:
   flutter_local_notifications: ^21.0.0
   timezone: ^0.11.0
   flutter_timezone: ^5.0.2
+
+  # Fuentes
+  google_fonts: ^6.1.0
 
 dev_dependencies:
   flutter_test:
