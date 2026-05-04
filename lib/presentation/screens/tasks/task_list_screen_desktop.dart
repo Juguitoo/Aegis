@@ -9,6 +9,9 @@ class TaskListScreenDesktop extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Padding(
@@ -16,33 +19,30 @@ class TaskListScreenDesktop extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Principal',
-              style: TextStyle(
-                color: Color(0xFF0F172A),
-                fontWeight: FontWeight.bold,
-                fontSize: 32,
-              ),
+              style: textTheme.displayLarge,
             ),
-            const Divider(height: 16, color: Color(0xFFE2E8F0)),
+            Divider(
+                height: 16, color: colorScheme.outline.withValues(alpha: 0.2)),
             const SizedBox(height: 16),
             Expanded(
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+                children: const [
                   Expanded(
                     flex: 5,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
+                      children: [
                         DesktopFilterControls(),
                         SizedBox(height: 16),
                         Expanded(child: TaskTableView()),
                       ],
                     ),
                   ),
-                  const SizedBox(width: 32),
-                  const Expanded(
+                  SizedBox(width: 32),
+                  Expanded(
                     flex: 3,
                     child: DesktopWidgetsSidebar(),
                   ),

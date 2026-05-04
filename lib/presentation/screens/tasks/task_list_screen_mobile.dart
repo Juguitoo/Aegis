@@ -37,10 +37,7 @@ class _TaskListScreenMobileState extends ConsumerState<TaskListScreenMobile> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
+      backgroundColor: Colors.transparent,
       builder: (context) => TaskFormMobile(task: task),
     );
   }
@@ -48,6 +45,8 @@ class _TaskListScreenMobileState extends ConsumerState<TaskListScreenMobile> {
   @override
   Widget build(BuildContext context) {
     final tasksAsync = ref.watch(taskListViewModelProvider);
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
 
     ref.listen(taskToOpenProvider, (previous, next) {
       if (next != null) {
@@ -88,22 +87,18 @@ class _TaskListScreenMobileState extends ConsumerState<TaskListScreenMobile> {
     });
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         titleSpacing: 0,
-        title: const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.0),
+        title: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Text(
             'Principal',
-            style: TextStyle(
-              color: Color(0xFF1E293B),
-              fontWeight: FontWeight.bold,
-              fontSize: 24,
-            ),
+            style: textTheme.displayLarge?.copyWith(fontSize: 24),
           ),
         ),
-        backgroundColor: const Color(0xFFF8FAFC),
-        foregroundColor: const Color(0xFF1E293B),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        foregroundColor: colorScheme.onSurface,
         elevation: 0,
         scrolledUnderElevation: 0,
         surfaceTintColor: Colors.transparent,
@@ -111,8 +106,8 @@ class _TaskListScreenMobileState extends ConsumerState<TaskListScreenMobile> {
           Padding(
             padding: const EdgeInsets.only(right: 8.0),
             child: PopupMenuButton<int>(
-              icon: const Icon(Icons.more_vert, color: Color(0xFF1E293B)),
-              color: Colors.white,
+              icon: Icon(Icons.more_vert, color: colorScheme.onSurface),
+              color: colorScheme.surface,
               surfaceTintColor: Colors.transparent,
               position: PopupMenuPosition.under,
               elevation: 4,
@@ -141,48 +136,48 @@ class _TaskListScreenMobileState extends ConsumerState<TaskListScreenMobile> {
                 }
               },
               itemBuilder: (context) => [
-                const PopupMenuItem(
+                PopupMenuItem(
                   value: 1,
                   height: 48,
-                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(Icons.folder_outlined,
-                          color: Color(0xFF64748B), size: 20),
-                      SizedBox(width: 24),
+                          color: colorScheme.onSurfaceVariant, size: 20),
+                      const SizedBox(width: 24),
                       Text('Gestionar proyectos',
-                          style: TextStyle(color: Color(0xFF1E293B))),
+                          style: TextStyle(color: colorScheme.onSurface)),
                     ],
                   ),
                 ),
-                const PopupMenuItem(
+                PopupMenuItem(
                   value: 2,
                   height: 48,
-                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(Icons.label_outlined,
-                          color: Color(0xFF64748B), size: 20),
-                      SizedBox(width: 24),
+                          color: colorScheme.onSurfaceVariant, size: 20),
+                      const SizedBox(width: 24),
                       Text('Gestionar etiquetas',
-                          style: TextStyle(color: Color(0xFF1E293B))),
+                          style: TextStyle(color: colorScheme.onSurface)),
                     ],
                   ),
                 ),
-                const PopupMenuItem(
+                PopupMenuItem(
                   value: 3,
                   height: 48,
-                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(Icons.auto_graph_outlined,
-                          color: Color(0xFF64748B), size: 20),
-                      SizedBox(width: 24),
+                          color: colorScheme.onSurfaceVariant, size: 20),
+                      const SizedBox(width: 24),
                       Text('Gestionar hábitos',
-                          style: TextStyle(color: Color(0xFF1E293B))),
+                          style: TextStyle(color: colorScheme.onSurface)),
                     ],
                   ),
                 ),
@@ -192,7 +187,7 @@ class _TaskListScreenMobileState extends ConsumerState<TaskListScreenMobile> {
           Padding(
             padding: const EdgeInsets.only(right: 8.0),
             child: IconButton(
-              icon: const Icon(Icons.settings, color: Color(0xFF1E293B)),
+              icon: Icon(Icons.settings, color: colorScheme.onSurface),
               onPressed: () {
                 Navigator.push(
                   context,
@@ -207,10 +202,10 @@ class _TaskListScreenMobileState extends ConsumerState<TaskListScreenMobile> {
       floatingActionButton: SpeedDial(
         icon: Icons.add,
         activeIcon: Icons.close,
-        backgroundColor: const Color(0xFF6366F1),
-        foregroundColor: Colors.white,
-        activeBackgroundColor: const Color(0xFF4F46E5),
-        activeForegroundColor: Colors.white,
+        backgroundColor: colorScheme.primary,
+        foregroundColor: colorScheme.onPrimary,
+        activeBackgroundColor: colorScheme.primary,
+        activeForegroundColor: colorScheme.onPrimary,
         overlayColor: Colors.black,
         overlayOpacity: 0.4,
         spacing: 12,
@@ -219,15 +214,14 @@ class _TaskListScreenMobileState extends ConsumerState<TaskListScreenMobile> {
         ),
         children: [
           SpeedDialChild(
-            child: const Icon(Icons.check_circle_outline,
-                color: Color(0xFF6366F1)),
-            backgroundColor: Colors.white,
+            child: Icon(Icons.check_circle_outline, color: colorScheme.primary),
+            backgroundColor: colorScheme.surface,
             shape: const CircleBorder(),
             onTap: () => _openTaskForm(),
           ),
           SpeedDialChild(
             child: const Icon(Icons.folder_outlined, color: Color(0xFF0284C7)),
-            backgroundColor: Colors.white,
+            backgroundColor: colorScheme.surface,
             shape: const CircleBorder(),
             onTap: () {
               showDialog(
@@ -238,7 +232,7 @@ class _TaskListScreenMobileState extends ConsumerState<TaskListScreenMobile> {
           ),
           SpeedDialChild(
             child: const Icon(Icons.label_outline, color: Color(0xFFDB2777)),
-            backgroundColor: Colors.white,
+            backgroundColor: colorScheme.surface,
             shape: const CircleBorder(),
             onTap: () {
               showDialog(
@@ -251,20 +245,17 @@ class _TaskListScreenMobileState extends ConsumerState<TaskListScreenMobile> {
       ),
       body: Column(
         children: [
-          const Divider(color: Color(0xFFE2E8F0), height: 1),
+          Divider(color: colorScheme.outline.withValues(alpha: 0.2), height: 1),
           const MobileHabitsSection(),
           const SizedBox(height: 8),
-          const Divider(color: Color(0xFFE2E8F0), height: 1),
+          Divider(color: colorScheme.outline.withValues(alpha: 0.2), height: 1),
           Container(
             alignment: Alignment.centerLeft,
             margin:
                 const EdgeInsets.only(left: 16, right: 16, top: 8, bottom: 8),
-            child: const Text(
+            child: Text(
               "Tareas",
-              style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF1E293B)),
+              style: textTheme.displayMedium?.copyWith(fontSize: 20),
               textAlign: TextAlign.left,
             ),
           ),
@@ -273,10 +264,10 @@ class _TaskListScreenMobileState extends ConsumerState<TaskListScreenMobile> {
             child: tasksAsync.when(
               data: (tasks) {
                 if (tasks.isEmpty) {
-                  return const Center(
+                  return Center(
                     child: Text(
                       'No hay tareas para este filtro.',
-                      style: TextStyle(color: Color(0xFF94A3B8)),
+                      style: TextStyle(color: colorScheme.outline),
                     ),
                   );
                 }

@@ -80,9 +80,10 @@ class AegisButton extends StatelessWidget {
                     child: Text(
                       text,
                       overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: textColor,
                             fontWeight: FontWeight.bold,
+                            fontSize: 15,
                           ),
                     ),
                   ),

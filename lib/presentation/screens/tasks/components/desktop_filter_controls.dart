@@ -175,23 +175,21 @@ class _ActionButtonsRow extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        SizedBox(
-          width: 180,
-          child: AegisButton(
-            text: 'Nueva Tarea',
-            icon: Icons.add,
-            type: ButtonType.primary,
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (context) => const TaskFormDesktop(),
-              );
-            },
-          ),
+        AegisButton(
+          text: 'Nueva Tarea',
+          icon: Icons.add,
+          type: ButtonType.primary,
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (context) => const TaskFormDesktop(),
+            );
+          },
         ),
         const SizedBox(width: 12),
         Container(
-          height: 56,
+          height: 48,
+          width: 48,
           decoration: BoxDecoration(
             color: colorScheme.surface,
             borderRadius: BorderRadius.circular(16),
@@ -204,6 +202,7 @@ class _ActionButtonsRow extends StatelessWidget {
             surfaceTintColor: Colors.transparent,
             position: PopupMenuPosition.under,
             elevation: 4,
+            padding: EdgeInsets.zero,
             onSelected: (value) {
               if (value == 1) {
                 showModalBottomSheet(
