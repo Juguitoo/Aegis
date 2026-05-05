@@ -94,7 +94,7 @@ class _TaskListScreenMobileState extends ConsumerState<TaskListScreenMobile> {
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Text(
             'Principal',
-            style: textTheme.displayLarge?.copyWith(fontSize: 24),
+            style: textTheme.displayLarge,
           ),
         ),
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -147,7 +147,8 @@ class _TaskListScreenMobileState extends ConsumerState<TaskListScreenMobile> {
                           color: colorScheme.onSurfaceVariant, size: 20),
                       const SizedBox(width: 24),
                       Text('Gestionar proyectos',
-                          style: TextStyle(color: colorScheme.onSurface)),
+                          style: textTheme.bodyMedium
+                              ?.copyWith(color: colorScheme.onSurface)),
                     ],
                   ),
                 ),
@@ -162,7 +163,8 @@ class _TaskListScreenMobileState extends ConsumerState<TaskListScreenMobile> {
                           color: colorScheme.onSurfaceVariant, size: 20),
                       const SizedBox(width: 24),
                       Text('Gestionar etiquetas',
-                          style: TextStyle(color: colorScheme.onSurface)),
+                          style: textTheme.bodyMedium
+                              ?.copyWith(color: colorScheme.onSurface)),
                     ],
                   ),
                 ),
@@ -177,7 +179,8 @@ class _TaskListScreenMobileState extends ConsumerState<TaskListScreenMobile> {
                           color: colorScheme.onSurfaceVariant, size: 20),
                       const SizedBox(width: 24),
                       Text('Gestionar hábitos',
-                          style: TextStyle(color: colorScheme.onSurface)),
+                          style: textTheme.bodyMedium
+                              ?.copyWith(color: colorScheme.onSurface)),
                     ],
                   ),
                 ),
@@ -255,7 +258,7 @@ class _TaskListScreenMobileState extends ConsumerState<TaskListScreenMobile> {
                 const EdgeInsets.only(left: 16, right: 16, top: 8, bottom: 8),
             child: Text(
               "Tareas",
-              style: textTheme.displayMedium?.copyWith(fontSize: 20),
+              style: textTheme.displayMedium,
               textAlign: TextAlign.left,
             ),
           ),

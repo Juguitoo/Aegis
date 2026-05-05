@@ -175,6 +175,7 @@ class _DigitCard extends StatelessWidget {
           fontWeight: FontWeight.w600,
           color: Color(0xFFE5E5EA),
           height: 1.0,
+          fontFamily: 'Roboto',
         ),
       ),
     );

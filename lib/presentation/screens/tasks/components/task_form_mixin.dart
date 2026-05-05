@@ -1,3 +1,4 @@
+import 'package:aegis/presentation/viewmodels/timer_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:drift/drift.dart' hide Column;
@@ -311,6 +312,13 @@ mixin TaskFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
             checklist: validChecklist,
           );
 
+      final currentTimerTask = ref.read(timerViewModelProvider).assignedTask;
+      if (currentTimerTask?.id == updatedTask.id) {
+        ref
+            .read(timerViewModelProvider.notifier)
+            .updateAssignedTask(updatedTask);
+      }
+
       if (mounted) {
         Navigator.of(context).pop();
         _showSnackBar('Tarea actualizada correctamente');
@@ -330,6 +338,12 @@ mixin TaskFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
       await ref
           .read(taskListViewModelProvider.notifier)
           .deleteTask(initialTask!);
+
+      final currentTimerTask = ref.read(timerViewModelProvider).assignedTask;
+      if (currentTimerTask?.id == initialTask!.id) {
+        ref.read(timerViewModelProvider.notifier).clearAssignedTask();
+      }
+
       if (mounted) {
         Navigator.of(context).pop();
         _showSnackBar('Tarea eliminada');

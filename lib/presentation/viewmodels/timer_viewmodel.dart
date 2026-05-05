@@ -475,6 +475,13 @@ class TimerViewmodel extends Notifier<TimerState> with WidgetsBindingObserver {
     );
   }
 
+  void updateAssignedTask(Task updatedTask) {
+    if (state.assignedTask != null &&
+        state.assignedTask!.id == updatedTask.id) {
+      state = state.copyWith(assignedTask: updatedTask);
+    }
+  }
+
   Future<void> _showSessionCompleteNotification() async {
     final title = state.mode == TimerMode.focus
         ? '¡Fase de concentración terminada!'

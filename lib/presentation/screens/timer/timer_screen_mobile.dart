@@ -5,6 +5,7 @@ import 'package:aegis/presentation/screens/timer/components/tasks_panel_mobile.d
 import 'package:aegis/presentation/viewmodels/timer_state.dart';
 import 'package:aegis/presentation/viewmodels/timer_viewmodel.dart';
 import 'package:aegis/presentation/widgets/timer_control_button.dart';
+import 'package:aegis/presentation/widgets/aegis_buttons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
@@ -15,6 +16,9 @@ class TimerScreenMobile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     ref.listen<TimerState>(timerViewModelProvider, (previous, next) {
       if (previous?.pendingSuggestion == null &&
           next.pendingSuggestion != null) {
@@ -26,24 +30,23 @@ class TimerScreenMobile extends ConsumerWidget {
             return Dialog(
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(24)),
-              backgroundColor: Colors.white,
+              backgroundColor: colorScheme.surface,
+              surfaceTintColor: Colors.transparent,
               child: Padding(
                 padding: const EdgeInsets.all(24.0),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Row(
+                    Row(
                       children: [
                         Icon(Icons.psychology,
-                            color: Color(0xFF6366F1), size: 28),
-                        SizedBox(width: 12),
+                            color: colorScheme.primary, size: 28),
+                        const SizedBox(width: 12),
                         Expanded(
                           child: Text(
                             'Ajuste Dinámico',
-                            style: TextStyle(
+                            style: textTheme.displayMedium?.copyWith(
                               fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF0F172A),
                             ),
                           ),
                         ),
@@ -52,56 +55,37 @@ class TimerScreenMobile extends ConsumerWidget {
                     const SizedBox(height: 16),
                     Text(
                       suggestion.reason,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        color: Color(0xFF475569),
+                      style: textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
                         height: 1.5,
                       ),
                     ),
                     const SizedBox(height: 24),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        TextButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                            ref
-                                .read(timerViewModelProvider.notifier)
-                                .rejectSuggestion();
-                          },
-                          child: const Text(
-                            'Omitir',
-                            style: TextStyle(
-                              color: Color(0xFF94A3B8),
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
+                        Expanded(
+                          child: AegisButton(
+                            text: 'Omitir',
+                            type: ButtonType.secondary,
+                            onPressed: () {
+                              Navigator.pop(context);
+                              ref
+                                  .read(timerViewModelProvider.notifier)
+                                  .rejectSuggestion();
+                            },
                           ),
                         ),
                         const SizedBox(width: 12),
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF6366F1),
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 12),
-                            elevation: 0,
-                          ),
-                          onPressed: () {
-                            Navigator.pop(context);
-                            ref
-                                .read(timerViewModelProvider.notifier)
-                                .acceptSuggestion();
-                          },
-                          child: const Text(
-                            'Aceptar',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
+                        Expanded(
+                          child: AegisButton(
+                            text: 'Aceptar',
+                            type: ButtonType.primary,
+                            onPressed: () {
+                              Navigator.pop(context);
+                              ref
+                                  .read(timerViewModelProvider.notifier)
+                                  .acceptSuggestion();
+                            },
                           ),
                         ),
                       ],
@@ -122,22 +106,18 @@ class TimerScreenMobile extends ConsumerWidget {
         : 1.0;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         titleSpacing: 0,
-        title: const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.0),
+        title: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Text(
             'Temporizador',
-            style: TextStyle(
-              color: Color(0xFF1E293B),
-              fontWeight: FontWeight.bold,
-              fontSize: 24,
-            ),
+            style: textTheme.displayLarge,
           ),
         ),
-        backgroundColor: const Color(0xFFF8FAFC),
-        foregroundColor: const Color(0xFF1E293B),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        foregroundColor: colorScheme.onSurface,
         elevation: 0,
         scrolledUnderElevation: 0,
         surfaceTintColor: Colors.transparent,
@@ -146,8 +126,7 @@ class TimerScreenMobile extends ConsumerWidget {
             padding: const EdgeInsets.only(right: 8.0),
             child: IconButton(
               iconSize: 28,
-              icon:
-                  const Icon(Icons.self_improvement, color: Color(0xFF1E293B)),
+              icon: Icon(Icons.self_improvement, color: colorScheme.onSurface),
               onPressed: () {
                 Navigator.push(
                   context,
@@ -161,7 +140,7 @@ class TimerScreenMobile extends ConsumerWidget {
             padding: const EdgeInsets.only(right: 8.0),
             child: IconButton(
               iconSize: 28,
-              icon: const Icon(Icons.settings, color: Color(0xFF1E293B)),
+              icon: Icon(Icons.settings, color: colorScheme.onSurface),
               onPressed: () {
                 Navigator.push(
                   context,
@@ -176,11 +155,12 @@ class TimerScreenMobile extends ConsumerWidget {
       body: SafeArea(
         child: Column(
           children: [
-            const Divider(color: Color(0xFFE2E8F0), height: 1),
+            Divider(
+                color: colorScheme.outline.withValues(alpha: 0.2), height: 1),
             const Spacer(flex: 1),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
-              child: _buildDynamicModePanel(ref, timerState),
+              child: _buildDynamicModePanel(ref, timerState, context),
             ),
             const Spacer(flex: 2),
             Stack(
@@ -190,19 +170,13 @@ class TimerScreenMobile extends ConsumerWidget {
                   radius: 140.0,
                   lineWidth: 20.0,
                   percent: percent,
-                  progressColor: const Color(0xFF828BFA),
-                  backgroundColor: const Color(0xFFF1F5F9),
+                  progressColor: colorScheme.primary.withValues(alpha: 0.8),
+                  backgroundColor: colorScheme.secondary,
                   circularStrokeCap: CircularStrokeCap.round,
                   animateFromLastPercent: true,
                 ),
-                Text(
-                  FormatUtils.formatTime(timerState.remainingSeconds),
-                  style: const TextStyle(
-                    fontSize: 64,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF1E293B),
-                  ),
-                ),
+                Text(FormatUtils.formatTime(timerState.remainingSeconds),
+                    style: AppTheme.timerDisplay),
               ],
             ),
             const Spacer(flex: 2),
@@ -219,17 +193,21 @@ class TimerScreenMobile extends ConsumerWidget {
     );
   }
 
-  Widget _buildDynamicModePanel(WidgetRef ref, TimerState state) {
+  Widget _buildDynamicModePanel(
+      WidgetRef ref, TimerState state, BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: colorScheme.outline.withValues(alpha: 0.2)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(5),
+            color: colorScheme.onSurface.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -238,51 +216,56 @@ class TimerScreenMobile extends ConsumerWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const Column(
+          Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 "Modo Dinámico",
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 15,
-                    color: Color(0xFF1E293B)),
+                style: textTheme.bodyLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               Text(
                 "Ajuste inteligente de intervalos",
-                style: TextStyle(fontSize: 12, color: Color(0xFF94A3B8)),
+                style: textTheme.bodySmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
               ),
             ],
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
-            spacing: 8,
             children: [
               IconButton(
                 icon: Icon(
                   Icons.info_outline,
                   size: 24,
-                  color: Color(0xFF94A3B8),
+                  color: colorScheme.onSurfaceVariant,
                 ),
                 onPressed: () {
                   showDialog(
                     context: ref.context,
                     builder: (context) {
                       return AlertDialog(
-                        title: const Text("Modo Dinámico"),
-                        content: const Text(
+                        backgroundColor: colorScheme.surface,
+                        surfaceTintColor: Colors.transparent,
+                        title: Text("Modo Dinámico",
+                            style: textTheme.displayMedium),
+                        content: Text(
                           "Cuando el Modo Dinámico está activado, el temporizador puede sugerirte ajustes personalizados basados en tu rendimiento, estado actual e interrupciones. Esto te ayuda a mantener un equilibrio óptimo entre concentración y descanso.",
-                          style:
-                              TextStyle(fontSize: 14, color: Color(0xFF475569)),
+                          style: textTheme.bodyMedium?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                          ),
                         ),
                         actions: [
                           TextButton(
                             onPressed: () => Navigator.pop(context),
-                            child: const Text(
+                            child: Text(
                               "Cerrar",
                               style: TextStyle(
-                                  color: Color(0xFF1E293B),
-                                  fontWeight: FontWeight.bold),
+                                color: colorScheme.onSurface,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         ],
@@ -291,15 +274,16 @@ class TimerScreenMobile extends ConsumerWidget {
                   );
                 },
               ),
+              const SizedBox(width: 8),
               Switch(
                 value: state.isDynamicModeActive,
                 onChanged: (value) {
                   ref.read(timerViewModelProvider.notifier).toggleDynamicMode();
                 },
-                activeThumbColor: const Color(0xFF6366F1),
-                activeTrackColor: const Color(0xFF6366F1).withAlpha(50),
-                inactiveThumbColor: Colors.white,
-                inactiveTrackColor: const Color(0xFFE2E8F0),
+                activeThumbColor: colorScheme.primary,
+                activeTrackColor: colorScheme.primary.withValues(alpha: 0.2),
+                inactiveThumbColor: colorScheme.surface,
+                inactiveTrackColor: colorScheme.outline.withValues(alpha: 0.3),
               ),
             ],
           )

@@ -37,7 +37,7 @@ class MobileHabitsSection extends ConsumerWidget {
             children: [
               Text(
                 "Hábitos",
-                style: textTheme.displayMedium?.copyWith(fontSize: 20),
+                style: textTheme.displayMedium,
               ),
               IconButton(
                 icon: const Icon(Icons.add_circle_outline),
