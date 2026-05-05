@@ -40,4 +40,17 @@ class FormatUtils {
     final seconds = (totalSeconds % 60).toString().padLeft(2, '0');
     return '$minutes:$seconds';
   }
+
+  static String getPriorityText(int priority) {
+    switch (priority) {
+      case 1:
+        return 'Baja';
+      case 2:
+        return 'Media';
+      case 3:
+        return 'Alta';
+      default:
+        return 'Ninguna';
+    }
+  }
 }

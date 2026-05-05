@@ -28,4 +28,17 @@ class ColorUtils {
   static String colorToHex(Color color) {
     return '#${color.value.toRadixString(16).substring(2).toUpperCase()}';
   }
+
+  static Color getPriorityColor(int priority, ColorScheme scheme) {
+    switch (priority) {
+      case 1:
+        return const Color(0xFF22C55E);
+      case 2:
+        return const Color(0xFFEAB308);
+      case 3:
+        return scheme.error;
+      default:
+        return scheme.outline.withValues(alpha: 0.3);
+    }
+  }
 }
