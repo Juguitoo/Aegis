@@ -31,7 +31,18 @@ La aplicación está construida siguiendo los principios de **Clean Architecture
 
 ## 🚀 Instalación y Ejecución
 
-Para ejecutar este proyecto en tu entorno local, asegúrate de tener Flutter instalado y configurado.
+Para poder ejecutar este proyecto sigue estos pasos para configurar tu entorno local correctamente.
+
+### 📋 Requisitos Previos
+
+*   **[Flutter SDK](https://docs.flutter.dev/get-started/install):** Versión `>=3.4.0`
+*   **Para compilar en Windows:** Es obligatorio instalar **[Visual Studio](https://visualstudio.microsoft.com/downloads/)** (la versión completa de IDE, no VS Code) y marcar la carga de trabajo *"Desarrollo para el escritorio con C++"* durante la instalación.
+*   **Para compilar en Android:** 
+    1. Instala **[Android Studio](https://developer.android.com/studio)**. 
+    2. Abre el **SDK Manager** (dentro de Android Studio) y asegúrate de tener instalado al menos un **Android SDK** reciente y las **Android SDK Command-line Tools** (pestaña *SDK Tools*).
+    3. Abre tu terminal y acepta las licencias ejecutando: `flutter doctor --android-licenses`
+
+### 🛠️ Instalación
 
 1. **Clonar el repositorio:**
    ```bash
@@ -57,6 +68,14 @@ Dado que el proyecto utiliza generación de código para la base de datos, es fu
        ```bash
        flutter run -d android
        ```
+### 🩺 Solución de problemas (Troubleshooting)
+
+Si la aplicación no compila o tienes conflictos con tu entorno local, ejecuta la herramienta de diagnóstico de Flutter:
+
+```bash
+flutter doctor -v
+```
+Este comando escaneará tu ordenador y te mostrará una lista de lo que está correctamente instalado y lo que falta. Presta especial atención a cualquier elemento marcado con una cruz roja ([x]) y sigue las instrucciones que la propia consola te proporcionará para solucionarlo.
 
 ## 📱 Capturas de Pantalla
 
