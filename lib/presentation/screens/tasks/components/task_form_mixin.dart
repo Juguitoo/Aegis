@@ -98,7 +98,7 @@ mixin TaskFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
       context: context,
       initialDate: selectedDueDate ?? DateTime.now(),
       firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
+      lastDate: DateTime(DateTime.now().year + 50),
       locale: const Locale('es', 'ES'),
       cancelText: 'Cancelar',
       confirmText: 'Aceptar',

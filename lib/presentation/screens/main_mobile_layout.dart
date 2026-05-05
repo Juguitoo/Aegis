@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:aegis/core/providers/general_providers.dart';
 import 'package:aegis/core/utils/native_app_monitor.dart';
 import 'package:aegis/core/services/notification_service.dart';
 import 'package:aegis/presentation/screens/blocker/block_overlay_screen.dart';
@@ -12,10 +13,6 @@ import 'package:aegis/presentation/viewmodels/calendar_viewmodel.dart';
 import 'package:aegis/presentation/widgets/permission_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
-
-final navigationIndexProvider = StateProvider<int>((ref) => 2);
-final taskToOpenProvider = StateProvider<int?>((ref) => null);
 
 class MainMobileLayout extends ConsumerStatefulWidget {
   final Widget? floatingActionButton;

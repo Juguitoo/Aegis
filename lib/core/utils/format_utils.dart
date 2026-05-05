@@ -1,3 +1,6 @@
+import 'package:aegis/presentation/viewmodels/statistics_viewmodel.dart';
+import 'package:intl/intl.dart';
+
 class FormatUtils {
   FormatUtils._();
 
@@ -51,6 +54,18 @@ class FormatUtils {
         return 'Alta';
       default:
         return 'Ninguna';
+    }
+  }
+
+  static String formatDateRange(
+      DateTime start, DateTime end, ChartPeriod period) {
+    final monthFormat = DateFormat('MMM', 'es');
+    if (period == ChartPeriod.week) {
+      return '${start.day} ${monthFormat.format(start)[0].toUpperCase()}${monthFormat.format(start).substring(1)} - ${end.day} ${monthFormat.format(end)[0].toUpperCase()}${monthFormat.format(end).substring(1)}';
+    } else if (period == ChartPeriod.month) {
+      return '${monthFormat.format(start)[0].toUpperCase()}${monthFormat.format(start).substring(1)} ${start.year}';
+    } else {
+      return '${start.year}';
     }
   }
 }

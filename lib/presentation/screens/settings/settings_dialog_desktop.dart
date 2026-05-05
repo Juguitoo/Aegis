@@ -1,6 +1,8 @@
+import 'package:aegis/core/providers/general_providers.dart';
 import 'package:aegis/data/local/database/app_database.dart';
 import 'package:aegis/presentation/viewmodels/settings_viewmodel.dart';
 import 'package:aegis/presentation/viewmodels/backup_viewmodel.dart';
+import 'package:aegis/presentation/widgets/aegis_buttons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -89,6 +91,7 @@ class _SettingsDialogState extends ConsumerState<SettingsDialogDesktop> {
     });
 
     final isBackupLoading = ref.watch(backupViewModelProvider).isLoading;
+    final isDevMode = ref.watch(devModeProvider); // CORRECCIÓN AQUÍ
 
     return AlertDialog(
       backgroundColor: Colors.white,
@@ -182,6 +185,24 @@ class _SettingsDialogState extends ConsumerState<SettingsDialogDesktop> {
                       ),
                     ],
                   ),
+                  const SizedBox(height: 24),
+                  const Divider(color: Color(0xFFE2E8F0)),
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Modo Desarrollador',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF475569))),
+                      Switch(
+                          value: isDevMode,
+                          activeThumbColor: const Color(0xFF6366F1),
+                          onChanged: (bool newValue) {
+                            ref.read(devModeProvider.notifier).state = newValue;
+                          }),
+                    ],
+                  ),
                 ],
               ),
             ),
@@ -198,28 +219,21 @@ class _SettingsDialogState extends ConsumerState<SettingsDialogDesktop> {
         ),
       ),
       actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('Cancelar',
-              style: TextStyle(color: Color(0xFF64748B))),
-        ),
-        ElevatedButton(
-          onPressed: () {
-            ref.read(settingsViewModelProvider.notifier).upsertSettings(
-                  pomodoroDuration: _pomodoro.toInt(),
-                  shortBreakDuration: _shortBreak.toInt(),
-                  longBreakDuration: _longBreak.toInt(),
-                );
-            Navigator.pop(context);
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF6366F1),
-            foregroundColor: Colors.white,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          ),
-          child: const Text('Guardar'),
-        ),
+        AegisButton(
+            text: 'Cancelar',
+            onPressed: () => Navigator.pop(context),
+            type: ButtonType.secondary),
+        AegisButton(
+            text: 'Guardar',
+            onPressed: () {
+              ref.read(settingsViewModelProvider.notifier).upsertSettings(
+                    pomodoroDuration: _pomodoro.toInt(),
+                    shortBreakDuration: _shortBreak.toInt(),
+                    longBreakDuration: _longBreak.toInt(),
+                  );
+              Navigator.pop(context);
+            },
+            type: ButtonType.primary),
       ],
     );
   }

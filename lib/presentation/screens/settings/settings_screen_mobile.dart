@@ -1,3 +1,4 @@
+import 'package:aegis/core/providers/general_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:aegis/presentation/screens/settings/timer_settings_mobile.dart';
@@ -72,6 +73,8 @@ class SettingsScreenMobile extends ConsumerWidget {
     });
 
     final isBackupLoading = ref.watch(backupViewModelProvider).isLoading;
+    // CORRECCIÓN: Para escuchar el estado y que se repinte la pantalla
+    final isDevMode = ref.watch(devModeProvider);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
@@ -179,6 +182,31 @@ class SettingsScreenMobile extends ConsumerWidget {
                   );
                 },
               ),
+              const SizedBox(height: 24),
+              const Padding(
+                padding: EdgeInsets.only(left: 8.0, bottom: 8.0),
+                child: Text('AVANZADO',
+                    style: TextStyle(
+                        color: Color(0xFF64748B),
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold)),
+              ),
+              _SettingsTile(
+                icon: Icons.developer_mode,
+                title: 'Modo Desarrollador',
+                subtitle: 'Habilita herramientas y botones de prueba',
+                iconColor: Colors.deepPurple,
+                trailing: Switch(
+                  value: isDevMode,
+                  activeThumbColor: const Color(0xFF6366F1),
+                  onChanged: (bool newValue) {
+                    ref.read(devModeProvider.notifier).state = newValue;
+                  },
+                ),
+                onTap: () {
+                  ref.read(devModeProvider.notifier).state = !isDevMode;
+                },
+              ),
             ],
           ),
           if (isBackupLoading)
@@ -200,6 +228,7 @@ class _SettingsTile extends StatelessWidget {
   final String subtitle;
   final VoidCallback onTap;
   final Color? iconColor;
+  final Widget? trailing; // Añadido para el Switch
 
   const _SettingsTile({
     required this.icon,
@@ -207,6 +236,7 @@ class _SettingsTile extends StatelessWidget {
     required this.subtitle,
     required this.onTap,
     this.iconColor,
+    this.trailing,
   });
 
   @override
@@ -265,7 +295,8 @@ class _SettingsTile extends StatelessWidget {
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right, color: Color(0xFFCBD5E1)),
+            trailing ??
+                const Icon(Icons.chevron_right, color: Color(0xFFCBD5E1)),
           ],
         ),
       ),

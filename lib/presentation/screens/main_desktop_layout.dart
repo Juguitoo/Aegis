@@ -1,3 +1,4 @@
+import 'package:aegis/core/providers/general_providers.dart';
 import 'package:aegis/presentation/screens/calendar/calendar_screen_desktop.dart';
 import 'package:aegis/presentation/screens/diary/diary_screen_desktop.dart';
 import 'package:aegis/presentation/screens/statistics/statistics_screen_desktop.dart';
@@ -7,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:aegis/presentation/screens/settings/settings_dialog_desktop.dart';
 import 'package:aegis/presentation/viewmodels/settings_viewmodel.dart';
-import 'package:aegis/presentation/screens/main_mobile_layout.dart';
 
 class MainDesktopLayout extends ConsumerWidget {
   const MainDesktopLayout({super.key});

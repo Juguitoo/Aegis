@@ -1,4 +1,4 @@
-import 'package:aegis/presentation/screens/main_mobile_layout.dart';
+import 'package:aegis/core/providers/general_providers.dart';
 import 'package:aegis/presentation/screens/projects/components/manage_projects_bottom_sheet.dart';
 import 'package:aegis/presentation/screens/settings/settings_screen_mobile.dart';
 import 'package:aegis/presentation/screens/tags/components/manage_tags_bottom_sheet.dart';
