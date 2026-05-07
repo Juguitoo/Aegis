@@ -43,7 +43,7 @@ class _DesktopHabitsWidget extends ConsumerWidget {
         List.generate(7, (index) => monday.add(Duration(days: index)));
 
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+      padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 24),
       decoration: BoxDecoration(
         color: colorScheme.surface,
         borderRadius: BorderRadius.circular(24),

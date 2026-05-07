@@ -173,8 +173,16 @@ class TimerScreenMobile extends ConsumerWidget {
                   circularStrokeCap: CircularStrokeCap.round,
                   animateFromLastPercent: true,
                 ),
-                Text(FormatUtils.formatTime(timerState.remainingSeconds),
-                    style: AppTheme.timerDisplay(colorScheme.onSurface)),
+                SizedBox(
+                  width: 220.0,
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      FormatUtils.formatTime(timerState.remainingSeconds),
+                      style: AppTheme.timerDisplay(colorScheme.onSurface),
+                    ),
+                  ),
+                ),
               ],
             ),
             const Spacer(flex: 2),

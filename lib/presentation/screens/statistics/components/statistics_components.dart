@@ -74,7 +74,6 @@ class StatisticsHeaderControls extends ConsumerWidget {
 
   Future<void> _pickDate(BuildContext context, WidgetRef ref) async {
     final state = ref.read(statisticsViewModelProvider);
-    // Este colorScheme ya viene con los colores correctos según el modo actual
     final colorScheme = Theme.of(context).colorScheme;
 
     final picked = await showDatePicker(
@@ -88,7 +87,6 @@ class StatisticsHeaderControls extends ConsumerWidget {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            // Asignamos directamente el esquema actual en lugar de forzar el light()
             colorScheme: colorScheme,
           ),
           child: Localizations.override(
@@ -131,10 +129,10 @@ class StatisticsHeaderControls extends ConsumerWidget {
     final textTheme = Theme.of(context).textTheme;
 
     return Row(
-      mainAxisSize: isMobile ? MainAxisSize.max : MainAxisSize.min,
-      mainAxisAlignment:
-          isMobile ? MainAxisAlignment.spaceBetween : MainAxisAlignment.start,
+      mainAxisSize: MainAxisSize.max,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
+        // 1. Sector izquierdo: Botones de periodo
         Container(
           decoration: BoxDecoration(
             color: colorScheme.secondary,
@@ -158,61 +156,77 @@ class StatisticsHeaderControls extends ConsumerWidget {
             ],
           ),
         ),
-        if (!isMobile) const SizedBox(width: 32),
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            IconButton(
-              padding: EdgeInsets.zero,
-              constraints: BoxConstraints(
-                  minWidth: isMobile ? 32 : 40, minHeight: isMobile ? 32 : 40),
-              icon: Icon(Icons.arrow_left,
-                  color: colorScheme.onSurfaceVariant,
-                  size: isMobile ? 24 : 28),
-              onPressed: () => _navigateDate(ref, false),
-            ),
-            SizedBox(width: isMobile ? 0 : 4),
-            InkWell(
-              onTap: () => _pickDate(context, ref),
-              borderRadius: BorderRadius.circular(12),
-              child: Container(
-                padding: EdgeInsets.symmetric(
-                    horizontal: isMobile ? 12.0 : 12.0,
-                    vertical: isMobile ? 8.0 : 8.0),
-                decoration: BoxDecoration(
-                  color: colorScheme.surface,
+
+        if (!isMobile)
+          const SizedBox(width: 32)
+        else
+          const SizedBox(width: 8), // Margen seguro de separación en móvil
+
+        // 2. Sector derecho: Controles de fecha (Envueltos en Expanded para que absorban la falta de espacio)
+        Expanded(
+          flex: isMobile ? 1 : 0,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment:
+                isMobile ? MainAxisAlignment.end : MainAxisAlignment.start,
+            children: [
+              IconButton(
+                padding: EdgeInsets.zero,
+                constraints: BoxConstraints(
+                    minWidth: isMobile ? 28 : 40,
+                    minHeight: isMobile ? 28 : 40),
+                icon: Icon(Icons.arrow_left,
+                    color: colorScheme.onSurfaceVariant,
+                    size: isMobile ? 24 : 28),
+                onPressed: () => _navigateDate(ref, false),
+              ),
+              // FLEXIBLE: Si la pantalla es pequeña, este contenedor cederá terreno
+              Flexible(
+                child: InkWell(
+                  onTap: () => _pickDate(context, ref),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                      color: colorScheme.outline.withValues(alpha: 0.2)),
-                ),
-                child: SizedBox(
-                  width: isMobile ? null : 150,
-                  child: Text(
-                    FormatUtils.formatDateRange(
-                        state.startDate, state.endDate, state.currentPeriod),
-                    textAlign: TextAlign.center,
-                    style:
-                        (isMobile ? textTheme.bodySmall : textTheme.bodyMedium)
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                        horizontal: isMobile ? 8.0 : 12.0,
+                        vertical: isMobile ? 6.0 : 8.0),
+                    decoration: BoxDecoration(
+                      color: colorScheme.surface,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                          color: colorScheme.outline.withValues(alpha: 0.2)),
+                    ),
+                    // FITTEDBOX: Encogerá la fuente del texto mágicamente si no cabe
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        FormatUtils.formatDateRange(state.startDate,
+                            state.endDate, state.currentPeriod),
+                        textAlign: TextAlign.center,
+                        style: (isMobile
+                                ? textTheme.bodySmall
+                                : textTheme.bodyMedium)
                             ?.copyWith(
-                      fontSize: isMobile ? null : 16,
-                      fontWeight: FontWeight.w600,
-                      color: colorScheme.onSurface,
+                          fontSize: isMobile ? null : 16,
+                          fontWeight: FontWeight.w600,
+                          color: colorScheme.onSurface,
+                        ),
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-            SizedBox(width: isMobile ? 0 : 4),
-            IconButton(
-              padding: EdgeInsets.zero,
-              constraints: BoxConstraints(
-                  minWidth: isMobile ? 32 : 40, minHeight: isMobile ? 32 : 40),
-              icon: Icon(Icons.arrow_right,
-                  color: colorScheme.onSurfaceVariant,
-                  size: isMobile ? 24 : 28),
-              onPressed: () => _navigateDate(ref, true),
-            ),
-          ],
+              IconButton(
+                padding: EdgeInsets.zero,
+                constraints: BoxConstraints(
+                    minWidth: isMobile ? 28 : 40,
+                    minHeight: isMobile ? 28 : 40),
+                icon: Icon(Icons.arrow_right,
+                    color: colorScheme.onSurfaceVariant,
+                    size: isMobile ? 24 : 28),
+                onPressed: () => _navigateDate(ref, true),
+              ),
+            ],
+          ),
         ),
       ],
     );

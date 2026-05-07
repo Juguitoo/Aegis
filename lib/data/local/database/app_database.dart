@@ -180,7 +180,28 @@ class AppDatabase extends _$AppDatabase {
     await delete(habits).go();
     await customStatement('PRAGMA foreign_keys = ON');
 
-    final existingProjects = await select(projects).get();
+    var existingProjects = await select(projects).get();
+
+    if (existingProjects.isEmpty) {
+      await batch((batch) {
+        batch.insertAll(projects, [
+          ProjectsCompanion.insert(
+            name: 'Personal',
+            colorHex: const Value('#3B82F6'),
+          ),
+          ProjectsCompanion.insert(
+            name: 'Trabajo',
+            colorHex: const Value('#10B981'),
+          ),
+          ProjectsCompanion.insert(
+            name: 'Estudios',
+            colorHex: const Value('#8B5CF6'),
+          ),
+        ]);
+      });
+      existingProjects = await select(projects).get();
+    }
+
     final projectIds = existingProjects.map((p) => p.id).toList();
 
     final h1Id = await into(habits).insert(
@@ -252,9 +273,18 @@ class AppDatabase extends _$AppDatabase {
 
   Future<void> deleteAllData() {
     return transaction(() async {
-      for (final table in allTables) {
-        await delete(table).go();
-      }
+      await delete(habitEntries).go();
+      await delete(taskTags).go();
+      await delete(subtasks).go();
+      await delete(tasks).go();
+      await delete(projects).go();
+      await delete(tags).go();
+      await delete(habits).go();
+      await delete(settings).go();
+      await delete(blacklistedApps).go();
+      await delete(focusSessions).go();
+      await delete(diaryNote).go();
+      await delete(events).go();
     });
   }
 }
