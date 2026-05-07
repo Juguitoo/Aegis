@@ -91,6 +91,8 @@ class _MainMobileLayoutState extends ConsumerState<MainMobileLayout>
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     ref.listen(blockedAppTriggerProvider, (previous, next) async {
       if (next != null) {
         await ref.read(nativeAppMonitorProvider).bringToForeground();
@@ -116,13 +118,13 @@ class _MainMobileLayoutState extends ConsumerState<MainMobileLayout>
     ];
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(child: screens[currentIndex]),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withAlpha(10),
+              color: colorScheme.shadow.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, -4),
             ),
@@ -134,9 +136,9 @@ class _MainMobileLayoutState extends ConsumerState<MainMobileLayout>
             ref.read(navigationIndexProvider.notifier).state = index;
           },
           type: BottomNavigationBarType.fixed,
-          backgroundColor: Colors.white,
-          selectedItemColor: const Color(0xFF6366F1),
-          unselectedItemColor: const Color(0xFF94A3B8),
+          backgroundColor: colorScheme.surface,
+          selectedItemColor: colorScheme.primary,
+          unselectedItemColor: colorScheme.onSurfaceVariant,
           showSelectedLabels: true,
           showUnselectedLabels: false,
           elevation: 0,

@@ -15,6 +15,7 @@ class MainDesktopLayout extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currentIndex = ref.watch(navigationIndexProvider);
+    final colorScheme = Theme.of(context).colorScheme;
 
     final screens = [
       const CalendarScreenDesktop(),
@@ -25,10 +26,14 @@ class MainDesktopLayout extends ConsumerWidget {
     ];
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Row(
         children: [
-          _SideNavigationRail(ref: ref, currentIndex: currentIndex),
+          _SideNavigationRail(currentIndex: currentIndex),
+          VerticalDivider(
+              width: 1,
+              thickness: 1,
+              color: colorScheme.outline.withValues(alpha: 0.15)),
           Expanded(
             child: screens[currentIndex],
           ),
@@ -38,32 +43,46 @@ class MainDesktopLayout extends ConsumerWidget {
   }
 }
 
-class _SideNavigationRail extends StatelessWidget {
-  final WidgetRef ref;
+class _SideNavigationRail extends ConsumerWidget {
   final int currentIndex;
 
   const _SideNavigationRail({
-    required this.ref,
     required this.currentIndex,
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final settingsAsync = ref.watch(settingsViewModelProvider);
+    final colorScheme = Theme.of(context).colorScheme;
+    final themeMode = ref.watch(themeModeProvider);
+    final isDark = themeMode == ThemeMode.dark;
 
     return Container(
-      width: 80,
-      color: Colors.white,
+      width: 88,
+      color: colorScheme.surface,
       child: Column(
         children: [
           const SizedBox(height: 24),
           Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: const Color(0xFF6366F1),
-              borderRadius: BorderRadius.circular(12),
+            padding: const EdgeInsets.all(8),
+            child: Image.asset(
+              'assets/icon/app_icon.png',
+              width: 44,
+              height: 44,
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) {
+                return Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: colorScheme.primary.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child:
+                      Icon(Icons.shield_outlined, color: colorScheme.primary),
+                );
+              },
             ),
-            child: const Icon(Icons.flash_on, color: Colors.white),
           ),
           const SizedBox(height: 48),
           _NavIcon(
@@ -77,22 +96,29 @@ class _SideNavigationRail extends StatelessWidget {
             onTap: () => ref.read(navigationIndexProvider.notifier).state = 1,
           ),
           _NavIcon(
-            icon: Icons.check_box,
+            icon: Icons.check_box_outlined,
             isSelected: currentIndex == 2,
             onTap: () => ref.read(navigationIndexProvider.notifier).state = 2,
           ),
           _NavIcon(
-            icon: Icons.bar_chart,
+            icon: Icons.bar_chart_rounded,
             isSelected: currentIndex == 3,
             onTap: () => ref.read(navigationIndexProvider.notifier).state = 3,
           ),
           _NavIcon(
-            icon: Icons.menu_book,
+            icon: Icons.menu_book_rounded,
             isSelected: currentIndex == 4,
             onTap: () => ref.read(navigationIndexProvider.notifier).state = 4,
           ),
           const Spacer(),
-          const _NavIcon(icon: Icons.dark_mode_outlined, isSelected: false),
+          _NavIcon(
+              icon:
+                  isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
+              isSelected: false,
+              onTap: () {
+                ref.read(themeModeProvider.notifier).state =
+                    isDark ? ThemeMode.light : ThemeMode.dark;
+              }),
           _NavIcon(
             icon: Icons.settings_outlined,
             isSelected: false,
@@ -132,6 +158,8 @@ class _NavIconState extends State<_NavIcon> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: MouseRegion(
@@ -143,24 +171,26 @@ class _NavIconState extends State<_NavIcon> {
         child: GestureDetector(
           onTap: widget.onTap,
           child: AnimatedContainer(
-            duration: const Duration(milliseconds: 150),
-            width: 48,
-            height: 48,
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeOutCubic,
+            width: 52,
+            height: 52,
             decoration: BoxDecoration(
               color: widget.isSelected
-                  ? const Color(0xFFEEF2FF)
+                  ? colorScheme.primary.withValues(alpha: 0.15)
                   : _isHovered
-                      ? const Color(0xFFF1F5F9)
-                      : Colors.white,
-              borderRadius: BorderRadius.circular(12),
+                      ? colorScheme.secondary.withValues(alpha: 0.5)
+                      : Colors.transparent,
+              borderRadius: BorderRadius.circular(16),
             ),
             child: Icon(
               widget.icon,
+              size: 26,
               color: widget.isSelected
-                  ? const Color(0xFF6366F1)
+                  ? colorScheme.primary
                   : _isHovered
-                      ? const Color(0xFF64748B)
-                      : const Color(0xFF94A3B8),
+                      ? colorScheme.onSurface
+                      : colorScheme.onSurfaceVariant,
             ),
           ),
         ),

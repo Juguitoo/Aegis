@@ -37,6 +37,7 @@ class _TaskListScreenMobileState extends ConsumerState<TaskListScreenMobile> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      useSafeArea: true,
       backgroundColor: Colors.transparent,
       builder: (context) => TaskFormMobile(task: task),
     );

@@ -174,7 +174,7 @@ class TimerScreenMobile extends ConsumerWidget {
                   animateFromLastPercent: true,
                 ),
                 Text(FormatUtils.formatTime(timerState.remainingSeconds),
-                    style: AppTheme.timerDisplay),
+                    style: AppTheme.timerDisplay(colorScheme.onSurface)),
               ],
             ),
             const Spacer(flex: 2),

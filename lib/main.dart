@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:ui';
+import 'package:aegis/core/providers/general_providers.dart';
 import 'package:aegis/core/services/notification_service.dart';
 import 'package:aegis/core/theme/app_theme.dart';
 import 'package:aegis/presentation/screens/main_desktop_layout.dart';
@@ -69,15 +70,9 @@ class AegisApp extends ConsumerWidget {
         Locale('es', 'ES'),
       ],
       locale: const Locale('es', 'ES'),
+      themeMode: ref.watch(themeModeProvider),
       theme: AppTheme.lightTheme,
-      darkTheme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF006A6A),
-          brightness: Brightness.dark,
-        ),
-        useMaterial3: true,
-      ),
-      themeMode: ThemeMode.light,
+      darkTheme: AppTheme.darkTheme,
       home: LayoutBuilder(
         builder: (context, constraints) {
           if (constraints.maxWidth < 800) {

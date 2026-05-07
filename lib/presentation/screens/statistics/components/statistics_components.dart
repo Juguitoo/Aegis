@@ -74,6 +74,7 @@ class StatisticsHeaderControls extends ConsumerWidget {
 
   Future<void> _pickDate(BuildContext context, WidgetRef ref) async {
     final state = ref.read(statisticsViewModelProvider);
+    // Este colorScheme ya viene con los colores correctos según el modo actual
     final colorScheme = Theme.of(context).colorScheme;
 
     final picked = await showDatePicker(
@@ -87,11 +88,8 @@ class StatisticsHeaderControls extends ConsumerWidget {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
-              primary: colorScheme.primary,
-              onPrimary: colorScheme.onPrimary,
-              onSurface: colorScheme.onSurface,
-            ),
+            // Asignamos directamente el esquema actual en lugar de forzar el light()
+            colorScheme: colorScheme,
           ),
           child: Localizations.override(
             context: context,

@@ -261,7 +261,7 @@ class TimerScreenDesktop extends ConsumerWidget {
           animateFromLastPercent: true,
         ),
         Text(FormatUtils.formatTime(remainingSeconds),
-            style: AppTheme.timerDisplay),
+            style: AppTheme.timerDisplay(colorScheme.onSurface)),
       ],
     );
   }

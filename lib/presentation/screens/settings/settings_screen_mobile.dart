@@ -78,24 +78,33 @@ class SettingsScreenMobile extends ConsumerWidget {
 
     final isBackupLoading = ref.watch(backupViewModelProvider).isLoading;
     final isDevMode = ref.watch(devModeProvider);
+    final themeMode = ref.watch(themeModeProvider);
+    final isDark = themeMode == ThemeMode.dark;
 
     return Scaffold(
-      backgroundColor: colorScheme.surface,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: colorScheme.surface,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         surfaceTintColor: Colors.transparent,
         title: Text(
           'Ajustes',
           style: textTheme.displayMedium,
         ),
         iconTheme: IconThemeData(color: colorScheme.onSurface),
-        elevation: 1,
+        elevation: 0,
+        scrolledUnderElevation: 1,
         shadowColor: colorScheme.shadow.withValues(alpha: 0.1),
       ),
       body: Stack(
         children: [
+          Divider(color: colorScheme.outline.withValues(alpha: 0.2), height: 1),
           ListView(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.only(
+              top: 16,
+              right: 16,
+              left: 16,
+              bottom: MediaQuery.paddingOf(context).bottom + 24,
+            ),
             children: [
               _SettingsTile(
                 icon: Icons.timer_outlined,
@@ -155,12 +164,13 @@ class SettingsScreenMobile extends ConsumerWidget {
               _SettingsTile(
                 icon: Icons.delete_forever_outlined,
                 title: 'Restablecer aplicación',
-                subtitle: 'Borra todos los datos.',
+                subtitle: 'Borra todos los datos de forma permanente.',
                 iconColor: colorScheme.error,
                 onTap: () {
                   showDialog(
                     context: context,
                     builder: (context) => AlertDialog(
+                      backgroundColor: colorScheme.surface,
                       title: const Text('¿Restablecer la aplicación?'),
                       content: const Text(
                           'Todos los datos de la aplicación (tareas, proyectos, configuraciones, etc.) se eliminarán de forma permanente. Esta acción no se puede deshacer.'),
@@ -185,18 +195,47 @@ class SettingsScreenMobile extends ConsumerWidget {
                   );
                 },
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 32),
               Padding(
-                padding: const EdgeInsets.only(left: 8.0, bottom: 8.0),
-                child: Text('Opciones avanzadas',
-                    style: textTheme.labelSmall
-                        ?.copyWith(color: colorScheme.onSurfaceVariant)),
+                padding: const EdgeInsets.only(left: 8.0, bottom: 12.0),
+                child: Text('APARIENCIA',
+                    style: textTheme.labelSmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1.2)),
+              ),
+              _SettingsTile(
+                icon: isDark ? Icons.dark_mode : Icons.light_mode,
+                title: 'Modo oscuro',
+                subtitle: 'Cambia entre el tema claro y oscuro',
+                iconColor: colorScheme.primary,
+                trailing: Switch(
+                  value: isDark,
+                  activeThumbColor: colorScheme.primary,
+                  onChanged: (bool newValue) {
+                    ref.read(themeModeProvider.notifier).state =
+                        newValue ? ThemeMode.dark : ThemeMode.light;
+                  },
+                ),
+                onTap: () {
+                  ref.read(themeModeProvider.notifier).state =
+                      isDark ? ThemeMode.light : ThemeMode.dark;
+                },
+              ),
+              const SizedBox(height: 32),
+              Padding(
+                padding: const EdgeInsets.only(left: 8.0, bottom: 12.0),
+                child: Text('AVANZADO',
+                    style: textTheme.labelSmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1.2)),
               ),
               _SettingsTile(
                 icon: Icons.developer_mode,
                 title: 'Modo desarrollador',
                 subtitle: 'Habilita herramientas y botones de prueba',
-                iconColor: Colors.deepPurple,
+                iconColor: Colors.deepPurpleAccent,
                 trailing: Switch(
                   value: isDevMode,
                   activeThumbColor: colorScheme.primary,
@@ -208,6 +247,7 @@ class SettingsScreenMobile extends ConsumerWidget {
                   ref.read(devModeProvider.notifier).state = !isDevMode;
                 },
               ),
+              const SizedBox(height: 32),
             ],
           ),
           if (isBackupLoading)
@@ -244,6 +284,7 @@ class _SettingsTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(16),
@@ -289,7 +330,9 @@ class _SettingsTile extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     subtitle,
-                    style: textTheme.bodySmall,
+                    style: textTheme.bodySmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
                   ),
                 ],
               ),

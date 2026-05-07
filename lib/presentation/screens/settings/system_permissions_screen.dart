@@ -56,64 +56,76 @@ class _SystemPermissionsScreenState
     final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
-      backgroundColor: colorScheme.surface,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: colorScheme.surface,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         surfaceTintColor: Colors.transparent,
         title: Text(
           'Permisos del sistema',
           style: textTheme.displayMedium,
         ),
         iconTheme: IconThemeData(color: colorScheme.onSurface),
-        elevation: 1,
+        elevation: 0,
+        scrolledUnderElevation: 1,
         shadowColor: colorScheme.shadow.withValues(alpha: 0.1),
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
+      body: Column(
         children: [
-          Text(
-            'Aegis necesita estos permisos para poder detectar distracciones y mostrar la pantalla de bloqueo. Pulsa sobre ellos para gestionarlos.',
-            style: textTheme.bodyMedium,
-          ),
-          const SizedBox(height: 24),
-          _PermissionItem(
-            title: 'Acceso a datos de uso',
-            description:
-                'Permite saber qué aplicación tienes abierta en pantalla en todo momento.',
-            icon: Icons.data_usage,
-            isGranted: _hasUsagePermission,
-            onTap: () =>
-                ref.read(nativeAppMonitorProvider).requestUsagePermission(),
-          ),
-          const SizedBox(height: 16),
-          _PermissionItem(
-            title: 'Mostrar sobre otras apps',
-            description:
-                'Permite lanzar la pantalla de advertencia por encima de tu distracción.',
-            icon: Icons.layers_outlined,
-            isGranted: _hasOverlayPermission,
-            onTap: () =>
-                ref.read(nativeAppMonitorProvider).requestOverlayPermission(),
-          ),
-          const SizedBox(height: 16),
-          _PermissionItem(
-            title: 'Notificaciones',
-            description:
-                'Permite que Aegis te avise sobre tareas y eventos programados.',
-            icon: Icons.notifications_active_outlined,
-            isGranted: _hasRequestedNotifications,
-            onTap: () async {
-              await NotificationService.requestPermissions();
-              if (mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content:
-                        const Text('Permisos de notificaciones solicitados.'),
-                    backgroundColor: colorScheme.primary,
+          Divider(color: colorScheme.outline.withValues(alpha: 0.2), height: 1),
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.all(16),
+              children: [
+                Text(
+                  'Aegis necesita estos permisos para poder detectar distracciones y mostrar la pantalla de bloqueo. Pulsa sobre ellos para gestionarlos.',
+                  style: textTheme.bodyMedium?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
                   ),
-                );
-              }
-            },
+                ),
+                const SizedBox(height: 24),
+                _PermissionItem(
+                  title: 'Acceso a datos de uso',
+                  description:
+                      'Permite saber qué aplicación tienes abierta en pantalla en todo momento.',
+                  icon: Icons.data_usage,
+                  isGranted: _hasUsagePermission,
+                  onTap: () => ref
+                      .read(nativeAppMonitorProvider)
+                      .requestUsagePermission(),
+                ),
+                const SizedBox(height: 16),
+                _PermissionItem(
+                  title: 'Mostrar sobre otras apps',
+                  description:
+                      'Permite lanzar la pantalla de advertencia por encima de tu distracción.',
+                  icon: Icons.layers_outlined,
+                  isGranted: _hasOverlayPermission,
+                  onTap: () => ref
+                      .read(nativeAppMonitorProvider)
+                      .requestOverlayPermission(),
+                ),
+                const SizedBox(height: 16),
+                _PermissionItem(
+                  title: 'Notificaciones',
+                  description:
+                      'Permite que Aegis te avise sobre tareas y eventos programados.',
+                  icon: Icons.notifications_active_outlined,
+                  isGranted: _hasRequestedNotifications,
+                  onTap: () async {
+                    await NotificationService.requestPermissions();
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: const Text(
+                              'Permisos de notificaciones solicitados.'),
+                          backgroundColor: colorScheme.primary,
+                        ),
+                      );
+                    }
+                  },
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -189,12 +201,15 @@ class _PermissionItem extends StatelessWidget {
                     title,
                     style: textTheme.bodyLarge?.copyWith(
                       fontWeight: FontWeight.bold,
+                      color: colorScheme.onSurface,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     description,
-                    style: textTheme.bodySmall,
+                    style: textTheme.bodySmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
                   ),
                 ],
               ),

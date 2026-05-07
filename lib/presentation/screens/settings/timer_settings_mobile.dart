@@ -22,16 +22,17 @@ class _TimerSettingsMobileState extends ConsumerState<TimerSettingsMobile> {
     final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
-      backgroundColor: colorScheme.surface,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: colorScheme.surface,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         surfaceTintColor: Colors.transparent,
         title: Text(
           'Temporizador',
           style: textTheme.displayMedium,
         ),
         iconTheme: IconThemeData(color: colorScheme.onSurface),
-        elevation: 1,
+        elevation: 0,
+        scrolledUnderElevation: 1,
         shadowColor: colorScheme.shadow.withValues(alpha: 0.1),
       ),
       body: settingsAsync.when(
@@ -40,56 +41,66 @@ class _TimerSettingsMobileState extends ConsumerState<TimerSettingsMobile> {
           _shortBreak ??= settings?.shortBreakDuration.toDouble() ?? 5.0;
           _longBreak ??= settings?.longBreakDuration.toDouble() ?? 15.0;
 
-          return ListView(
-            padding: const EdgeInsets.all(24),
+          return Column(
             children: [
-              Text(
-                'Configuración de intervalos',
-                style: textTheme.displayMedium,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Ajusta la duración por defecto para tus sesiones de enfoque y descansos.',
-                style: textTheme.bodyMedium,
-              ),
-              const SizedBox(height: 40),
-              _buildSliderSection(
-                label: 'Tiempo de foco',
-                value: _pomodoro!,
-                min: 5,
-                max: 90,
-                onChanged: (val) => setState(() => _pomodoro = val),
-                onChangeEnd: (val) {
-                  ref
-                      .read(settingsViewModelProvider.notifier)
-                      .upsertSettings(pomodoroDuration: val.toInt());
-                },
-              ),
-              const SizedBox(height: 32),
-              _buildSliderSection(
-                label: 'Descanso corto',
-                value: _shortBreak!,
-                min: 1,
-                max: 15,
-                onChanged: (val) => setState(() => _shortBreak = val),
-                onChangeEnd: (val) {
-                  ref
-                      .read(settingsViewModelProvider.notifier)
-                      .upsertSettings(shortBreakDuration: val.toInt());
-                },
-              ),
-              const SizedBox(height: 32),
-              _buildSliderSection(
-                label: 'Descanso largo',
-                value: _longBreak!,
-                min: 5,
-                max: 45,
-                onChanged: (val) => setState(() => _longBreak = val),
-                onChangeEnd: (val) {
-                  ref
-                      .read(settingsViewModelProvider.notifier)
-                      .upsertSettings(longBreakDuration: val.toInt());
-                },
+              Divider(
+                  color: colorScheme.outline.withValues(alpha: 0.2), height: 1),
+              Expanded(
+                child: ListView(
+                  padding: const EdgeInsets.all(24),
+                  children: [
+                    Text(
+                      'Configuración de intervalos',
+                      style: textTheme.displayMedium,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Ajusta la duración por defecto para tus sesiones de enfoque y descansos.',
+                      style: textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                    const SizedBox(height: 40),
+                    _buildSliderSection(
+                      label: 'Tiempo de foco',
+                      value: _pomodoro!,
+                      min: 5,
+                      max: 90,
+                      onChanged: (val) => setState(() => _pomodoro = val),
+                      onChangeEnd: (val) {
+                        ref
+                            .read(settingsViewModelProvider.notifier)
+                            .upsertSettings(pomodoroDuration: val.toInt());
+                      },
+                    ),
+                    const SizedBox(height: 32),
+                    _buildSliderSection(
+                      label: 'Descanso corto',
+                      value: _shortBreak!,
+                      min: 1,
+                      max: 15,
+                      onChanged: (val) => setState(() => _shortBreak = val),
+                      onChangeEnd: (val) {
+                        ref
+                            .read(settingsViewModelProvider.notifier)
+                            .upsertSettings(shortBreakDuration: val.toInt());
+                      },
+                    ),
+                    const SizedBox(height: 32),
+                    _buildSliderSection(
+                      label: 'Descanso largo',
+                      value: _longBreak!,
+                      min: 5,
+                      max: 45,
+                      onChanged: (val) => setState(() => _longBreak = val),
+                      onChangeEnd: (val) {
+                        ref
+                            .read(settingsViewModelProvider.notifier)
+                            .upsertSettings(longBreakDuration: val.toInt());
+                      },
+                    ),
+                  ],
+                ),
               ),
             ],
           );
@@ -111,6 +122,7 @@ class _TimerSettingsMobileState extends ConsumerState<TimerSettingsMobile> {
   }) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -133,8 +145,10 @@ class _TimerSettingsMobileState extends ConsumerState<TimerSettingsMobile> {
             children: [
               Text(
                 label,
-                style:
-                    textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
+                style: textTheme.bodyLarge?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: colorScheme.onSurface,
+                ),
               ),
               Container(
                 padding:
@@ -157,10 +171,10 @@ class _TimerSettingsMobileState extends ConsumerState<TimerSettingsMobile> {
               trackHeight: 6,
               activeTrackColor: colorScheme.primary,
               inactiveTrackColor: colorScheme.outline.withValues(alpha: 0.2),
-              thumbColor: colorScheme.surface,
+              thumbColor: colorScheme.primary,
               overlayColor: colorScheme.primary.withValues(alpha: 0.2),
               thumbShape: const RoundSliderThumbShape(
-                  enabledThumbRadius: 12, elevation: 4),
+                  enabledThumbRadius: 12, elevation: 2),
               overlayShape: const RoundSliderOverlayShape(overlayRadius: 24),
             ),
             child: Slider(
