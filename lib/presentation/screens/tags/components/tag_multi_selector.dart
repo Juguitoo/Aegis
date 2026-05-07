@@ -54,7 +54,7 @@ class _TagMultiSelectorState extends ConsumerState<TagMultiSelector> {
                   borderRadius: BorderRadius.circular(24)),
               title: Text(
                 'Seleccionar etiquetas',
-                style: textTheme.displayMedium?.copyWith(fontSize: 20),
+                style: textTheme.displayMedium,
               ),
               content: ConstrainedBox(
                 constraints: BoxConstraints(

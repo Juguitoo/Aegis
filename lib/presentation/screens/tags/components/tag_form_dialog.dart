@@ -74,7 +74,7 @@ class _TagFormDialogState extends ConsumerState<TagFormDialog> {
         borderRadius: BorderRadius.circular(24),
       ),
       title: Text(isEditing ? 'Editar etiqueta' : 'Nueva etiqueta',
-          style: textTheme.displayMedium?.copyWith(fontSize: 20)),
+          style: textTheme.displayMedium),
       content: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 400),
         child: SingleChildScrollView(

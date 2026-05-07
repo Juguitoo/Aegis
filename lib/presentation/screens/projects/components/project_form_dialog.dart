@@ -1,4 +1,6 @@
 import 'package:aegis/core/utils/color_utils.dart';
+import 'package:aegis/presentation/widgets/aegis_buttons.dart';
+import 'package:aegis/presentation/widgets/aegis_inputs.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
@@ -63,18 +65,17 @@ class _ProjectFormDialogState extends ConsumerState<ProjectFormDialog> {
   @override
   Widget build(BuildContext context) {
     final isEditing = widget.existingProject != null;
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
 
     return AlertDialog(
-      backgroundColor: Colors.white,
+      backgroundColor: colorScheme.surface,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
       ),
       title: Text(
-        isEditing ? 'Editar Proyecto' : 'Nuevo Proyecto',
-        style: const TextStyle(
-          color: Color(0xFF1E293B),
-          fontWeight: FontWeight.bold,
-        ),
+        isEditing ? 'Editar proyecto' : 'Nuevo proyecto',
+        style: textTheme.displayMedium?.copyWith(fontSize: 20),
       ),
       content: Container(
         constraints: const BoxConstraints(maxWidth: 400),
@@ -83,67 +84,29 @@ class _ProjectFormDialogState extends ConsumerState<ProjectFormDialog> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            TextField(
+            AegisTextField(
               controller: nameController,
               textCapitalization: TextCapitalization.sentences,
-              style: const TextStyle(
-                color: Color(0xFF1E293B),
-                fontWeight: FontWeight.w600,
-              ),
               maxLength: 80,
-              decoration: InputDecoration(
-                labelText: 'Nombre del proyecto',
-                hintText: "Universidad, Trabajo, Personal...",
-                hintStyle: const TextStyle(color: Color(0xFF94A3B8)),
-                counterText: "",
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide:
-                      const BorderSide(color: Color(0xFF6366F1), width: 2),
-                ),
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              ),
+              labelText: 'Nombre del proyecto',
+              hintText: "Universidad, Trabajo, Personal...",
               autofocus: true,
             ),
             const SizedBox(height: 24),
-            TextField(
+            AegisTextField(
               controller: descriptionController,
               textCapitalization: TextCapitalization.sentences,
               maxLength: 120,
               maxLines: 3,
               minLines: 1,
-              style: const TextStyle(
-                color: Color(0xFF1E293B),
-                fontWeight: FontWeight.w600,
-              ),
-              decoration: InputDecoration(
-                labelText: 'Descripción del proyecto',
-                hintText: 'Detalles sobre el proyecto...',
-                hintStyle: const TextStyle(color: Color(0xFF94A3B8)),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide:
-                      const BorderSide(color: Color(0xFF6366F1), width: 2),
-                ),
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              ),
+              labelText: 'Descripción del proyecto',
+              hintText: 'Detalles sobre el proyecto...',
             ),
-            const Text(
+            const SizedBox(height: 16),
+            Text(
               'Color',
-              style: TextStyle(
-                fontSize: 14,
+              style: textTheme.bodyMedium?.copyWith(
                 fontWeight: FontWeight.w600,
-                color: Color(0xFF475569),
               ),
             ),
             const SizedBox(height: 12),
@@ -195,8 +158,9 @@ class _ProjectFormDialogState extends ConsumerState<ProjectFormDialog> {
                     decoration: BoxDecoration(
                       color: selectedColor,
                       shape: BoxShape.circle,
-                      border:
-                          Border.all(color: const Color(0xFFE2E8F0), width: 2),
+                      border: Border.all(
+                          color: colorScheme.outline.withValues(alpha: 0.3),
+                          width: 2),
                       boxShadow: [
                         BoxShadow(
                           color: selectedColor.withAlpha(100),
@@ -209,7 +173,7 @@ class _ProjectFormDialogState extends ConsumerState<ProjectFormDialog> {
                 ),
                 const SizedBox(width: 16),
                 Expanded(
-                  child: TextField(
+                  child: AegisTextField(
                     controller: hexController,
                     focusNode: hexFocusNode,
                     onChanged: (value) {
@@ -220,25 +184,7 @@ class _ProjectFormDialogState extends ConsumerState<ProjectFormDialog> {
                         });
                       }
                     },
-                    style: const TextStyle(
-                      color: Color(0xFF64748B),
-                      fontWeight: FontWeight.w500,
-                      letterSpacing: 1,
-                    ),
-                    decoration: InputDecoration(
-                      hintText: '#HEX',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(
-                            color: Color(0xFF6366F1), width: 2),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 0),
-                    ),
+                    hintText: '#HEX',
                   ),
                 ),
               ],
@@ -248,87 +194,70 @@ class _ProjectFormDialogState extends ConsumerState<ProjectFormDialog> {
       ),
       actions: [
         Row(
-          spacing: 32,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            if (isEditing)
+              Expanded(
+                child: AegisButton(
+                  height: 44,
+                  text: 'Eliminar',
+                  onPressed: () {
+                    ref
+                        .read(projectListViewModelProvider.notifier)
+                        .deleteProject(widget.existingProject!);
+                    Navigator.pop(context);
+                  },
+                  type: ButtonType.destructive,
+                ),
+              )
+            else
+              Expanded(
+                child: AegisButton(
+                  height: 44,
+                  text: 'Cancelar',
+                  onPressed: () => Navigator.pop(context),
+                  type: ButtonType.secondary,
+                ),
+              ),
+            const SizedBox(width: 16),
             Expanded(
-              child: ElevatedButton(
-                onPressed: () async {
-                  try {
+              child: AegisButton(
+                height: 44,
+                text: isEditing ? 'Actualizar' : 'Guardar',
+                onPressed: () {
+                  if (nameController.text.trim().isNotEmpty) {
+                    final hexToSave = ColorUtils.colorToHex(selectedColor);
+                    final description = descriptionController.text.trim();
+
                     if (isEditing) {
+                      final updatedProject = Project(
+                        id: widget.existingProject!.id,
+                        name: nameController.text.trim(),
+                        colorHex: hexToSave,
+                        description: description,
+                      );
                       ref
                           .read(projectListViewModelProvider.notifier)
-                          .deleteProject(widget.existingProject!);
-                    }
-                  } catch (e) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content: Text('Error al eliminar el proyecto')),
-                    );
-                  }
-                  Navigator.pop(context);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFEF4444),
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: Text(isEditing ? 'Eliminar' : 'Cancelar'),
-              ),
-            ),
-            Expanded(
-              child: ElevatedButton(
-                onPressed: () async {
-                  try {
-                    if (nameController.text.trim().isNotEmpty) {
-                      final hexToSave = ColorUtils.colorToHex(selectedColor);
-                      final description = descriptionController.text.trim();
-
-                      if (isEditing) {
-                        final updatedProject = Project(
-                          id: widget.existingProject!.id,
-                          name: nameController.text.trim(),
-                          colorHex: hexToSave,
-                          description: description,
-                        );
-                        ref
-                            .read(projectListViewModelProvider.notifier)
-                            .updateProject(updatedProject);
-                      } else {
-                        ref
-                            .read(projectListViewModelProvider.notifier)
-                            .addProject(
-                              nameController.text.trim(),
-                              hexToSave,
-                              description,
-                            );
-                      }
-                      Navigator.pop(context);
+                          .updateProject(updatedProject);
                     } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content:
-                                Text('El nombre del proyecto es obligatorio')),
-                      );
+                      ref
+                          .read(projectListViewModelProvider.notifier)
+                          .addProject(
+                            nameController.text.trim(),
+                            hexToSave,
+                            description,
+                          );
                     }
-                  } catch (e) {
+                    Navigator.pop(context);
+                  } else {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content: Text('Error al guardar el proyecto')),
+                      SnackBar(
+                          backgroundColor: colorScheme.error,
+                          content: const Text(
+                              'El nombre del proyecto es obligatorio')),
                     );
-                    return;
                   }
                 },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF6366F1),
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: Text(isEditing ? 'Actualizar' : 'Guardar'),
               ),
             )
           ],

@@ -49,7 +49,7 @@ class _ManageTagsBottomSheetState extends ConsumerState<ManageTagsBottomSheet> {
               children: [
                 Text(
                   'Gestionar etiquetas',
-                  style: textTheme.displayMedium?.copyWith(fontSize: 20),
+                  style: textTheme.displayMedium,
                 ),
                 IconButton(
                   icon: Icon(Icons.close, color: colorScheme.outline),
