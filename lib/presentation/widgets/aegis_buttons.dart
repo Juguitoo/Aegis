@@ -12,6 +12,7 @@ class AegisButton extends StatelessWidget {
   final IconData? icon;
   final bool isLoading;
   final ButtonType type;
+  final double? height;
 
   const AegisButton({
     super.key,
@@ -20,6 +21,7 @@ class AegisButton extends StatelessWidget {
     this.icon,
     this.isLoading = false,
     this.type = ButtonType.primary,
+    this.height,
   });
 
   @override
@@ -48,7 +50,7 @@ class AegisButton extends StatelessWidget {
     }
 
     return SizedBox(
-      height: 48,
+      height: height ?? 48,
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(

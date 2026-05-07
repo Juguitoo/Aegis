@@ -8,7 +8,6 @@ import 'package:aegis/presentation/widgets/aegis_inputs.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 import '../../tags/components/tag_multi_selector.dart';
 
 class TaskFormDesktop extends ConsumerStatefulWidget {
@@ -88,10 +87,10 @@ class _TaskFormDesktopState extends ConsumerState<TaskFormDesktop>
                               descriptionController: descriptionController,
                               estimatedDurationController:
                                   estimatedDurationController,
-                              selectedDueDate: selectedDueDate,
+                              dueDateController: dueDateController,
+                              notificationDateController:
+                                  notificationDateController,
                               onPickDueDate: pickDueDate,
-                              selectedNotificationDate:
-                                  selectedNotificationDate,
                               onPickNotificationDate: pickNotificationDate,
                               projectsAsync: projectsAsync,
                               selectedProjectId: selectedProjectId,
@@ -229,9 +228,9 @@ class _TaskDetailsColumn extends StatelessWidget {
   final TextEditingController titleController;
   final TextEditingController descriptionController;
   final TextEditingController estimatedDurationController;
-  final DateTime? selectedDueDate;
+  final TextEditingController dueDateController;
+  final TextEditingController notificationDateController;
   final VoidCallback onPickDueDate;
-  final DateTime? selectedNotificationDate;
   final VoidCallback onPickNotificationDate;
   final AsyncValue<List<Project>> projectsAsync;
   final int? selectedProjectId;
@@ -245,9 +244,9 @@ class _TaskDetailsColumn extends StatelessWidget {
     required this.titleController,
     required this.descriptionController,
     required this.estimatedDurationController,
-    required this.selectedDueDate,
+    required this.dueDateController,
+    required this.notificationDateController,
     required this.onPickDueDate,
-    required this.selectedNotificationDate,
     required this.onPickNotificationDate,
     required this.projectsAsync,
     required this.selectedProjectId,
@@ -300,23 +299,22 @@ class _TaskDetailsColumn extends StatelessWidget {
               const SizedBox(width: 16),
               Expanded(
                 child: AegisTextField(
+                  controller: dueDateController,
                   readOnly: true,
                   onTap: onPickDueDate,
-                  hintText: selectedDueDate == null
-                      ? 'Sin fecha'
-                      : '${selectedDueDate!.day}/${selectedDueDate!.month}/${selectedDueDate!.year}',
+                  labelText: 'Fecha',
+                  hintText: 'Sin fecha',
                   prefixIcon: Icons.calendar_today,
                 ),
               ),
               const SizedBox(width: 16),
               Expanded(
                 child: AegisTextField(
+                  controller: notificationDateController,
                   readOnly: true,
                   onTap: onPickNotificationDate,
-                  hintText: selectedNotificationDate == null
-                      ? 'Recordatorio'
-                      : DateFormat('dd/MM HH:mm')
-                          .format(selectedNotificationDate!),
+                  labelText: 'Recordatorio',
+                  hintText: 'Sin recordatorio',
                   prefixIcon: Icons.notifications_active_outlined,
                 ),
               ),

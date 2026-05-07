@@ -20,6 +20,7 @@ class AegisTextField extends StatelessWidget {
   final ValueChanged<String>? onSubmitted;
   final List<TextInputFormatter>? inputFormatters;
   final TextAlignVertical? textAlignVertical;
+  final FocusNode? focusNode;
 
   const AegisTextField({
     super.key,
@@ -41,6 +42,7 @@ class AegisTextField extends StatelessWidget {
     this.onSubmitted,
     this.inputFormatters,
     this.textAlignVertical,
+    this.focusNode,
   });
 
   @override
@@ -63,6 +65,7 @@ class AegisTextField extends StatelessWidget {
       onSubmitted: onSubmitted,
       inputFormatters: inputFormatters,
       textAlignVertical: textAlignVertical,
+      focusNode: focusNode,
       style: textTheme.bodyLarge?.copyWith(
         color: colorScheme.onSurface,
       ),

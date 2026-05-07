@@ -1,6 +1,7 @@
 import 'package:aegis/core/utils/color_utils.dart';
 import 'package:aegis/presentation/screens/tags/components/tag_form_dialog.dart';
 import 'package:aegis/presentation/viewmodels/tag_list_viewmodel.dart';
+import 'package:aegis/presentation/widgets/aegis_buttons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../data/local/database/app_database.dart';
@@ -24,19 +25,17 @@ class _ManageTagsBottomSheetState extends ConsumerState<ManageTagsBottomSheet> {
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
     final tagsAsync = ref.watch(tagListViewModelProvider);
 
     return Container(
       constraints: BoxConstraints(
         maxHeight: screenHeight * 0.7,
       ),
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom +
-            MediaQuery.of(context).padding.bottom,
-      ),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -48,32 +47,28 @@ class _ManageTagsBottomSheetState extends ConsumerState<ManageTagsBottomSheet> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'Gestionar Etiquetas',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF1E293B),
-                  ),
+                Text(
+                  'Gestionar etiquetas',
+                  style: textTheme.displayMedium?.copyWith(fontSize: 20),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.close, color: Color(0xFF94A3B8)),
+                  icon: Icon(Icons.close, color: colorScheme.outline),
                   onPressed: () => Navigator.pop(context),
                 ),
               ],
             ),
           ),
-          const Divider(height: 1, color: Color(0xFFE2E8F0)),
+          Divider(color: colorScheme.outline.withValues(alpha: 0.2), height: 1),
           Flexible(
             child: tagsAsync.when(
               data: (tags) {
                 if (tags.isEmpty) {
-                  return const Padding(
-                    padding: EdgeInsets.all(32.0),
+                  return Padding(
+                    padding: const EdgeInsets.all(32.0),
                     child: Center(
                       child: Text(
                         'No tienes etiquetas aún.',
-                        style: TextStyle(color: Color(0xFF94A3B8)),
+                        style: textTheme.bodyMedium,
                       ),
                     ),
                   );
@@ -96,35 +91,25 @@ class _ManageTagsBottomSheetState extends ConsumerState<ManageTagsBottomSheet> {
                       ),
                       title: Text(
                         tag.name,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: Color(0xFF1E293B),
+                        style: textTheme.bodyLarge?.copyWith(
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           IconButton(
-                            icon: const Icon(Icons.edit_outlined,
-                                color: Color(0xFF64748B), size: 20),
+                            icon: Icon(Icons.edit_outlined,
+                                color: colorScheme.onSurfaceVariant, size: 20),
                             onPressed: () => _showTagDialog(tag),
                           ),
                           IconButton(
-                            icon: const Icon(Icons.delete_outline,
-                                color: Color(0xFFEF4444), size: 20),
-                            onPressed: () async {
-                              try {
-                                ref
-                                    .read(tagListViewModelProvider.notifier)
-                                    .deleteTag(tag);
-                              } catch (e) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                        content: Text(
-                                            'Error al eliminar la etiqueta.')));
-                                return;
-                              }
+                            icon: Icon(Icons.delete_outline,
+                                color: colorScheme.error, size: 20),
+                            onPressed: () {
+                              ref
+                                  .read(tagListViewModelProvider.notifier)
+                                  .deleteTag(tag);
                             },
                           ),
                         ],
@@ -143,22 +128,18 @@ class _ManageTagsBottomSheetState extends ConsumerState<ManageTagsBottomSheet> {
               ),
             ),
           ),
-          const Divider(height: 1, color: Color(0xFFE2E8F0)),
+          Divider(color: colorScheme.outline.withValues(alpha: 0.2), height: 1),
           Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: ElevatedButton.icon(
+            padding: EdgeInsets.only(
+                top: 24.0,
+                left: 24.0,
+                right: 24.0,
+                bottom: MediaQuery.of(context).padding.bottom + 24),
+            child: AegisButton(
               onPressed: () => _showTagDialog(),
-              icon: const Icon(Icons.add),
-              label: const Text('Crear nueva etiqueta'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFF1F5F9),
-                foregroundColor: const Color(0xFF0F172A),
-                elevation: 0,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
+              text: 'Crear nueva etiqueta',
+              icon: Icons.add,
+              type: ButtonType.secondary,
             ),
           ),
         ],

@@ -2,6 +2,7 @@ import 'package:aegis/presentation/viewmodels/timer_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:drift/drift.dart' hide Column;
+import 'package:intl/intl.dart';
 import '../../../../data/local/database/app_database.dart';
 import '../../../../core/providers/repository_providers.dart';
 import '../../../viewmodels/task_list_viewmodel.dart';
@@ -13,6 +14,8 @@ mixin TaskFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
   final descriptionController = TextEditingController();
   final estimatedDurationController = TextEditingController();
   final notesController = TextEditingController();
+  final dueDateController = TextEditingController();
+  final notificationDateController = TextEditingController();
 
   DateTime? selectedDueDate;
   DateTime? selectedNotificationDate;
@@ -57,7 +60,14 @@ mixin TaskFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
             (task.estimatedDuration! ~/ 60).toString();
       }
       selectedDueDate = task.dueDate;
+      if (task.dueDate != null) {
+        dueDateController.text = DateFormat.yMd('es').format(task.dueDate!);
+      }
       selectedNotificationDate = task.notificationAt;
+      if (task.notificationAt != null) {
+        notificationDateController.text =
+            DateFormat.yMd('es').add_Hm().format(task.notificationAt!);
+      }
       selectedProjectId = task.projectId;
       selectedPriority = task.priority;
 
@@ -120,6 +130,7 @@ mixin TaskFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
     if (date != null && mounted) {
       setState(() {
         selectedDueDate = date;
+        dueDateController.text = DateFormat.yMd('es').format(date);
       });
     }
   }
@@ -180,6 +191,8 @@ mixin TaskFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
             time.hour,
             time.minute,
           );
+          notificationDateController.text =
+              DateFormat.yMd('es').add_Hm().format(selectedNotificationDate!);
         });
       }
     }
@@ -359,6 +372,8 @@ mixin TaskFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
       descriptionController.clear();
       estimatedDurationController.clear();
       notesController.clear();
+      dueDateController.clear();
+      notificationDateController.clear();
       selectedDueDate = null;
       selectedNotificationDate = null;
       selectedProjectId = null;
@@ -375,6 +390,8 @@ mixin TaskFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
     descriptionController.dispose();
     estimatedDurationController.dispose();
     notesController.dispose();
+    dueDateController.dispose();
+    notificationDateController.dispose();
     super.dispose();
   }
 }
