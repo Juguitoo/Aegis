@@ -19,9 +19,14 @@ class TaskListScreenDesktop extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Principal',
-              style: textTheme.displayLarge,
+            SizedBox(
+              height: 48,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text('Principal', style: textTheme.displayLarge),
+                ],
+              ),
             ),
             Divider(
                 height: 16, color: colorScheme.outline.withValues(alpha: 0.2)),

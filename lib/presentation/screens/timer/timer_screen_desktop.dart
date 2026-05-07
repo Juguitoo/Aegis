@@ -112,32 +112,30 @@ class TimerScreenDesktop extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Temporizador',
-                  style: textTheme.displayLarge,
-                ),
-                MouseRegion(
-                  cursor: SystemMouseCursors.click,
-                  child: GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                const ImmersiveTimerScreenDesktop()),
-                      );
-                    },
-                    child: Icon(
-                      Icons.self_improvement,
-                      color: colorScheme.onSurface,
-                      size: 34,
+            SizedBox(
+              height: 48,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text('Temporizador', style: textTheme.displayLarge),
+                  MouseRegion(
+                    cursor: SystemMouseCursors.click,
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  const ImmersiveTimerScreenDesktop()),
+                        );
+                      },
+                      child: Icon(Icons.self_improvement,
+                          color: colorScheme.onSurface, size: 34),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
             Divider(
                 height: 16, color: colorScheme.outline.withValues(alpha: 0.2)),

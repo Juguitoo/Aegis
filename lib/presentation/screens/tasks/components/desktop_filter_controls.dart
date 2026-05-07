@@ -179,6 +179,7 @@ class _ActionButtonsRow extends StatelessWidget {
           text: 'Nueva Tarea',
           icon: Icons.add,
           type: ButtonType.primary,
+          height: 40,
           onPressed: () {
             showDialog(
               context: context,

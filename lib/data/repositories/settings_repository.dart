@@ -42,4 +42,8 @@ class SettingsRepository {
   Future<int> deleteSettings() {
     return _db.delete(_db.settings).go();
   }
+
+  Future<void> deleteAllData() async {
+    await _db.deleteAllData();
+  }
 }

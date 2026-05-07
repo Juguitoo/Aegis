@@ -179,8 +179,8 @@ class StatisticsHeaderControls extends ConsumerWidget {
               borderRadius: BorderRadius.circular(12),
               child: Container(
                 padding: EdgeInsets.symmetric(
-                    horizontal: isMobile ? 12.0 : 16.0,
-                    vertical: isMobile ? 8.0 : 10.0),
+                    horizontal: isMobile ? 12.0 : 12.0,
+                    vertical: isMobile ? 8.0 : 8.0),
                 decoration: BoxDecoration(
                   color: colorScheme.surface,
                   borderRadius: BorderRadius.circular(12),

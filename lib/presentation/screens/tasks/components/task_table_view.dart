@@ -89,8 +89,6 @@ class _TaskTableHeader extends StatelessWidget {
             child: Row(
               children: [
                 Text('Nombre', style: textStyle),
-                Icon(Icons.arrow_drop_down,
-                    color: colorScheme.onSurfaceVariant, size: 18),
               ],
             ),
           ),
@@ -105,8 +103,6 @@ class _TaskTableHeader extends StatelessWidget {
             child: Row(
               children: [
                 Text('Fecha', style: textStyle),
-                Icon(Icons.arrow_drop_down,
-                    color: colorScheme.onSurfaceVariant, size: 18),
               ],
             ),
           ),

@@ -249,6 +249,14 @@ class AppDatabase extends _$AppDatabase {
       }
     }
   }
+
+  Future<void> deleteAllData() {
+    return transaction(() async {
+      for (final table in allTables) {
+        await delete(table).go();
+      }
+    });
+  }
 }
 
 LazyDatabase _openConnection() {

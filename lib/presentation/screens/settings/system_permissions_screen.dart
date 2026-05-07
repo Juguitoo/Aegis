@@ -52,30 +52,32 @@ class _SystemPermissionsScreenState
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: colorScheme.surface,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: colorScheme.surface,
         surfaceTintColor: Colors.transparent,
-        title: const Text(
-          'Permisos del Sistema',
-          style:
-              TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF1E293B)),
+        title: Text(
+          'Permisos del sistema',
+          style: textTheme.displayMedium,
         ),
-        iconTheme: const IconThemeData(color: Color(0xFF1E293B)),
+        iconTheme: IconThemeData(color: colorScheme.onSurface),
         elevation: 1,
-        shadowColor: const Color.fromARGB(25, 0, 0, 0),
+        shadowColor: colorScheme.shadow.withValues(alpha: 0.1),
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          const Text(
+          Text(
             'Aegis necesita estos permisos para poder detectar distracciones y mostrar la pantalla de bloqueo. Pulsa sobre ellos para gestionarlos.',
-            style: TextStyle(color: Color(0xFF64748B), fontSize: 15),
+            style: textTheme.bodyMedium,
           ),
           const SizedBox(height: 24),
           _PermissionItem(
-            title: 'Acceso a Datos de Uso',
+            title: 'Acceso a datos de uso',
             description:
                 'Permite saber qué aplicación tienes abierta en pantalla en todo momento.',
             icon: Icons.data_usage,
@@ -104,9 +106,10 @@ class _SystemPermissionsScreenState
               await NotificationService.requestPermissions();
               if (mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Permisos de notificaciones solicitados.'),
-                    backgroundColor: Color(0xFF10B981),
+                  SnackBar(
+                    content:
+                        const Text('Permisos de notificaciones solicitados.'),
+                    backgroundColor: colorScheme.primary,
                   ),
                 );
               }
@@ -135,23 +138,29 @@ class _PermissionItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    final successColor = Colors.green.shade400;
+
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(16),
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: colorScheme.surface,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isGranted ? Colors.green.shade400 : const Color(0xFFE2E8F0),
+            color: isGranted
+                ? successColor
+                : colorScheme.outline.withValues(alpha: 0.2),
             width: isGranted ? 2 : 1,
           ),
-          boxShadow: const [
+          boxShadow: [
             BoxShadow(
-              color: Color.fromARGB(10, 0, 0, 0),
+              color: colorScheme.shadow.withValues(alpha: 0.05),
               blurRadius: 8,
-              offset: Offset(0, 2),
+              offset: const Offset(0, 2),
             ),
           ],
         ),
@@ -161,13 +170,13 @@ class _PermissionItem extends StatelessWidget {
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: isGranted
-                    ? Colors.green.withValues(alpha: 0.1)
-                    : const Color(0xFFEEF2FF),
+                    ? successColor.withValues(alpha: 0.1)
+                    : colorScheme.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
                 isGranted ? Icons.check_circle : icon,
-                color: isGranted ? Colors.green : const Color(0xFF6366F1),
+                color: isGranted ? successColor : colorScheme.primary,
                 size: 28,
               ),
             ),
@@ -178,25 +187,20 @@ class _PermissionItem extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
+                    style: textTheme.bodyLarge?.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF1E293B),
-                      fontSize: 16,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     description,
-                    style: const TextStyle(
-                      color: Color(0xFF64748B),
-                      fontSize: 13,
-                    ),
+                    style: textTheme.bodySmall,
                   ),
                 ],
               ),
             ),
             const SizedBox(width: 8),
-            const Icon(Icons.chevron_right, color: Color(0xFFCBD5E1)),
+            Icon(Icons.chevron_right, color: colorScheme.outline),
           ],
         ),
       ),

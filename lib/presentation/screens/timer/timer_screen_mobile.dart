@@ -125,7 +125,6 @@ class TimerScreenMobile extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.only(right: 8.0),
             child: IconButton(
-              iconSize: 28,
               icon: Icon(Icons.self_improvement, color: colorScheme.onSurface),
               onPressed: () {
                 Navigator.push(
@@ -139,7 +138,6 @@ class TimerScreenMobile extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.only(right: 8.0),
             child: IconButton(
-              iconSize: 28,
               icon: Icon(Icons.settings, color: colorScheme.onSurface),
               onPressed: () {
                 Navigator.push(

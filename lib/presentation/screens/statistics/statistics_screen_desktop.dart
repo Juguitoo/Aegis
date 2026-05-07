@@ -61,21 +61,20 @@ class _StatisticsScreenDesktopState
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Text('Análisis',
-                            style: textTheme.displayLarge?.copyWith(
-                                fontWeight: FontWeight.bold, fontSize: 32)),
+                        Text('Análisis', style: textTheme.displayLarge),
                         const StatisticsHeaderControls(isMobile: false),
                       ],
                     ),
                   ),
                   Divider(
-                      height: 32,
-                      color: colorScheme.outline.withValues(alpha: 0.1)),
+                      height: 16,
+                      color: colorScheme.outline.withValues(alpha: 0.2)),
+                  const SizedBox(height: 16),
                   Row(
                     children: [
                       Expanded(
                           child: KpiCard(
-                              title: 'Tiempo Foco',
+                              title: 'Tiempo foco',
                               value: formatChartDuration(
                                   state.totalFocusSeconds))),
                       const SizedBox(width: 16),
@@ -92,7 +91,7 @@ class _StatisticsScreenDesktopState
                       const SizedBox(width: 16),
                       Expanded(
                           child: KpiCard(
-                              title: 'Racha Hábitos',
+                              title: 'Racha hábitos',
                               value: '${state.habitStreak} días')),
                     ],
                   ),
@@ -102,14 +101,14 @@ class _StatisticsScreenDesktopState
                       children: [
                         Expanded(
                           child: ChartContainer(
-                            title: 'Rendimiento Diario (Horas)',
+                            title: 'Rendimiento diario (Horas)',
                             child: FocusBarChart(data: state.chartData),
                           ),
                         ),
                         const SizedBox(width: 24),
                         Expanded(
                           child: ChartContainer(
-                            title: 'Rendimiento Diario (Tareas)',
+                            title: 'Rendimiento diario (Tareas)',
                             trailing: 'Total: ${state.completedTasks}',
                             child: TasksLineChart(data: state.chartData),
                           ),
@@ -133,7 +132,7 @@ class _StatisticsScreenDesktopState
                         Expanded(
                           flex: 2,
                           child: ChartContainer(
-                            title: 'Distribución por Proyectos',
+                            title: 'Distribución por proyectos',
                             child: ProjectPieChart(
                                 data: state.projectDistribution),
                           ),

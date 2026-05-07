@@ -41,6 +41,10 @@ class SettingsViewmodel extends StreamNotifier<Setting?> {
   Future<void> deleteSessionData() {
     return _sessionRepository.deleteAllSessions();
   }
+
+  Future<void> deleteAllData() {
+    return _settingsRepository.deleteAllData();
+  }
 }
 
 final settingsViewModelProvider =

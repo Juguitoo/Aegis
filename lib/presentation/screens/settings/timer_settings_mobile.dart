@@ -18,20 +18,21 @@ class _TimerSettingsMobileState extends ConsumerState<TimerSettingsMobile> {
   @override
   Widget build(BuildContext context) {
     final settingsAsync = ref.watch(settingsViewModelProvider);
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: colorScheme.surface,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: colorScheme.surface,
         surfaceTintColor: Colors.transparent,
-        title: const Text(
+        title: Text(
           'Temporizador',
-          style:
-              TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF1E293B)),
+          style: textTheme.displayMedium,
         ),
-        iconTheme: const IconThemeData(color: Color(0xFF1E293B)),
+        iconTheme: IconThemeData(color: colorScheme.onSurface),
         elevation: 1,
-        shadowColor: const Color.fromARGB(25, 0, 0, 0),
+        shadowColor: colorScheme.shadow.withValues(alpha: 0.1),
       ),
       body: settingsAsync.when(
         data: (settings) {
@@ -42,21 +43,18 @@ class _TimerSettingsMobileState extends ConsumerState<TimerSettingsMobile> {
           return ListView(
             padding: const EdgeInsets.all(24),
             children: [
-              const Text(
-                'Configuración de Intervalos',
-                style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF1E293B)),
+              Text(
+                'Configuración de intervalos',
+                style: textTheme.displayMedium,
               ),
               const SizedBox(height: 8),
-              const Text(
+              Text(
                 'Ajusta la duración por defecto para tus sesiones de enfoque y descansos.',
-                style: TextStyle(color: Color(0xFF64748B)),
+                style: textTheme.bodyMedium,
               ),
               const SizedBox(height: 40),
               _buildSliderSection(
-                label: 'Tiempo de Foco',
+                label: 'Tiempo de foco',
                 value: _pomodoro!,
                 min: 5,
                 max: 90,
@@ -69,7 +67,7 @@ class _TimerSettingsMobileState extends ConsumerState<TimerSettingsMobile> {
               ),
               const SizedBox(height: 32),
               _buildSliderSection(
-                label: 'Descanso Corto',
+                label: 'Descanso corto',
                 value: _shortBreak!,
                 min: 1,
                 max: 15,
@@ -82,7 +80,7 @@ class _TimerSettingsMobileState extends ConsumerState<TimerSettingsMobile> {
               ),
               const SizedBox(height: 32),
               _buildSliderSection(
-                label: 'Descanso Largo',
+                label: 'Descanso largo',
                 value: _longBreak!,
                 min: 5,
                 max: 45,
@@ -96,8 +94,8 @@ class _TimerSettingsMobileState extends ConsumerState<TimerSettingsMobile> {
             ],
           );
         },
-        loading: () => const Center(
-            child: CircularProgressIndicator(color: Color(0xFF6366F1))),
+        loading: () => Center(
+            child: CircularProgressIndicator(color: colorScheme.primary)),
         error: (e, s) => Center(child: Text('Error: $e')),
       ),
     );
@@ -111,15 +109,17 @@ class _TimerSettingsMobileState extends ConsumerState<TimerSettingsMobile> {
     required ValueChanged<double> onChanged,
     required ValueChanged<double> onChangeEnd,
   }) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: colorScheme.outline.withValues(alpha: 0.2)),
         boxShadow: [
           BoxShadow(
-            color: const Color.fromARGB(14, 0, 0, 0),
+            color: colorScheme.shadow.withValues(alpha: 0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -133,24 +133,20 @@ class _TimerSettingsMobileState extends ConsumerState<TimerSettingsMobile> {
             children: [
               Text(
                 label,
-                style: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF475569),
-                    fontSize: 16),
+                style:
+                    textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
               ),
               Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFEEF2FF),
+                  color: colorScheme.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
                   '${value.toInt()} min',
-                  style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF6366F1),
-                      fontSize: 14),
+                  style: textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.bold, color: colorScheme.primary),
                 ),
               ),
             ],
@@ -159,10 +155,10 @@ class _TimerSettingsMobileState extends ConsumerState<TimerSettingsMobile> {
           SliderTheme(
             data: SliderTheme.of(context).copyWith(
               trackHeight: 6,
-              activeTrackColor: const Color(0xFF6366F1),
-              inactiveTrackColor: const Color(0xFFE2E8F0),
-              thumbColor: Colors.white,
-              overlayColor: const Color.fromARGB(50, 99, 101, 241),
+              activeTrackColor: colorScheme.primary,
+              inactiveTrackColor: colorScheme.outline.withValues(alpha: 0.2),
+              thumbColor: colorScheme.surface,
+              overlayColor: colorScheme.primary.withValues(alpha: 0.2),
               thumbShape: const RoundSliderThumbShape(
                   enabledThumbRadius: 12, elevation: 4),
               overlayShape: const RoundSliderOverlayShape(overlayRadius: 24),

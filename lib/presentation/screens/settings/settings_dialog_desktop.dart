@@ -28,36 +28,85 @@ class _SettingsDialogState extends ConsumerState<SettingsDialogDesktop> {
   }
 
   void _showImportWarningDialog(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Row(
+        backgroundColor: colorScheme.surface,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        title: Row(
           children: [
             Icon(Icons.warning_amber_rounded,
-                color: Colors.redAccent, size: 28),
-            SizedBox(width: 8),
-            Text('Atención', style: TextStyle(fontWeight: FontWeight.bold)),
+                color: colorScheme.error, size: 28),
+            const SizedBox(width: 8),
+            Text('Atención',
+                style: textTheme.displayMedium?.copyWith(fontSize: 20)),
           ],
         ),
-        content: const Text(
-          'Importar una copia de seguridad sobrescribirá todos los datos actuales de forma irreversible.\n\n¿Estás seguro?',
+        content: Text(
+          'Importar una copia de seguridad sobrescribirá todos los datos actuales de forma irreversible.\n\n¿Estás seguro de que deseas continuar?',
+          style: textTheme.bodyMedium
+              ?.copyWith(color: colorScheme.onSurfaceVariant),
         ),
         actions: [
-          TextButton(
+          AegisButton(
+            text: 'Cancelar',
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancelar',
-                style: TextStyle(color: Color(0xFF64748B))),
+            type: ButtonType.secondary,
           ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.redAccent,
-              foregroundColor: Colors.white,
-            ),
+          AegisButton(
+            text: 'Sí, importar',
             onPressed: () {
               Navigator.pop(context);
               ref.read(backupViewModelProvider.notifier).importData();
             },
-            child: const Text('Sí, Importar'),
+            type: ButtonType.destructive,
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showDeleteAllWarningDialog(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: colorScheme.surface,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        title: Row(
+          children: [
+            Icon(Icons.delete_forever_rounded,
+                color: colorScheme.error, size: 28),
+            const SizedBox(width: 8),
+            Text('Borrar todo',
+                style: textTheme.displayMedium?.copyWith(fontSize: 20)),
+          ],
+        ),
+        content: Text(
+          'Esta acción eliminará permanentemente todas tus tareas, proyectos, etiquetas e historial. No se puede deshacer.\n\n¿Estás absolutamente seguro?',
+          style: textTheme.bodyMedium
+              ?.copyWith(color: colorScheme.onSurfaceVariant),
+        ),
+        actions: [
+          AegisButton(
+            text: 'Cancelar',
+            onPressed: () => Navigator.pop(context),
+            type: ButtonType.secondary,
+          ),
+          AegisButton(
+            text: 'Borrar permanentemente',
+            onPressed: () {
+              Navigator.pop(context);
+              ref.read(settingsViewModelProvider.notifier).deleteAllData();
+            },
+            type: ButtonType.destructive,
           ),
         ],
       ),
@@ -66,14 +115,21 @@ class _SettingsDialogState extends ConsumerState<SettingsDialogDesktop> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     ref.listen<AsyncValue<void>>(backupViewModelProvider, (previous, next) {
       next.when(
         data: (_) {
           if (previous is AsyncLoading) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Operación completada con éxito'),
-                backgroundColor: Colors.green,
+              SnackBar(
+                content: const Text('Operación completada con éxito',
+                    style: TextStyle(fontWeight: FontWeight.bold)),
+                backgroundColor: colorScheme.primary,
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
               ),
             );
           }
@@ -81,8 +137,12 @@ class _SettingsDialogState extends ConsumerState<SettingsDialogDesktop> {
         error: (error, stackTrace) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(error.toString().replaceAll('Exception: ', '')),
-              backgroundColor: Colors.red,
+              content: Text(error.toString().replaceAll('Exception: ', ''),
+                  style: const TextStyle(fontWeight: FontWeight.bold)),
+              backgroundColor: colorScheme.error,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
             ),
           );
         },
@@ -91,117 +151,111 @@ class _SettingsDialogState extends ConsumerState<SettingsDialogDesktop> {
     });
 
     final isBackupLoading = ref.watch(backupViewModelProvider).isLoading;
-    final isDevMode = ref.watch(devModeProvider); // CORRECCIÓN AQUÍ
+    final isDevMode = ref.watch(devModeProvider);
 
     return AlertDialog(
-      backgroundColor: Colors.white,
+      backgroundColor: colorScheme.surface,
       surfaceTintColor: Colors.transparent,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      title: const Text('Ajustes',
-          style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF1E293B))),
-      content: SizedBox(
-        width: 450,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+      title: Row(
+        children: [
+          Icon(Icons.settings_outlined, color: colorScheme.primary, size: 28),
+          const SizedBox(width: 12),
+          Text('Ajustes', style: textTheme.displayMedium),
+        ],
+      ),
+      content: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxWidth: 700,
+          maxHeight: MediaQuery.of(context).size.height * 0.8,
+        ),
         child: Stack(
           children: [
             SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Text('Temporizador Pomodoro',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF6366F1))),
-                  const SizedBox(height: 16),
-                  _buildSliderSection(
-                    'Tiempo de Foco',
-                    _pomodoro,
-                    10,
-                    90,
-                    (val) => setState(() => _pomodoro = val),
+                  _buildSectionCard(
+                    context: context,
+                    title: 'Temporizador pomodoro',
+                    icon: Icons.timer_outlined,
+                    child: Column(
+                      children: [
+                        _buildSliderSection('Tiempo de foco', _pomodoro, 10, 90,
+                            (val) => setState(() => _pomodoro = val)),
+                        const SizedBox(height: 16),
+                        _buildSliderSection('Descanso corto', _shortBreak, 1,
+                            15, (val) => setState(() => _shortBreak = val)),
+                        const SizedBox(height: 16),
+                        _buildSliderSection('Descanso largo', _longBreak, 5, 45,
+                            (val) => setState(() => _longBreak = val)),
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 16),
-                  _buildSliderSection(
-                    'Descanso Corto',
-                    _shortBreak,
-                    1,
-                    15,
-                    (val) => setState(() => _shortBreak = val),
-                  ),
-                  const SizedBox(height: 16),
-                  _buildSliderSection(
-                    'Descanso Largo',
-                    _longBreak,
-                    5,
-                    45,
-                    (val) => setState(() => _longBreak = val),
-                  ),
-                  const SizedBox(height: 24),
-                  const Divider(color: Color(0xFFE2E8F0)),
-                  const SizedBox(height: 16),
-                  const Text('Copia de Seguridad',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF6366F1))),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: () => ref
-                              .read(backupViewModelProvider.notifier)
-                              .exportData(),
-                          icon: const Icon(Icons.upload_file,
-                              color: Color(0xFF1E293B)),
-                          label: const Text('Exportar',
-                              style: TextStyle(color: Color(0xFF1E293B))),
-                          style: OutlinedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            side: const BorderSide(color: Color(0xFFE2E8F0)),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8)),
-                          ),
+                  _buildSectionCard(
+                    context: context,
+                    title: 'Datos y seguridad',
+                    icon: Icons.sd_storage_outlined,
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: AegisButton(
+                                onPressed: () => ref
+                                    .read(backupViewModelProvider.notifier)
+                                    .exportData(),
+                                icon: Icons.upload_file,
+                                text: 'Exportar copia',
+                                type: ButtonType.secondary,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: AegisButton(
+                                onPressed: () =>
+                                    _showImportWarningDialog(context, ref),
+                                icon: Icons.file_download,
+                                text: 'Importar copia',
+                                type: ButtonType.destructive,
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: OutlinedButton.icon(
+                        const SizedBox(height: 12),
+                        AegisButton(
                           onPressed: () =>
-                              _showImportWarningDialog(context, ref),
-                          icon: const Icon(Icons.file_download,
-                              color: Colors.redAccent),
-                          label: const Text('Importar',
-                              style: TextStyle(color: Colors.redAccent)),
-                          style: OutlinedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            side: const BorderSide(color: Colors.redAccent),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8)),
-                          ),
+                              _showDeleteAllWarningDialog(context, ref),
+                          icon: Icons.delete_forever_rounded,
+                          text: 'Borrar toda la base de datos',
+                          type: ButtonType.destructive,
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                  const SizedBox(height: 24),
-                  const Divider(color: Color(0xFFE2E8F0)),
-                  const SizedBox(height: 8),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text('Modo Desarrollador',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF475569))),
-                      Switch(
+                  const SizedBox(height: 16),
+                  _buildSectionCard(
+                    context: context,
+                    title: 'Opciones avanzadas',
+                    icon: Icons.developer_mode,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Modo desarrollador',
+                            style: textTheme.bodyLarge
+                                ?.copyWith(fontWeight: FontWeight.w600)),
+                        Switch(
                           value: isDevMode,
-                          activeThumbColor: const Color(0xFF6366F1),
+                          activeThumbColor: colorScheme.primary,
                           onChanged: (bool newValue) {
                             ref.read(devModeProvider.notifier).state = newValue;
-                          }),
-                    ],
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -209,37 +263,86 @@ class _SettingsDialogState extends ConsumerState<SettingsDialogDesktop> {
             if (isBackupLoading)
               Positioned.fill(
                 child: Container(
-                  color: Colors.white.withValues(alpha: 0.8),
-                  child: const Center(
-                    child: CircularProgressIndicator(color: Color(0xFF6366F1)),
+                  decoration: BoxDecoration(
+                    color: colorScheme.surface.withValues(alpha: 0.8),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Center(
+                    child:
+                        CircularProgressIndicator(color: colorScheme.primary),
                   ),
                 ),
               ),
           ],
         ),
       ),
+      actionsPadding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
       actions: [
         AegisButton(
-            text: 'Cancelar',
-            onPressed: () => Navigator.pop(context),
-            type: ButtonType.secondary),
+          text: 'Cancelar',
+          onPressed: () => Navigator.pop(context),
+          type: ButtonType.secondary,
+        ),
+        const SizedBox(width: 8),
         AegisButton(
-            text: 'Guardar',
-            onPressed: () {
-              ref.read(settingsViewModelProvider.notifier).upsertSettings(
-                    pomodoroDuration: _pomodoro.toInt(),
-                    shortBreakDuration: _shortBreak.toInt(),
-                    longBreakDuration: _longBreak.toInt(),
-                  );
-              Navigator.pop(context);
-            },
-            type: ButtonType.primary),
+          text: 'Guardar cambios',
+          onPressed: () {
+            ref.read(settingsViewModelProvider.notifier).upsertSettings(
+                  pomodoroDuration: _pomodoro.toInt(),
+                  shortBreakDuration: _shortBreak.toInt(),
+                  longBreakDuration: _longBreak.toInt(),
+                );
+            Navigator.pop(context);
+          },
+          type: ButtonType.primary,
+        ),
       ],
+    );
+  }
+
+  Widget _buildSectionCard(
+      {required BuildContext context,
+      required String title,
+      required IconData icon,
+      required Widget child}) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: colorScheme.secondary.withValues(alpha: 0.3),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: colorScheme.outline.withValues(alpha: 0.1)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Icon(icon, size: 20, color: colorScheme.onSurfaceVariant),
+              const SizedBox(width: 8),
+              Text(
+                title,
+                style: textTheme.bodyLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          child,
+        ],
+      ),
     );
   }
 
   Widget _buildSliderSection(String label, double value, double min, double max,
       ValueChanged<double> onChanged) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -248,24 +351,41 @@ class _SettingsDialogState extends ConsumerState<SettingsDialogDesktop> {
           children: [
             Text(
               label,
-              style: const TextStyle(
-                  fontWeight: FontWeight.w600, color: Color(0xFF475569)),
+              style:
+                  textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
             ),
-            Text(
-              '${value.toInt()} min',
-              style: const TextStyle(
-                  fontWeight: FontWeight.bold, color: Color(0xFF6366F1)),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: colorScheme.primary.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                '${value.toInt()} min',
+                style: textTheme.bodySmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: colorScheme.primary,
+                ),
+              ),
             ),
           ],
         ),
-        Slider(
-          value: value,
-          min: min,
-          max: max,
-          divisions: (max - min).toInt(),
-          activeColor: const Color(0xFF6366F1),
-          inactiveColor: const Color(0xFFE2E8F0),
-          onChanged: onChanged,
+        const SizedBox(height: 8),
+        SliderTheme(
+          data: SliderTheme.of(context).copyWith(
+            trackHeight: 6,
+            activeTrackColor: colorScheme.primary,
+            inactiveTrackColor: colorScheme.outline.withValues(alpha: 0.2),
+            thumbColor: colorScheme.primary,
+            overlayColor: colorScheme.primary.withValues(alpha: 0.1),
+          ),
+          child: Slider(
+            value: value,
+            min: min,
+            max: max,
+            divisions: (max - min).toInt(),
+            onChanged: onChanged,
+          ),
         ),
       ],
     );
