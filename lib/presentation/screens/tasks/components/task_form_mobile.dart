@@ -282,12 +282,15 @@ class _TaskDetailsTab extends StatelessWidget {
           const SizedBox(height: 8),
           Wrap(
             spacing: 8,
+            runSpacing:
+                8, // Añadido para que respire si salta de línea en móviles estrechos
             children: [
               ChoiceChip(
                 label: const Text('Ninguna'),
                 selected: selectedPriority == 0,
                 onSelected: (selected) => onPriorityChanged(0),
-                selectedColor: colorScheme.secondary,
+                selectedColor: colorScheme.primary.withValues(alpha: 0.15),
+                checkmarkColor: colorScheme.primary, // Tick visible
                 labelStyle: textTheme.bodyMedium?.copyWith(
                   color: selectedPriority == 0
                       ? colorScheme.primary
@@ -298,7 +301,7 @@ class _TaskDetailsTab extends StatelessWidget {
                 ),
                 side: BorderSide(
                   color: selectedPriority == 0
-                      ? Colors.transparent
+                      ? colorScheme.primary.withValues(alpha: 0.5)
                       : colorScheme.outline.withValues(alpha: 0.3),
                 ),
               ),
@@ -306,10 +309,11 @@ class _TaskDetailsTab extends StatelessWidget {
                 label: const Text('Baja'),
                 selected: selectedPriority == 1,
                 onSelected: (selected) => onPriorityChanged(1),
-                selectedColor: const Color(0xFFDCFCE7),
+                selectedColor: const Color(0xFF10B981).withValues(alpha: 0.15),
+                checkmarkColor: const Color(0xFF10B981),
                 labelStyle: textTheme.bodyMedium?.copyWith(
                   color: selectedPriority == 1
-                      ? const Color(0xFF16A34A)
+                      ? const Color(0xFF10B981)
                       : colorScheme.outline,
                   fontWeight: selectedPriority == 1
                       ? FontWeight.bold
@@ -317,7 +321,7 @@ class _TaskDetailsTab extends StatelessWidget {
                 ),
                 side: BorderSide(
                   color: selectedPriority == 1
-                      ? Colors.transparent
+                      ? const Color(0xFF10B981).withValues(alpha: 0.5)
                       : colorScheme.outline.withValues(alpha: 0.3),
                 ),
               ),
@@ -325,10 +329,11 @@ class _TaskDetailsTab extends StatelessWidget {
                 label: const Text('Media'),
                 selected: selectedPriority == 2,
                 onSelected: (selected) => onPriorityChanged(2),
-                selectedColor: const Color(0xFFFEF9C3),
+                selectedColor: const Color(0xFFF59E0B).withValues(alpha: 0.15),
+                checkmarkColor: const Color(0xFFF59E0B),
                 labelStyle: textTheme.bodyMedium?.copyWith(
                   color: selectedPriority == 2
-                      ? const Color(0xFFCA8A04)
+                      ? const Color(0xFFF59E0B)
                       : colorScheme.outline,
                   fontWeight: selectedPriority == 2
                       ? FontWeight.bold
@@ -336,7 +341,7 @@ class _TaskDetailsTab extends StatelessWidget {
                 ),
                 side: BorderSide(
                   color: selectedPriority == 2
-                      ? Colors.transparent
+                      ? const Color(0xFFF59E0B).withValues(alpha: 0.5)
                       : colorScheme.outline.withValues(alpha: 0.3),
                 ),
               ),
@@ -344,7 +349,8 @@ class _TaskDetailsTab extends StatelessWidget {
                 label: const Text('Alta'),
                 selected: selectedPriority == 3,
                 onSelected: (selected) => onPriorityChanged(3),
-                selectedColor: colorScheme.onError,
+                selectedColor: colorScheme.error.withValues(alpha: 0.15),
+                checkmarkColor: colorScheme.error,
                 labelStyle: textTheme.bodyMedium?.copyWith(
                   color: selectedPriority == 3
                       ? colorScheme.error
@@ -355,7 +361,7 @@ class _TaskDetailsTab extends StatelessWidget {
                 ),
                 side: BorderSide(
                   color: selectedPriority == 3
-                      ? Colors.transparent
+                      ? colorScheme.error.withValues(alpha: 0.5)
                       : colorScheme.outline.withValues(alpha: 0.3),
                 ),
               ),
