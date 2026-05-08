@@ -157,13 +157,11 @@ class CalendarScreenDesktop extends ConsumerWidget {
                               ),
                             );
                           },
-                          // --- NUEVO INDICADOR DE EVENTOS ---
                           markerBuilder: (context, date, items) {
                             if (items.isEmpty) return const SizedBox();
-
-                            // Ocultamos el borde si el día ya está seleccionado para que no se superpongan
-                            if (isSameDay(state.selectedDay, date))
+                            if (isSameDay(state.selectedDay, date)) {
                               return const SizedBox();
+                            }
 
                             final hasTasks = items
                                 .any((i) => i.type == CalendarItemType.task);
@@ -183,7 +181,7 @@ class CalendarScreenDesktop extends ConsumerWidget {
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
                                   color: indicatorColor.withValues(
-                                      alpha: 0.05), // Glow sutil
+                                      alpha: 0.05),
                                   border: Border.all(
                                     color:
                                         indicatorColor.withValues(alpha: 0.6),
@@ -239,7 +237,7 @@ class CalendarScreenDesktop extends ConsumerWidget {
                                   );
                                 },
                                 icon: const Icon(Icons.add),
-                                label: const Text('Nuevo Evento'),
+                                label: const Text('Nuevo evento'),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: colorScheme.primary,
                                   foregroundColor: colorScheme.onPrimary,
