@@ -52,46 +52,26 @@ class TimerViewmodel extends Notifier<TimerState> with WidgetsBindingObserver {
         .listen((packageName) => _handleForegroundAppChange(packageName));
 
     ref.listen(settingsViewModelProvider, (previous, next) {
-      if (previous?.value != null && next.value != null) {
-        final prevSettings = previous!.value!;
-        final nextSettings = next.value!;
+      final settings = next.value;
+      if (settings != null && state.status == TimerStatus.idle) {
+        int expectedSeconds = state.initialSeconds;
 
-        bool hasChanged = false;
-        int newBaseSeconds = state.initialSeconds;
-
-        if (state.mode == TimerMode.focus &&
-            prevSettings.pomodoroDuration != nextSettings.pomodoroDuration) {
-          hasChanged = true;
-          newBaseSeconds = nextSettings.pomodoroDuration * 60;
-        } else if (state.mode == TimerMode.shortBreak &&
-            prevSettings.shortBreakDuration !=
-                nextSettings.shortBreakDuration) {
-          hasChanged = true;
-          newBaseSeconds = nextSettings.shortBreakDuration * 60;
-        } else if (state.mode == TimerMode.longBreak &&
-            prevSettings.longBreakDuration != nextSettings.longBreakDuration) {
-          hasChanged = true;
-          newBaseSeconds = nextSettings.longBreakDuration * 60;
+        switch (state.mode) {
+          case TimerMode.focus:
+            expectedSeconds = settings.pomodoroDuration * 60;
+            break;
+          case TimerMode.shortBreak:
+            expectedSeconds = settings.shortBreakDuration * 60;
+            break;
+          case TimerMode.longBreak:
+            expectedSeconds = settings.longBreakDuration * 60;
+            break;
         }
 
-        if (hasChanged) {
-          _monitor.stopMonitoring();
-          _saveSessionRecord();
-          _timer?.cancel();
-          _timer = null;
-          _pausedTime = null;
-          _manualPauseTime = null;
-
+        if (state.initialSeconds != expectedSeconds) {
           state = state.copyWith(
-            remainingSeconds: newBaseSeconds,
-            initialSeconds: newBaseSeconds,
-            status: TimerStatus.idle,
-            pauseCount: 0,
-            totalPauseDuration: 0,
-            addedTime: 0,
-            blocklistAttempts: 0,
-            pendingSuggestion: null,
-            clearSuggestion: true,
+            remainingSeconds: expectedSeconds,
+            initialSeconds: expectedSeconds,
           );
         }
       }

@@ -4,6 +4,7 @@ import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
 import 'package:aegis/presentation/viewmodels/diary_viewmodel.dart';
 import 'package:aegis/data/local/database/app_database.dart';
+import 'diary_state_mixin.dart';
 
 class DiaryScreenDesktop extends ConsumerStatefulWidget {
   const DiaryScreenDesktop({super.key});
@@ -12,59 +13,9 @@ class DiaryScreenDesktop extends ConsumerStatefulWidget {
   ConsumerState<DiaryScreenDesktop> createState() => _DiaryScreenDesktopState();
 }
 
-class _DiaryScreenDesktopState extends ConsumerState<DiaryScreenDesktop> {
-  final TextEditingController _noteController = TextEditingController();
-  final ScrollController _scrollController = ScrollController();
-  final FocusNode _focusNode = FocusNode();
-
-  int? _editingNoteId;
+class _DiaryScreenDesktopState extends ConsumerState<DiaryScreenDesktop>
+    with DiaryStateMixin {
   DateTime _focusedDay = DateTime.now();
-
-  @override
-  void dispose() {
-    _noteController.dispose();
-    _scrollController.dispose();
-    _focusNode.dispose();
-    super.dispose();
-  }
-
-  bool _isSameDay(DateTime a, DateTime b) {
-    return a.year == b.year && a.month == b.month && a.day == b.day;
-  }
-
-  void _scrollToBottom() {
-    if (_scrollController.hasClients) {
-      _scrollController.animateTo(
-        _scrollController.position.maxScrollExtent,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOut,
-      );
-    }
-  }
-
-  void _handleSubmit(DiaryViewModel viewModel) {
-    final text = _noteController.text;
-    if (text.trim().isEmpty) return;
-
-    if (_editingNoteId != null) {
-      viewModel.updateNoteContent(_editingNoteId!, text);
-      setState(() {
-        _editingNoteId = null;
-      });
-    } else {
-      viewModel.addNote(text);
-    }
-
-    _noteController.clear();
-  }
-
-  void _cancelEdit() {
-    setState(() {
-      _editingNoteId = null;
-    });
-    _noteController.clear();
-    _focusNode.unfocus();
-  }
 
   String _formatRecentDate(DateTime date) {
     final now = DateTime.now();
@@ -86,27 +37,23 @@ class _DiaryScreenDesktopState extends ConsumerState<DiaryScreenDesktop> {
     final allNotesAsyncValue = ref.watch(allDiaryNotesProvider);
     final viewModel = ref.read(diaryViewModelProvider.notifier);
 
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return Scaffold(
-      backgroundColor: Colors
-          .transparent, // Ajustado para ser como las demás vistas de escritorio
+      backgroundColor: Colors.transparent,
       body: Padding(
         padding: const EdgeInsets.all(32.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // --- CABECERA ESTANDARIZADA ---
-            const Text(
+            Text(
               'Diario',
-              style: TextStyle(
-                color: Color(0xFF0F172A),
-                fontWeight: FontWeight.bold,
-                fontSize: 32,
-              ),
+              style: textTheme.displayMedium?.copyWith(fontSize: 32),
             ),
-            const Divider(height: 16, color: Color(0xFFE2E8F0)),
+            Divider(
+                height: 16, color: colorScheme.outline.withValues(alpha: 0.2)),
             const SizedBox(height: 16),
-            // ------------------------------
-
             Expanded(
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -119,11 +66,15 @@ class _DiaryScreenDesktopState extends ConsumerState<DiaryScreenDesktop> {
                         Container(
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: colorScheme.surface,
                             borderRadius: BorderRadius.circular(24),
+                            border: Border.all(
+                                color:
+                                    colorScheme.outline.withValues(alpha: 0.1)),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.02),
+                                color:
+                                    colorScheme.shadow.withValues(alpha: 0.05),
                                 blurRadius: 10,
                                 offset: const Offset(0, 4),
                               ),
@@ -139,9 +90,9 @@ class _DiaryScreenDesktopState extends ConsumerState<DiaryScreenDesktop> {
                                   lastDay: DateTime.utc(2030, 12, 31),
                                   focusedDay: _focusedDay,
                                   selectedDayPredicate: (day) =>
-                                      _isSameDay(selectedDate, day),
+                                      isSameDay(selectedDate, day),
                                   onDaySelected: (selectedDay, focusedDay) {
-                                    _cancelEdit();
+                                    cancelEdit();
                                     ref
                                         .read(
                                             selectedDiaryDateProvider.notifier)
@@ -158,59 +109,74 @@ class _DiaryScreenDesktopState extends ConsumerState<DiaryScreenDesktop> {
                                   eventLoader: (day) {
                                     return allNotes
                                         .where((note) =>
-                                            _isSameDay(note.createdAt, day))
+                                            isSameDay(note.createdAt, day))
                                         .toList();
                                   },
-                                  headerStyle: const HeaderStyle(
+                                  daysOfWeekStyle: DaysOfWeekStyle(
+                                    weekdayStyle: TextStyle(
+                                        color: colorScheme.onSurfaceVariant,
+                                        fontSize: 13),
+                                    weekendStyle: TextStyle(
+                                        color: colorScheme.onSurfaceVariant,
+                                        fontSize: 13),
+                                  ),
+                                  headerStyle: HeaderStyle(
                                     formatButtonVisible: false,
                                     titleCentered: true,
                                     leftChevronIcon: Icon(Icons.chevron_left,
-                                        color: Color(0xFF475569)),
+                                        color: colorScheme.onSurfaceVariant),
                                     rightChevronIcon: Icon(Icons.chevron_right,
-                                        color: Color(0xFF475569)),
+                                        color: colorScheme.onSurfaceVariant),
                                     titleTextStyle: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold,
-                                        color: Color(0xFF1E293B)),
+                                        color: colorScheme.onSurface),
                                   ),
-                                  calendarStyle: const CalendarStyle(
+                                  calendarStyle: CalendarStyle(
+                                    defaultTextStyle:
+                                        TextStyle(color: colorScheme.onSurface),
+                                    weekendTextStyle: TextStyle(
+                                        color: colorScheme.onSurfaceVariant),
+                                    outsideTextStyle: TextStyle(
+                                        color: colorScheme.outline
+                                            .withValues(alpha: 0.5)),
                                     todayDecoration: BoxDecoration(
-                                      color: Color(0xFFE2E8F0),
+                                      color: colorScheme.secondary,
                                       shape: BoxShape.circle,
                                     ),
                                     todayTextStyle:
-                                        TextStyle(color: Color(0xFF1E293B)),
+                                        TextStyle(color: colorScheme.onSurface),
                                     selectedDecoration: BoxDecoration(
-                                      color: Color(0xFF6366F1),
+                                      color: colorScheme.primary,
                                       shape: BoxShape.circle,
                                     ),
                                     markerDecoration: BoxDecoration(
-                                      color: Color(0xFFF43F5E),
+                                      color: colorScheme.error,
                                       shape: BoxShape.circle,
                                     ),
                                     markersMaxCount: 1,
                                   ),
                                 );
                               },
-                              loading: () => const SizedBox(
+                              loading: () => SizedBox(
                                   height: 300,
                                   child: Center(
-                                      child: CircularProgressIndicator())),
-                              error: (_, __) => const SizedBox(
+                                      child: CircularProgressIndicator(
+                                          color: colorScheme.primary))),
+                              error: (_, __) => SizedBox(
                                   height: 300,
                                   child: Center(
-                                      child:
-                                          Text('Error al cargar calendario'))),
+                                      child: Text('Error al cargar calendario',
+                                          style: TextStyle(
+                                              color: colorScheme.error)))),
                             ),
                           ),
                         ),
                         const SizedBox(height: 24),
-                        const Text(
+                        Text(
                           'Entradas Recientes',
-                          style: TextStyle(
-                            fontSize: 16,
+                          style: textTheme.bodyLarge?.copyWith(
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF1E293B),
                           ),
                         ),
                         const SizedBox(height: 16),
@@ -228,8 +194,9 @@ class _DiaryScreenDesktopState extends ConsumerState<DiaryScreenDesktop> {
                               uniqueDays = uniqueDays.take(7).toList();
 
                               if (uniqueDays.isEmpty) {
-                                return const Text('No hay entradas recientes',
-                                    style: TextStyle(color: Color(0xFF94A3B8)));
+                                return Text('No hay entradas recientes',
+                                    style:
+                                        TextStyle(color: colorScheme.outline));
                               }
 
                               return ListView.builder(
@@ -237,13 +204,13 @@ class _DiaryScreenDesktopState extends ConsumerState<DiaryScreenDesktop> {
                                 itemBuilder: (context, index) {
                                   final date = uniqueDays[index];
                                   final isSelected =
-                                      _isSameDay(date, selectedDate);
+                                      isSameDay(date, selectedDate);
 
                                   return MouseRegion(
                                     cursor: SystemMouseCursors.click,
                                     child: GestureDetector(
                                       onTap: () {
-                                        _cancelEdit();
+                                        cancelEdit();
                                         ref
                                             .read(selectedDiaryDateProvider
                                                 .notifier)
@@ -259,15 +226,17 @@ class _DiaryScreenDesktopState extends ConsumerState<DiaryScreenDesktop> {
                                             horizontal: 16, vertical: 12),
                                         decoration: BoxDecoration(
                                           color: isSelected
-                                              ? const Color(0xFFEEF2FF)
-                                              : Colors.white,
+                                              ? colorScheme.primary
+                                                  .withValues(alpha: 0.1)
+                                              : colorScheme.surface,
                                           borderRadius:
                                               BorderRadius.circular(16),
                                           border: Border.all(
                                             color: isSelected
-                                                ? const Color(0xFF6366F1)
-                                                    .withValues(alpha: 0.2)
-                                                : Colors.transparent,
+                                                ? colorScheme.primary
+                                                    .withValues(alpha: 0.5)
+                                                : colorScheme.outline
+                                                    .withValues(alpha: 0.1),
                                           ),
                                         ),
                                         child: Text(
@@ -278,8 +247,8 @@ class _DiaryScreenDesktopState extends ConsumerState<DiaryScreenDesktop> {
                                                 ? FontWeight.bold
                                                 : FontWeight.w500,
                                             color: isSelected
-                                                ? const Color(0xFF6366F1)
-                                                : const Color(0xFF475569),
+                                                ? colorScheme.primary
+                                                : colorScheme.onSurfaceVariant,
                                           ),
                                         ),
                                       ),
@@ -288,8 +257,9 @@ class _DiaryScreenDesktopState extends ConsumerState<DiaryScreenDesktop> {
                                 },
                               );
                             },
-                            loading: () => const Center(
-                                child: CircularProgressIndicator()),
+                            loading: () => Center(
+                                child: CircularProgressIndicator(
+                                    color: colorScheme.primary)),
                             error: (_, __) => const Center(
                                 child: Text('Error al cargar recientes')),
                           ),
@@ -301,11 +271,13 @@ class _DiaryScreenDesktopState extends ConsumerState<DiaryScreenDesktop> {
                   Expanded(
                     child: Container(
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: colorScheme.surface,
                         borderRadius: BorderRadius.circular(24),
+                        border: Border.all(
+                            color: colorScheme.outline.withValues(alpha: 0.1)),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.02),
+                            color: colorScheme.shadow.withValues(alpha: 0.05),
                             blurRadius: 10,
                             offset: const Offset(0, 4),
                           ),
@@ -314,48 +286,48 @@ class _DiaryScreenDesktopState extends ConsumerState<DiaryScreenDesktop> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Padding(
-                            padding: EdgeInsets.only(
+                          Padding(
+                            padding: const EdgeInsets.only(
                                 left: 32, top: 32, right: 32, bottom: 16),
                             child: Text(
                               'Notas',
-                              style: TextStyle(
-                                fontSize: 32,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFF0F172A),
-                              ),
+                              style: textTheme.displayMedium
+                                  ?.copyWith(fontSize: 32),
                             ),
                           ),
                           Expanded(
                             child: notesAsyncValue.when(
-                              loading: () => const Center(
-                                  child: CircularProgressIndicator()),
-                              error: (error, stack) =>
-                                  Center(child: Text('Error: $error')),
+                              loading: () => Center(
+                                  child: CircularProgressIndicator(
+                                      color: colorScheme.primary)),
+                              error: (error, stack) => Center(
+                                  child: Text('Error: $error',
+                                      style:
+                                          TextStyle(color: colorScheme.error))),
                               data: (allNotes) {
                                 final filteredNotes = allNotes
-                                    .where((note) => _isSameDay(
-                                        note.createdAt, selectedDate))
+                                    .where((note) =>
+                                        isSameDay(note.createdAt, selectedDate))
                                     .toList();
 
                                 WidgetsBinding.instance
                                     .addPostFrameCallback((_) {
-                                  _scrollToBottom();
+                                  scrollToBottom();
                                 });
 
                                 if (filteredNotes.isEmpty) {
-                                  return const Center(
+                                  return Center(
                                     child: Text(
                                       'No hay notas para este día',
                                       style: TextStyle(
-                                          color: Color(0xFF94A3B8),
+                                          color: colorScheme.outline,
                                           fontSize: 16),
                                     ),
                                   );
                                 }
 
                                 return ListView.builder(
-                                  controller: _scrollController,
+                                  controller: scrollController,
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 32.0, vertical: 16.0),
                                   itemCount: filteredNotes.length,
@@ -364,21 +336,31 @@ class _DiaryScreenDesktopState extends ConsumerState<DiaryScreenDesktop> {
                                     final timeString =
                                         '${note.createdAt.hour.toString().padLeft(2, '0')}:${note.createdAt.minute.toString().padLeft(2, '0')}';
                                     final isBeingEdited =
-                                        _editingNoteId == note.id;
+                                        editingNoteId == note.id;
 
                                     return Container(
                                       margin: const EdgeInsets.only(bottom: 16),
                                       padding: const EdgeInsets.all(20),
                                       decoration: BoxDecoration(
                                         color: isBeingEdited
-                                            ? const Color(0xFFFDE68A)
-                                            : const Color(0xFFFEF3C7),
+                                            ? colorScheme.primary
+                                                .withValues(alpha: 0.1)
+                                            : colorScheme.surface,
                                         borderRadius: BorderRadius.circular(16),
-                                        border: isBeingEdited
-                                            ? Border.all(
-                                                color: const Color(0xFFF59E0B),
-                                                width: 1)
-                                            : null,
+                                        border: Border.all(
+                                          color: isBeingEdited
+                                              ? colorScheme.primary
+                                              : colorScheme.outline
+                                                  .withValues(alpha: 0.2),
+                                        ),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: colorScheme.shadow
+                                                .withValues(alpha: 0.05),
+                                            blurRadius: 8,
+                                            offset: const Offset(0, 2),
+                                          ),
+                                        ],
                                       ),
                                       child: Column(
                                         crossAxisAlignment:
@@ -390,10 +372,10 @@ class _DiaryScreenDesktopState extends ConsumerState<DiaryScreenDesktop> {
                                             children: [
                                               Text(
                                                 timeString,
-                                                style: const TextStyle(
-                                                  fontSize: 14,
-                                                  color: Color(0xFF94A3B8),
-                                                  fontWeight: FontWeight.w500,
+                                                style: textTheme.bodySmall
+                                                    ?.copyWith(
+                                                  color: colorScheme
+                                                      .onSurfaceVariant,
                                                 ),
                                               ),
                                               Row(
@@ -405,19 +387,19 @@ class _DiaryScreenDesktopState extends ConsumerState<DiaryScreenDesktop> {
                                                     child: GestureDetector(
                                                       onTap: () {
                                                         setState(() {
-                                                          _editingNoteId =
+                                                          editingNoteId =
                                                               note.id;
-                                                          _noteController.text =
+                                                          noteController.text =
                                                               note.content;
                                                         });
-                                                        _focusNode
+                                                        focusNode
                                                             .requestFocus();
                                                       },
-                                                      child: const Icon(
+                                                      child: Icon(
                                                         Icons.edit_outlined,
                                                         size: 18,
-                                                        color:
-                                                            Color(0xFF475569),
+                                                        color: colorScheme
+                                                            .onSurfaceVariant,
                                                       ),
                                                     ),
                                                   ),
@@ -427,18 +409,18 @@ class _DiaryScreenDesktopState extends ConsumerState<DiaryScreenDesktop> {
                                                         .click,
                                                     child: GestureDetector(
                                                       onTap: () {
-                                                        if (_editingNoteId ==
+                                                        if (editingNoteId ==
                                                             note.id) {
-                                                          _cancelEdit();
+                                                          cancelEdit();
                                                         }
                                                         viewModel.deleteNote(
                                                             note.id);
                                                       },
-                                                      child: const Icon(
+                                                      child: Icon(
                                                         Icons.delete_outline,
                                                         size: 18,
-                                                        color:
-                                                            Color(0xFF475569),
+                                                        color: colorScheme
+                                                            .onSurfaceVariant,
                                                       ),
                                                     ),
                                                   ),
@@ -449,9 +431,8 @@ class _DiaryScreenDesktopState extends ConsumerState<DiaryScreenDesktop> {
                                           const SizedBox(height: 8),
                                           Text(
                                             note.content,
-                                            style: const TextStyle(
-                                              fontSize: 16,
-                                              color: Color(0xFF334155),
+                                            style:
+                                                textTheme.bodyLarge?.copyWith(
                                               height: 1.5,
                                             ),
                                           ),
@@ -467,34 +448,37 @@ class _DiaryScreenDesktopState extends ConsumerState<DiaryScreenDesktop> {
                             padding: const EdgeInsets.all(24),
                             child: Container(
                               decoration: BoxDecoration(
-                                color: const Color(0xFFEEF2FF),
+                                color: colorScheme.secondary,
                                 borderRadius: BorderRadius.circular(24),
                               ),
                               child: Row(
                                 children: [
-                                  if (_editingNoteId != null)
+                                  if (editingNoteId != null)
                                     IconButton(
-                                      icon: const Icon(Icons.close,
-                                          color: Color(0xFF94A3B8)),
-                                      onPressed: _cancelEdit,
+                                      icon: Icon(Icons.close,
+                                          color: colorScheme.onSurfaceVariant),
+                                      onPressed: cancelEdit,
                                     ),
                                   Expanded(
                                     child: TextField(
-                                      controller: _noteController,
-                                      focusNode: _focusNode,
+                                      controller: noteController,
+                                      focusNode: focusNode,
                                       textInputAction: TextInputAction.send,
                                       onSubmitted: (_) =>
-                                          _handleSubmit(viewModel),
+                                          handleSubmit(viewModel),
+                                      style: TextStyle(
+                                          color: colorScheme.onSurface),
                                       decoration: InputDecoration(
-                                        hintText: _editingNoteId != null
+                                        hintText: editingNoteId != null
                                             ? 'Editando nota...'
                                             : 'Escribe tu nota...',
-                                        hintStyle: const TextStyle(
-                                            color: Color(0xFF94A3B8)),
+                                        hintStyle: TextStyle(
+                                            color:
+                                                colorScheme.onSurfaceVariant),
                                         border: InputBorder.none,
                                         contentPadding: EdgeInsets.symmetric(
                                             horizontal:
-                                                _editingNoteId != null ? 0 : 24,
+                                                editingNoteId != null ? 0 : 24,
                                             vertical: 18),
                                       ),
                                     ),
@@ -503,11 +487,11 @@ class _DiaryScreenDesktopState extends ConsumerState<DiaryScreenDesktop> {
                                     padding: const EdgeInsets.only(right: 8.0),
                                     child: IconButton(
                                       icon: Icon(
-                                          _editingNoteId != null
+                                          editingNoteId != null
                                               ? Icons.check_circle
                                               : Icons.send_outlined,
-                                          color: const Color(0xFF6366F1)),
-                                      onPressed: () => _handleSubmit(viewModel),
+                                          color: colorScheme.primary),
+                                      onPressed: () => handleSubmit(viewModel),
                                     ),
                                   ),
                                 ],

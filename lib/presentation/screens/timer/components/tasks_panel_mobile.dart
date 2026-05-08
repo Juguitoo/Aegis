@@ -137,10 +137,10 @@ class TasksPanelMobile extends ConsumerWidget {
         width: double.infinity,
         padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
         decoration: BoxDecoration(
-          color: colorScheme.secondary,
+          color: colorScheme.surface,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: colorScheme.primary.withValues(alpha: 0.2),
+            color: colorScheme.outline.withValues(alpha: 0.2),
             width: 1,
             style: BorderStyle.solid,
           ),
@@ -149,19 +149,20 @@ class TasksPanelMobile extends ConsumerWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.assignment_add, color: colorScheme.primary, size: 32),
+              Icon(Icons.assignment_add,
+                  color: colorScheme.onSurface, size: 32),
               const SizedBox(height: 8),
               Text(
                 'Reloj libre',
                 style: textTheme.bodyLarge?.copyWith(
-                  color: colorScheme.primary,
+                  color: colorScheme.onSurface,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               Text(
                 'Toca para seleccionar una tarea',
                 style: textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.primary.withValues(alpha: 0.7),
+                  color: colorScheme.onSurface.withValues(alpha: 0.7),
                 ),
               ),
             ],
