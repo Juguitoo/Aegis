@@ -132,7 +132,6 @@ class StatisticsHeaderControls extends ConsumerWidget {
       mainAxisSize: MainAxisSize.max,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        // 1. Sector izquierdo: Botones de periodo
         Container(
           decoration: BoxDecoration(
             color: colorScheme.secondary,
@@ -156,13 +155,7 @@ class StatisticsHeaderControls extends ConsumerWidget {
             ],
           ),
         ),
-
-        if (!isMobile)
-          const SizedBox(width: 32)
-        else
-          const SizedBox(width: 8), // Margen seguro de separación en móvil
-
-        // 2. Sector derecho: Controles de fecha (Envueltos en Expanded para que absorban la falta de espacio)
+        if (!isMobile) const SizedBox(width: 32) else const SizedBox(width: 8),
         Expanded(
           flex: isMobile ? 1 : 0,
           child: Row(
@@ -180,7 +173,6 @@ class StatisticsHeaderControls extends ConsumerWidget {
                     size: isMobile ? 24 : 28),
                 onPressed: () => _navigateDate(ref, false),
               ),
-              // FLEXIBLE: Si la pantalla es pequeña, este contenedor cederá terreno
               Flexible(
                 child: InkWell(
                   onTap: () => _pickDate(context, ref),
@@ -195,7 +187,6 @@ class StatisticsHeaderControls extends ConsumerWidget {
                       border: Border.all(
                           color: colorScheme.outline.withValues(alpha: 0.2)),
                     ),
-                    // FITTEDBOX: Encogerá la fuente del texto mágicamente si no cabe
                     child: FittedBox(
                       fit: BoxFit.scaleDown,
                       child: Text(

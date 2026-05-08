@@ -64,13 +64,10 @@ void main() {
       await tester.tap(find.text('Guardar'));
       await tester.pump();
 
-      // Comprobamos la alerta
       expect(find.byType(SnackBar), findsOneWidget);
 
-      // Comprobamos la seguridad (no guarda datos)
       verifyNever(() => mockRepository.insertProject(any()));
 
-      // Limpieza
       ScaffoldMessenger.of(tester.element(find.byType(Scaffold)))
           .clearSnackBars();
       await tester.pumpAndSettle();

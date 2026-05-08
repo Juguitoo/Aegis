@@ -48,7 +48,7 @@ class _DiaryScreenMobileState extends ConsumerState<DiaryScreenMobile>
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Text(
             'Diario',
-            style: textTheme.displayMedium,
+            style: textTheme.displayLarge,
           ),
         ),
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,

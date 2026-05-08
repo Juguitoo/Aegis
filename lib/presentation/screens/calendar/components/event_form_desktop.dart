@@ -23,6 +23,16 @@ class _EventFormDesktopState extends ConsumerState<EventFormDesktop>
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    dateController.text = selectedDate != null
+        ? DateFormat('dd MMM yyyy', 'es').format(selectedDate!)
+        : '';
+    timeController.text =
+        selectedTime != null ? selectedTime!.format(context) : '';
+    notificationController.text = selectedNotificationDate != null
+        ? DateFormat('dd MMM HH:mm', 'es').format(selectedNotificationDate!)
+        : '';
 
     return Dialog(
       backgroundColor: Colors.transparent,
@@ -35,7 +45,7 @@ class _EventFormDesktopState extends ConsumerState<EventFormDesktop>
           borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
-              color: colorScheme.onSurface.withValues(alpha: 0.1),
+              color: colorScheme.shadow.withValues(alpha: 0.1),
               blurRadius: 20,
               offset: const Offset(0, 10),
             ),
@@ -50,12 +60,12 @@ class _EventFormDesktopState extends ConsumerState<EventFormDesktop>
               children: [
                 Text(
                   initialEvent == null ? 'Nuevo Evento' : 'Editar Evento',
-                  style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                  style: textTheme.displayMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 IconButton(
-                  icon: Icon(Icons.close, color: colorScheme.outline),
+                  icon: Icon(Icons.close, color: colorScheme.onSurfaceVariant),
                   onPressed: () => Navigator.pop(context),
                 ),
               ],
@@ -73,17 +83,15 @@ class _EventFormDesktopState extends ConsumerState<EventFormDesktop>
               children: [
                 Text(
                   'Todo el día',
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
+                  style: textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: colorScheme.onSurface,
+                  ),
                 ),
                 Switch(
                   value: isAllDay,
                   onChanged: toggleAllDay,
-                  activeThumbColor: colorScheme.onPrimary,
-                  activeTrackColor: colorScheme.primary,
-                  inactiveThumbColor: colorScheme.outline,
-                  inactiveTrackColor: colorScheme.surface,
+                  activeThumbColor: colorScheme.primary,
                 ),
               ],
             ),
@@ -92,9 +100,8 @@ class _EventFormDesktopState extends ConsumerState<EventFormDesktop>
               children: [
                 Expanded(
                   child: AegisTextField(
-                    hintText: selectedDate != null
-                        ? DateFormat('dd MMM yyyy', 'es').format(selectedDate!)
-                        : 'Fecha',
+                    controller: dateController,
+                    hintText: 'Fecha',
                     prefixIcon: Icons.calendar_today,
                     readOnly: true,
                     onTap: pickDate,
@@ -104,9 +111,8 @@ class _EventFormDesktopState extends ConsumerState<EventFormDesktop>
                   const SizedBox(width: 16),
                   Expanded(
                     child: AegisTextField(
-                      hintText: selectedTime != null
-                          ? selectedTime!.format(context)
-                          : 'Hora',
+                      controller: timeController,
+                      hintText: 'Hora',
                       prefixIcon: Icons.access_time,
                       readOnly: true,
                       onTap: pickTime,
@@ -117,10 +123,8 @@ class _EventFormDesktopState extends ConsumerState<EventFormDesktop>
             ),
             const SizedBox(height: 24),
             AegisTextField(
-              hintText: selectedNotificationDate != null
-                  ? DateFormat('dd MMM HH:mm', 'es')
-                      .format(selectedNotificationDate!)
-                  : 'Añadir Recordatorio',
+              controller: notificationController,
+              hintText: 'Añadir Recordatorio',
               prefixIcon: Icons.notifications_active_outlined,
               suffixIcon: selectedNotificationDate != null
                   ? IconButton(

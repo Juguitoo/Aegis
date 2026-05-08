@@ -62,15 +62,12 @@ void main() {
       expect(find.text('Nueva Etiqueta'), findsOneWidget);
 
       await tester.tap(find.text('Guardar'));
-      await tester.pump(); // Iniciamos animación del SnackBar
+      await tester.pump();
 
-      // Comprobamos que el mensaje de error aparece
       expect(find.byType(SnackBar), findsOneWidget);
 
-      // Comprobamos que NO se ha guardado en base de datos
       verifyNever(() => mockRepository.insertTag(any()));
 
-      // Limpiamos los Snackbars para que el test cierre limpiamente
       ScaffoldMessenger.of(tester.element(find.byType(Scaffold)))
           .clearSnackBars();
       await tester.pumpAndSettle();

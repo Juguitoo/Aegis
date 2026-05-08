@@ -44,7 +44,7 @@ class AppTheme {
     onSurfaceVariant: darkDetail,
     outline: fiord,
     error: Color(0xFFEF4444),
-    onError: Color(0xFF7F1D1D),
+    onError: Color(0xFFFEE2E2),
   );
 
   static ThemeData get lightTheme {

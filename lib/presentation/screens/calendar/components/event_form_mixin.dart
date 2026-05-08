@@ -6,7 +6,12 @@ import 'package:aegis/presentation/viewmodels/calendar_viewmodel.dart';
 
 mixin EventFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
   Event? get initialEvent;
+
   final titleController = TextEditingController();
+  final dateController = TextEditingController();
+  final timeController = TextEditingController();
+  final notificationController = TextEditingController();
+
   DateTime? selectedDate;
   TimeOfDay? selectedTime;
   bool isAllDay = false;
@@ -34,6 +39,9 @@ mixin EventFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
   @override
   void dispose() {
     titleController.dispose();
+    dateController.dispose();
+    timeController.dispose();
+    notificationController.dispose();
     super.dispose();
   }
 
@@ -43,7 +51,7 @@ mixin EventFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: isError ? colorScheme.error : const Color(0xFF10B981),
+        backgroundColor: isError ? colorScheme.error : Colors.green.shade500,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
@@ -60,17 +68,10 @@ mixin EventFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
       cancelText: 'Cancelar',
       confirmText: 'Aceptar',
       builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: Theme.of(context).colorScheme.copyWith(
-                  primary: Theme.of(context).colorScheme.primary,
-                ),
-          ),
-          child: Localizations.override(
-            context: context,
-            locale: const Locale('es', 'ES'),
-            child: child!,
-          ),
+        return Localizations.override(
+          context: context,
+          locale: const Locale('es', 'ES'),
+          child: child!,
         );
       },
     );
@@ -120,17 +121,10 @@ mixin EventFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
       cancelText: 'Cancelar',
       confirmText: 'Aceptar',
       builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: Theme.of(context).colorScheme.copyWith(
-                  primary: Theme.of(context).colorScheme.primary,
-                ),
-          ),
-          child: Localizations.override(
-            context: context,
-            locale: const Locale('es', 'ES'),
-            child: child!,
-          ),
+        return Localizations.override(
+          context: context,
+          locale: const Locale('es', 'ES'),
+          child: child!,
         );
       },
     );

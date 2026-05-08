@@ -25,6 +25,16 @@ class _EventFormMobileState extends ConsumerState<EventFormMobile>
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
     final safeBottom = MediaQuery.of(context).padding.bottom;
     final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    dateController.text = selectedDate != null
+        ? DateFormat('dd MMM yyyy', 'es').format(selectedDate!)
+        : '';
+    timeController.text =
+        selectedTime != null ? selectedTime!.format(context) : '';
+    notificationController.text = selectedNotificationDate != null
+        ? DateFormat('dd MMM HH:mm', 'es').format(selectedNotificationDate!)
+        : '';
 
     return Padding(
       padding: EdgeInsets.only(bottom: bottomInset),
@@ -45,9 +55,9 @@ class _EventFormMobileState extends ConsumerState<EventFormMobile>
                 children: [
                   Text(
                     initialEvent == null ? 'Nuevo Evento' : 'Editar Evento',
-                    style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                    style: textTheme.displayMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   IconButton(
                     icon:
@@ -64,24 +74,22 @@ class _EventFormMobileState extends ConsumerState<EventFormMobile>
                 textCapitalization: TextCapitalization.sentences,
               ),
               const SizedBox(height: 8),
-              Divider(color: colorScheme.secondary),
+              Divider(color: colorScheme.outline.withValues(alpha: 0.2)),
               const SizedBox(height: 8),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
                     'Todo el día',
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
+                    style: textTheme.bodyLarge?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: colorScheme.onSurface,
+                    ),
                   ),
                   Switch(
                     value: isAllDay,
                     onChanged: toggleAllDay,
-                    activeThumbColor: colorScheme.onPrimary,
-                    activeTrackColor: colorScheme.primary,
-                    inactiveThumbColor: colorScheme.outline,
-                    inactiveTrackColor: colorScheme.surface,
+                    activeThumbColor: colorScheme.primary,
                   ),
                 ],
               ),
@@ -90,10 +98,8 @@ class _EventFormMobileState extends ConsumerState<EventFormMobile>
                 children: [
                   Expanded(
                     child: AegisTextField(
-                      hintText: selectedDate != null
-                          ? DateFormat('dd MMM yyyy', 'es')
-                              .format(selectedDate!)
-                          : 'Fecha',
+                      controller: dateController,
+                      hintText: 'Fecha',
                       prefixIcon: Icons.calendar_today,
                       readOnly: true,
                       onTap: pickDate,
@@ -103,9 +109,8 @@ class _EventFormMobileState extends ConsumerState<EventFormMobile>
                     const SizedBox(width: 12),
                     Expanded(
                       child: AegisTextField(
-                        hintText: selectedTime != null
-                            ? selectedTime!.format(context)
-                            : 'Hora',
+                        controller: timeController,
+                        hintText: 'Hora',
                         prefixIcon: Icons.access_time,
                         readOnly: true,
                         onTap: pickTime,
@@ -116,10 +121,8 @@ class _EventFormMobileState extends ConsumerState<EventFormMobile>
               ),
               const SizedBox(height: 16),
               AegisTextField(
-                hintText: selectedNotificationDate != null
-                    ? DateFormat('dd MMM HH:mm', 'es')
-                        .format(selectedNotificationDate!)
-                    : 'Añadir Recordatorio',
+                controller: notificationController,
+                hintText: 'Añadir Recordatorio',
                 prefixIcon: Icons.notifications_active_outlined,
                 suffixIcon: selectedNotificationDate != null
                     ? IconButton(

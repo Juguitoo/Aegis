@@ -18,6 +18,9 @@ class CalendarScreenDesktop extends ConsumerWidget {
     final tasksListAsync = ref.watch(taskListViewModelProvider);
     final eventsListAsync = ref.watch(eventsStreamProvider);
 
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     final normalizedSelectedDay = DateTime(
         state.selectedDay.year, state.selectedDay.month, state.selectedDay.day);
     final selectedItems = eventsMap[normalizedSelectedDay] ?? [];
@@ -34,15 +37,12 @@ class CalendarScreenDesktop extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Calendario',
-              style: TextStyle(
-                color: Color(0xFF0F172A),
-                fontWeight: FontWeight.bold,
-                fontSize: 32,
-              ),
+              style: textTheme.displayMedium?.copyWith(fontSize: 32),
             ),
-            const Divider(height: 16, color: Color(0xFFE2E8F0)),
+            Divider(
+                height: 16, color: colorScheme.outline.withValues(alpha: 0.2)),
             const SizedBox(height: 16),
             Expanded(
               child: Row(
@@ -53,12 +53,13 @@ class CalendarScreenDesktop extends ConsumerWidget {
                     child: Container(
                       padding: const EdgeInsets.all(24),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: colorScheme.surface,
                         borderRadius: BorderRadius.circular(24),
-                        border: Border.all(color: const Color(0xFFE2E8F0)),
+                        border: Border.all(
+                            color: colorScheme.outline.withValues(alpha: 0.1)),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.02),
+                            color: colorScheme.shadow.withValues(alpha: 0.05),
                             blurRadius: 10,
                             offset: const Offset(0, 4),
                           ),
@@ -88,11 +89,29 @@ class CalendarScreenDesktop extends ConsumerWidget {
                         },
                         startingDayOfWeek: StartingDayOfWeek.monday,
                         shouldFillViewport: true,
-                        headerStyle: const HeaderStyle(
+                        daysOfWeekStyle: DaysOfWeekStyle(
+                          weekdayStyle:
+                              TextStyle(color: colorScheme.onSurfaceVariant),
+                          weekendStyle:
+                              TextStyle(color: colorScheme.onSurfaceVariant),
+                        ),
+                        calendarStyle: CalendarStyle(
+                          defaultTextStyle:
+                              TextStyle(color: colorScheme.onSurface),
+                          weekendTextStyle:
+                              TextStyle(color: colorScheme.onSurfaceVariant),
+                          outsideTextStyle: TextStyle(
+                              color:
+                                  colorScheme.outline.withValues(alpha: 0.5)),
+                        ),
+                        headerStyle: HeaderStyle(
                           formatButtonVisible: false,
                           titleCentered: true,
-                          titleTextStyle: TextStyle(
-                            fontSize: 18,
+                          leftChevronIcon: Icon(Icons.chevron_left,
+                              color: colorScheme.onSurfaceVariant),
+                          rightChevronIcon: Icon(Icons.chevron_right,
+                              color: colorScheme.onSurfaceVariant),
+                          titleTextStyle: textTheme.bodyLarge!.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -102,15 +121,15 @@ class CalendarScreenDesktop extends ConsumerWidget {
                               child: Container(
                                 width: 50,
                                 height: 50,
-                                decoration: const BoxDecoration(
-                                  color: Color(0xFF6366F1),
+                                decoration: BoxDecoration(
+                                  color: colorScheme.primary,
                                   shape: BoxShape.circle,
                                 ),
                                 alignment: Alignment.center,
                                 child: Text(
                                   '${date.day}',
-                                  style: const TextStyle(
-                                    color: Colors.white,
+                                  style: TextStyle(
+                                    color: colorScheme.onPrimary,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
@@ -122,33 +141,53 @@ class CalendarScreenDesktop extends ConsumerWidget {
                               child: Container(
                                 width: 50,
                                 height: 50,
-                                decoration: const BoxDecoration(
-                                  color: Color(0xFFEEF2FF),
+                                decoration: BoxDecoration(
+                                  color: colorScheme.primary
+                                      .withValues(alpha: 0.1),
                                   shape: BoxShape.circle,
                                 ),
                                 alignment: Alignment.center,
                                 child: Text(
                                   '${date.day}',
-                                  style: const TextStyle(
-                                    color: Color(0xFF6366F1),
+                                  style: TextStyle(
+                                    color: colorScheme.primary,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
                               ),
                             );
                           },
-                          markerBuilder: (context, date, events) {
-                            if (events.isEmpty) return const SizedBox();
-                            return Align(
-                              alignment: Alignment.center,
-                              child: Transform.translate(
-                                offset: const Offset(0, 30),
-                                child: Container(
-                                  width: 6,
-                                  height: 6,
-                                  decoration: const BoxDecoration(
-                                    color: Color(0xFF6366F1),
-                                    shape: BoxShape.circle,
+                          // --- NUEVO INDICADOR DE EVENTOS ---
+                          markerBuilder: (context, date, items) {
+                            if (items.isEmpty) return const SizedBox();
+
+                            // Ocultamos el borde si el día ya está seleccionado para que no se superpongan
+                            if (isSameDay(state.selectedDay, date))
+                              return const SizedBox();
+
+                            final hasTasks = items
+                                .any((i) => i.type == CalendarItemType.task);
+                            final hasEvents = items
+                                .any((i) => i.type == CalendarItemType.event);
+
+                            Color indicatorColor = colorScheme.primary;
+                            if (hasTasks && hasEvents) {
+                              indicatorColor = Colors.purple.shade400;
+                            } else if (hasEvents) {
+                              indicatorColor = Colors.orange.shade400;
+                            }
+
+                            return Positioned.fill(
+                              child: Container(
+                                margin: const EdgeInsets.all(6.0),
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: indicatorColor.withValues(
+                                      alpha: 0.05), // Glow sutil
+                                  border: Border.all(
+                                    color:
+                                        indicatorColor.withValues(alpha: 0.6),
+                                    width: 2.0,
                                   ),
                                 ),
                               ),
@@ -164,12 +203,13 @@ class CalendarScreenDesktop extends ConsumerWidget {
                     child: Container(
                       padding: const EdgeInsets.all(24),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: colorScheme.surface,
                         borderRadius: BorderRadius.circular(24),
-                        border: Border.all(color: const Color(0xFFE2E8F0)),
+                        border: Border.all(
+                            color: colorScheme.outline.withValues(alpha: 0.1)),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.02),
+                            color: colorScheme.shadow.withValues(alpha: 0.05),
                             blurRadius: 10,
                             offset: const Offset(0, 4),
                           ),
@@ -181,12 +221,11 @@ class CalendarScreenDesktop extends ConsumerWidget {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Text(
+                              Text(
                                 'Planificación',
-                                style: TextStyle(
+                                style: textTheme.bodyLarge?.copyWith(
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
-                                  color: Color(0xFF1E293B),
                                 ),
                               ),
                               ElevatedButton.icon(
@@ -202,8 +241,8 @@ class CalendarScreenDesktop extends ConsumerWidget {
                                 icon: const Icon(Icons.add),
                                 label: const Text('Nuevo Evento'),
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFF6366F1),
-                                  foregroundColor: Colors.white,
+                                  backgroundColor: colorScheme.primary,
+                                  foregroundColor: colorScheme.onPrimary,
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 16, vertical: 12),
                                   shape: RoundedRectangleBorder(
@@ -214,37 +253,38 @@ class CalendarScreenDesktop extends ConsumerWidget {
                               ),
                             ],
                           ),
-                          const Divider(height: 32, color: Color(0xFFE2E8F0)),
+                          Divider(
+                              height: 32,
+                              color:
+                                  colorScheme.outline.withValues(alpha: 0.2)),
                           Text(
                             DateFormat('EEEE, d MMMM', 'es')
                                 .format(state.selectedDay)
                                 .capitalize(),
-                            style: const TextStyle(
-                              fontSize: 16,
+                            style: textTheme.bodyLarge?.copyWith(
                               fontWeight: FontWeight.w600,
-                              color: Color(0xFF64748B),
+                              color: colorScheme.onSurfaceVariant,
                             ),
                           ),
                           const SizedBox(height: 16),
                           Expanded(
                             child: selectedItems.isEmpty
-                                ? const Center(
+                                ? Center(
                                     child: Text(
                                       'No hay eventos ni tareas para este día',
                                       style:
-                                          TextStyle(color: Color(0xFF94A3B8)),
+                                          TextStyle(color: colorScheme.outline),
                                     ),
                                   )
                                 : ListView(
                                     padding: EdgeInsets.zero,
                                     children: [
                                       if (events.isNotEmpty) ...[
-                                        const Text(
+                                        Text(
                                           'Eventos',
-                                          style: TextStyle(
-                                            fontSize: 14,
+                                          style: textTheme.bodySmall?.copyWith(
                                             fontWeight: FontWeight.bold,
-                                            color: Color(0xFF64748B),
+                                            color: colorScheme.onSurfaceVariant,
                                           ),
                                         ),
                                         const SizedBox(height: 12),
@@ -276,12 +316,11 @@ class CalendarScreenDesktop extends ConsumerWidget {
                                         const SizedBox(height: 24),
                                       ],
                                       if (calendarTasks.isNotEmpty) ...[
-                                        const Text(
+                                        Text(
                                           'Tareas',
-                                          style: TextStyle(
-                                            fontSize: 14,
+                                          style: textTheme.bodySmall?.copyWith(
                                             fontWeight: FontWeight.bold,
-                                            color: Color(0xFF64748B),
+                                            color: colorScheme.onSurfaceVariant,
                                           ),
                                         ),
                                         const SizedBox(height: 12),
@@ -351,12 +390,15 @@ class _EventCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: const Color(0xFFEEF2FF),
+        color: colorScheme.primary.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE0E7FF)),
+        border: Border.all(color: colorScheme.primary.withValues(alpha: 0.15)),
       ),
       child: Material(
         color: Colors.transparent,
@@ -369,12 +411,18 @@ class _EventCard extends StatelessWidget {
               children: [
                 Container(
                   padding: const EdgeInsets.all(12),
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.event,
-                      color: Color(0xFF6366F1), size: 24),
+                  decoration: BoxDecoration(
+                      color: colorScheme.surface,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: colorScheme.shadow.withValues(alpha: 0.05),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        )
+                      ]),
+                  child:
+                      Icon(Icons.event, color: colorScheme.primary, size: 24),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
@@ -383,10 +431,8 @@ class _EventCard extends StatelessWidget {
                     children: [
                       Text(
                         item.title,
-                        style: const TextStyle(
-                          fontSize: 16,
+                        style: textTheme.bodyLarge?.copyWith(
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF1E293B),
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -394,9 +440,8 @@ class _EventCard extends StatelessWidget {
                         item.isAllDay
                             ? 'Todo el día'
                             : DateFormat('HH:mm').format(item.date),
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: Color(0xFF6366F1),
+                        style: textTheme.bodySmall?.copyWith(
+                          color: colorScheme.primary,
                           fontWeight: FontWeight.w600,
                         ),
                       ),

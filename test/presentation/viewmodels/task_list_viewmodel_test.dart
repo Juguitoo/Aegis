@@ -140,8 +140,7 @@ void main() {
       expect(tagsPassed, [1, 2]);
       expect(subtasksPassed.length, 1);
       expect(subtasksPassed.first.title.value, 'Primer paso');
-      expect(subtasksPassed.first.position.value,
-          0); // Verifica que el ViewModel le asignó posición
+      expect(subtasksPassed.first.position.value, 0);
     });
 
     test('Debe llamar al repositorio al eliminar una tarea', () async {

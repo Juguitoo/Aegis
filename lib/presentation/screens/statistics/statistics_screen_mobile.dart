@@ -125,7 +125,7 @@ class _StatisticsScreenMobileState
               child: Column(
                 children: [
                   Divider(
-                      color: colorScheme.outline.withValues(alpha: 0.1),
+                      color: colorScheme.outline.withValues(alpha: 0.2),
                       height: 1),
                   const Expanded(
                     child: Padding(
@@ -134,7 +134,7 @@ class _StatisticsScreenMobileState
                     ),
                   ),
                   Divider(
-                      color: colorScheme.outline.withValues(alpha: 0.1),
+                      color: colorScheme.outline.withValues(alpha: 0.2),
                       height: 1),
                 ],
               ),
@@ -191,13 +191,13 @@ class _StatisticsScreenMobileState
                     children: [
                       ChartContainer(
                         height: 320,
-                        title: 'Rendimiento Diario (Horas)',
+                        title: 'Rendimiento diario (Horas)',
                         child: FocusBarChart(data: state.chartData),
                       ),
                       const SizedBox(height: 24),
                       ChartContainer(
                         height: 320,
-                        title: 'Rendimiento Diario (Tareas)',
+                        title: 'Rendimiento diario (Tareas)',
                         trailing: 'Total: ${state.completedTasks}',
                         child: TasksLineChart(data: state.chartData),
                       ),
@@ -211,7 +211,7 @@ class _StatisticsScreenMobileState
                       const SizedBox(height: 24),
                       ChartContainer(
                         height: 320,
-                        title: 'Distribución por Proyectos',
+                        title: 'Distribución por areas',
                         child: ProjectPieChart(data: state.projectDistribution),
                       ),
                       const SizedBox(height: 80),

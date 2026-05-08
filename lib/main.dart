@@ -13,7 +13,6 @@ import 'package:window_manager/window_manager.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 void main() async {
-  // Asegura que el motor y el gestor de ventanas estén inicializados
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting('es_ES', null);
 
@@ -23,7 +22,6 @@ void main() async {
   if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
     await windowManager.ensureInitialized();
 
-    // Configuración de la ventana para escritorio
     WindowOptions windowOptions = const WindowOptions(
       size: Size(1200, 800),
       minimumSize: Size(1200, 750),

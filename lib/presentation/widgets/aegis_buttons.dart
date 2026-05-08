@@ -43,9 +43,9 @@ class AegisButton extends StatelessWidget {
         iconColor = colorScheme.onSecondary;
         break;
       case ButtonType.destructive:
-        backgroundColor = colorScheme.onError;
-        textColor = colorScheme.error;
-        iconColor = colorScheme.error;
+        backgroundColor = colorScheme.error;
+        textColor = colorScheme.onError;
+        iconColor = colorScheme.onError;
         break;
     }
 

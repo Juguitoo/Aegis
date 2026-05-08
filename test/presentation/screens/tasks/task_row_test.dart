@@ -20,7 +20,6 @@ void main() {
     mockTaskRepo = MockTaskRepository();
     mockTagRepo = MockTagRepository();
 
-    // Le decimos a los mocks que devuelvan listas vacías para que el widget no se queje
     when(() => mockTaskRepo.watchTagIdsForTask(any()))
         .thenAnswer((_) => Stream.value([]));
     when(() => mockTagRepo.watchAllTags()).thenAnswer((_) => Stream.value([]));

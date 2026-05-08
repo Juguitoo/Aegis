@@ -110,12 +110,10 @@ void main() {
     final container = ProviderContainer(
       overrides: [
         settingsViewModelProvider.overrideWith(() => MockSettingsViewmodel()),
-        // ¡CORREGIDO! Usamos las variables del setUp, no instancias nuevas.
         taskRepositoryProvider.overrideWithValue(fakeTaskRepo),
         sessionRepositoryProvider.overrideWithValue(fakeSessionRepo),
         adaptiveCalculatorProvider
             .overrideWithValue(AdaptiveIntervalCalculator()),
-        // ¡LA MAGIA AQUÍ! Inyectamos null para apagar el audio en los tests.
         audioPlayerProvider.overrideWith((ref) => null),
       ],
     );
