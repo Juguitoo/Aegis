@@ -2,12 +2,12 @@ import 'package:aegis/data/local/database/app_database.dart';
 import 'package:drift/drift.dart';
 
 class ProjectDistributionData {
-  final String projectName;
+  final String areaName;
   final String colorHex;
   final int taskCount;
 
   ProjectDistributionData({
-    required this.projectName,
+    required this.areaName,
     required this.colorHex,
     required this.taskCount,
   });
@@ -84,20 +84,18 @@ class StatisticsRepository {
     final countExpr = _db.tasks.id.count();
 
     final query = _db.selectOnly(_db.tasks)
-      ..addColumns([_db.projects.name, _db.projects.colorHex, countExpr])
-      ..join([
-        innerJoin(_db.projects, _db.projects.id.equalsExp(_db.tasks.projectId))
-      ])
+      ..addColumns([_db.areas.name, _db.areas.colorHex, countExpr])
+      ..join([innerJoin(_db.areas, _db.areas.id.equalsExp(_db.tasks.areaId))])
       ..where(_db.tasks.completedAt.isNotNull() &
           _db.tasks.completedAt.isBetweenValues(start, end))
-      ..groupBy([_db.projects.id]);
+      ..groupBy([_db.areas.id]);
 
     final results = await query.get();
 
     return results.map((row) {
       return ProjectDistributionData(
-        projectName: row.read(_db.projects.name) ?? 'Sin Proyecto',
-        colorHex: row.read(_db.projects.colorHex) ?? '#000000',
+        areaName: row.read(_db.areas.name) ?? 'Sin Proyecto',
+        colorHex: row.read(_db.areas.colorHex) ?? '#000000',
         taskCount: row.read(countExpr) ?? 0,
       );
     }).toList();

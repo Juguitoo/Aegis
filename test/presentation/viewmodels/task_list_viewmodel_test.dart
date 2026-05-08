@@ -17,18 +17,18 @@ void main() {
   late ProviderContainer container;
   ProviderSubscription? subscription;
 
-  final task1 = Task(
-      id: 1, title: 'Tarea 1', completedAt: null, priority: 0, projectId: 1);
-  final task2 = Task(
-      id: 2, title: 'Tarea 2', completedAt: null, priority: 0, projectId: 1);
-  final task3 = Task(
-      id: 3, title: 'Tarea 3', completedAt: null, priority: 0, projectId: 2);
+  final task1 =
+      Task(id: 1, title: 'Tarea 1', completedAt: null, priority: 0, areaId: 1);
+  final task2 =
+      Task(id: 2, title: 'Tarea 2', completedAt: null, priority: 0, areaId: 1);
+  final task3 =
+      Task(id: 3, title: 'Tarea 3', completedAt: null, priority: 0, areaId: 2);
   final task4 = Task(
       id: 4,
       title: 'Bandeja Entrada',
       completedAt: null,
       priority: 0,
-      projectId: null);
+      areaId: null);
 
   setUpAll(() {
     registerFallbackValue(FakeTask());
@@ -72,14 +72,14 @@ void main() {
     });
 
     test('Debe filtrar por proyecto especifico', () async {
-      container.read(projectFilterProvider.notifier).state = 1;
+      container.read(areaFilterProvider.notifier).state = 1;
       final tasks = await container.read(taskListViewModelProvider.future);
       expect(tasks.length, 2);
       expect(tasks.map((t) => t.id), containsAll([1, 2]));
     });
 
-    test('Debe filtrar por bandeja de entrada (projectId == null)', () async {
-      container.read(projectFilterProvider.notifier).state = -1;
+    test('Debe filtrar por bandeja de entrada (areaId == null)', () async {
+      container.read(areaFilterProvider.notifier).state = -1;
       final tasks = await container.read(taskListViewModelProvider.future);
       expect(tasks.length, 1);
       expect(tasks.first.id, 4);
@@ -102,7 +102,7 @@ void main() {
     });
 
     test('Debe combinar filtro de proyecto y etiquetas (logica AND)', () async {
-      container.read(projectFilterProvider.notifier).state = 2;
+      container.read(areaFilterProvider.notifier).state = 2;
       container.read(tagFilterProvider.notifier).state = [1];
       final tasks = await container.read(taskListViewModelProvider.future);
       expect(tasks.length, 1);

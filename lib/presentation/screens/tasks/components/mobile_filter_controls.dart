@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:aegis/core/utils/color_utils.dart';
-import 'package:aegis/presentation/viewmodels/project_list_viewmodel.dart';
+import 'package:aegis/presentation/viewmodels/area_list_viewmodel.dart';
 import 'package:aegis/presentation/viewmodels/task_list_viewmodel.dart';
 import 'package:aegis/presentation/viewmodels/tag_list_viewmodel.dart';
 import 'package:aegis/presentation/screens/tags/components/tag_multi_selector.dart';
@@ -13,27 +13,26 @@ class MobileFilterControls extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final selectedProjectId = ref.watch(projectFilterProvider);
+    final selectedAreaId = ref.watch(areaFilterProvider);
     final selectedTagIds = ref.watch(tagFilterProvider);
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    final projectsAsync = ref.watch(projectListViewModelProvider);
+    final areasAsync = ref.watch(areaListViewModelProvider);
     final tagsAsync = ref.watch(tagListViewModelProvider);
 
-    String? activeProjectName;
-    Color? activeProjectColor;
+    String? activeAreaName;
+    Color? activeAreaColor;
 
-    if (selectedProjectId == -1) {
-      activeProjectName = 'Bandeja de entrada';
-      activeProjectColor = colorScheme.onSurfaceVariant;
-    } else if (selectedProjectId != null) {
-      final projectVal = projectsAsync.value
-          ?.where((p) => p.id == selectedProjectId)
-          .firstOrNull;
-      if (projectVal != null) {
-        activeProjectName = projectVal.name;
-        activeProjectColor = ColorUtils.parseColor(projectVal.colorHex);
+    if (selectedAreaId == -1) {
+      activeAreaName = 'Bandeja de entrada';
+      activeAreaColor = colorScheme.onSurfaceVariant;
+    } else if (selectedAreaId != null) {
+      final areaVal =
+          areasAsync.value?.where((p) => p.id == selectedAreaId).firstOrNull;
+      if (areaVal != null) {
+        activeAreaName = areaVal.name;
+        activeAreaColor = ColorUtils.parseColor(areaVal.colorHex);
       }
     }
 
@@ -77,23 +76,23 @@ class MobileFilterControls extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: 16),
-          if (activeProjectName != null || selectedTagIds.isNotEmpty)
+          if (activeAreaName != null || selectedTagIds.isNotEmpty)
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.only(bottom: 12),
               child: Row(
                 children: [
-                  if (activeProjectName != null)
+                  if (activeAreaName != null)
                     Container(
                       margin: const EdgeInsets.only(right: 8),
                       padding: const EdgeInsets.symmetric(
                           horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
-                        color: activeProjectColor?.withValues(alpha: 0.1) ??
+                        color: activeAreaColor?.withValues(alpha: 0.1) ??
                             colorScheme.secondary,
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: activeProjectColor?.withValues(alpha: 0.4) ??
+                          color: activeAreaColor?.withValues(alpha: 0.4) ??
                               colorScheme.outline.withValues(alpha: 0.3),
                         ),
                       ),
@@ -101,22 +100,22 @@ class MobileFilterControls extends ConsumerWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            'Proyecto: $activeProjectName',
+                            'Area: $activeAreaName',
                             style: textTheme.bodySmall?.copyWith(
-                              color: activeProjectColor ??
+                              color: activeAreaColor ??
                                   colorScheme.onSurfaceVariant,
                             ),
                           ),
                           const SizedBox(width: 8),
                           GestureDetector(
                             onTap: () {
-                              ref.read(projectFilterProvider.notifier).state =
+                              ref.read(areaFilterProvider.notifier).state =
                                   null;
                             },
                             child: Icon(
                               Icons.close,
                               size: 16,
-                              color: activeProjectColor ??
+                              color: activeAreaColor ??
                                   colorScheme.onSurfaceVariant,
                             ),
                           ),
@@ -184,8 +183,8 @@ class MobileTaskFiltersBottomSheet extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final projectsAsync = ref.watch(projectListViewModelProvider);
-    final selectedProjectId = ref.watch(projectFilterProvider);
+    final areasAsync = ref.watch(areaListViewModelProvider);
+    final selectedAreaId = ref.watch(areaFilterProvider);
     final selectedTagIds = ref.watch(tagFilterProvider);
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
@@ -220,18 +219,18 @@ class MobileTaskFiltersBottomSheet extends ConsumerWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            'Proyecto',
+            'Area',
             style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 8),
-          projectsAsync.when(
-            data: (projects) {
+          areasAsync.when(
+            data: (areas) {
               return AegisDropdown<int?>(
-                value: selectedProjectId,
+                value: selectedAreaId,
                 items: [
                   const DropdownMenuItem<int?>(
                     value: null,
-                    child: Text('Todos los proyectos'),
+                    child: Text('Todas las areas'),
                   ),
                   DropdownMenuItem<int?>(
                     value: -1,
@@ -246,7 +245,7 @@ class MobileTaskFiltersBottomSheet extends ConsumerWidget {
                       ],
                     ),
                   ),
-                  ...projects.map((p) => DropdownMenuItem<int?>(
+                  ...areas.map((p) => DropdownMenuItem<int?>(
                         value: p.id,
                         child: Row(
                           children: [
@@ -265,7 +264,7 @@ class MobileTaskFiltersBottomSheet extends ConsumerWidget {
                       ))
                 ],
                 onChanged: (val) {
-                  ref.read(projectFilterProvider.notifier).state = val;
+                  ref.read(areaFilterProvider.notifier).state = val;
                 },
               );
             },
@@ -292,7 +291,7 @@ class MobileTaskFiltersBottomSheet extends ConsumerWidget {
                   text: 'Limpiar',
                   type: ButtonType.secondary,
                   onPressed: () {
-                    ref.read(projectFilterProvider.notifier).state = null;
+                    ref.read(areaFilterProvider.notifier).state = null;
                     ref.read(tagFilterProvider.notifier).state = [];
                     Navigator.pop(context);
                   },

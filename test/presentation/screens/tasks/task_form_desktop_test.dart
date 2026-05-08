@@ -4,14 +4,14 @@ import 'package:mocktail/mocktail.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:aegis/data/local/database/app_database.dart';
 import 'package:aegis/data/repositories/task_repository.dart';
-import 'package:aegis/data/repositories/project_repository.dart';
+import 'package:aegis/data/repositories/area_repository.dart';
 import 'package:aegis/data/repositories/tag_repository.dart';
 import 'package:aegis/core/providers/repository_providers.dart';
 import 'package:aegis/presentation/screens/tasks/components/task_form_desktop.dart';
 
 class MockTaskRepository extends Mock implements TaskRepository {}
 
-class MockProjectRepository extends Mock implements ProjectRepository {}
+class MockAreaRepository extends Mock implements AreaRepository {}
 
 class MockTagRepository extends Mock implements TagRepository {}
 
@@ -19,7 +19,7 @@ class FakeTasksCompanion extends Fake implements TasksCompanion {}
 
 void main() {
   late MockTaskRepository mockTaskRepo;
-  late MockProjectRepository mockProjectRepo;
+  late MockAreaRepository mockAreaRepo;
   late MockTagRepository mockTagRepo;
 
   setUpAll(() {
@@ -28,10 +28,10 @@ void main() {
 
   setUp(() {
     mockTaskRepo = MockTaskRepository();
-    mockProjectRepo = MockProjectRepository();
+    mockAreaRepo = MockAreaRepository();
     mockTagRepo = MockTagRepository();
 
-    when(() => mockProjectRepo.watchAllProjects())
+    when(() => mockAreaRepo.watchAllAreas())
         .thenAnswer((_) => Stream.value([]));
     when(() => mockTagRepo.watchAllTags()).thenAnswer((_) => Stream.value([]));
   });
@@ -57,7 +57,7 @@ void main() {
       ProviderScope(
         overrides: [
           taskRepositoryProvider.overrideWithValue(mockTaskRepo),
-          projectRepositoryProvider.overrideWithValue(mockProjectRepo),
+          areaRepositoryProvider.overrideWithValue(mockAreaRepo),
           tagRepositoryProvider.overrideWithValue(mockTagRepo),
         ],
         child: const MaterialApp(
@@ -112,7 +112,7 @@ void main() {
       ProviderScope(
         overrides: [
           taskRepositoryProvider.overrideWithValue(mockTaskRepo),
-          projectRepositoryProvider.overrideWithValue(mockProjectRepo),
+          areaRepositoryProvider.overrideWithValue(mockAreaRepo),
           tagRepositoryProvider.overrideWithValue(mockTagRepo),
         ],
         child: const MaterialApp(

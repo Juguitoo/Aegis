@@ -24,7 +24,7 @@ class TaskChecklistItem {
             '${DateTime.now().microsecondsSinceEpoch}_${Random().nextInt(10000)}';
 }
 
-final projectFilterProvider = StateProvider<int?>((ref) => null);
+final areaFilterProvider = StateProvider<int?>((ref) => null);
 final tagFilterProvider = StateProvider<List<int>>((ref) => []);
 final searchQueryProvider = StateProvider<String>((ref) => '');
 
@@ -33,7 +33,7 @@ class TaskListViewModel extends StreamNotifier<List<Task>> {
 
   @override
   Stream<List<Task>> build() {
-    final selectedProjectId = ref.watch(projectFilterProvider);
+    final selectedAreaId = ref.watch(areaFilterProvider);
     final selectedTagIds = ref.watch(tagFilterProvider);
     final searchQuery = ref.watch(searchQueryProvider);
 
@@ -43,11 +43,10 @@ class TaskListViewModel extends StreamNotifier<List<Task>> {
         .asyncMap((tasks) async {
       List<Task> filteredTasks = tasks;
 
-      if (selectedProjectId == -1) {
-        filteredTasks = tasks.where((t) => t.projectId == null).toList();
-      } else if (selectedProjectId != null) {
-        filteredTasks =
-            tasks.where((t) => t.projectId == selectedProjectId).toList();
+      if (selectedAreaId == -1) {
+        filteredTasks = tasks.where((t) => t.areaId == null).toList();
+      } else if (selectedAreaId != null) {
+        filteredTasks = tasks.where((t) => t.areaId == selectedAreaId).toList();
       }
 
       if (searchQuery.isNotEmpty) {
@@ -82,7 +81,7 @@ class TaskListViewModel extends StreamNotifier<List<Task>> {
     int? estimatedDuration,
     DateTime? dueDate,
     DateTime? notificationAt,
-    int? projectId,
+    int? areaId,
     int priority = 0,
     List<int> tagIds = const [],
     List<TaskChecklistItem> checklist = const [],
@@ -95,7 +94,7 @@ class TaskListViewModel extends StreamNotifier<List<Task>> {
       actualDuration: const Value(0),
       dueDate: Value(dueDate),
       notificationAt: Value(notificationAt),
-      projectId: Value(projectId),
+      areaId: Value(areaId),
       priority: Value(priority),
       notes: Value(notes ?? ''),
       completedAt: const Value(null),

@@ -1,7 +1,7 @@
 import 'package:aegis/core/utils/color_utils.dart';
 import 'package:aegis/data/local/database/app_database.dart';
 import 'package:aegis/presentation/screens/tasks/components/task_form_mixin.dart';
-import 'package:aegis/presentation/viewmodels/project_list_viewmodel.dart';
+import 'package:aegis/presentation/viewmodels/area_list_viewmodel.dart';
 import 'package:aegis/presentation/viewmodels/task_list_viewmodel.dart';
 import 'package:aegis/presentation/widgets/aegis_buttons.dart';
 import 'package:aegis/presentation/widgets/aegis_inputs.dart';
@@ -26,7 +26,7 @@ class _TaskFormDesktopState extends ConsumerState<TaskFormDesktop>
 
   @override
   Widget build(BuildContext context) {
-    final projectsAsync = ref.watch(projectListViewModelProvider);
+    final areasAsync = ref.watch(areaListViewModelProvider);
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
@@ -54,8 +54,8 @@ class _TaskFormDesktopState extends ConsumerState<TaskFormDesktop>
                     children: [
                       Text(
                         widget.task == null
-                            ? "Crear Nueva Tarea"
-                            : "Editar Tarea",
+                            ? "Crear nueva tarea"
+                            : "Editar tarea",
                         style: textTheme.displayLarge?.copyWith(fontSize: 28),
                       ),
                       IconButton(
@@ -92,10 +92,10 @@ class _TaskFormDesktopState extends ConsumerState<TaskFormDesktop>
                                   notificationDateController,
                               onPickDueDate: pickDueDate,
                               onPickNotificationDate: pickNotificationDate,
-                              projectsAsync: projectsAsync,
-                              selectedProjectId: selectedProjectId,
+                              areasAsync: areasAsync,
+                              selectedAreaId: selectedAreaId,
                               onProjectChanged: (value) =>
-                                  setState(() => selectedProjectId = value),
+                                  setState(() => selectedAreaId = value),
                               selectedPriority: selectedPriority,
                               onPriorityChanged: (value) =>
                                   setState(() => selectedPriority = value),
@@ -125,7 +125,7 @@ class _TaskFormDesktopState extends ConsumerState<TaskFormDesktop>
                                         CrossAxisAlignment.stretch,
                                     children: [
                                       Text(
-                                        'Lista de Control',
+                                        'Lista de control',
                                         style: textTheme.bodyLarge?.copyWith(
                                             fontWeight: FontWeight.bold),
                                       ),
@@ -232,8 +232,8 @@ class _TaskDetailsColumn extends StatelessWidget {
   final TextEditingController notificationDateController;
   final VoidCallback onPickDueDate;
   final VoidCallback onPickNotificationDate;
-  final AsyncValue<List<Project>> projectsAsync;
-  final int? selectedProjectId;
+  final AsyncValue<List<Area>> areasAsync;
+  final int? selectedAreaId;
   final ValueChanged<int?> onProjectChanged;
   final int selectedPriority;
   final ValueChanged<int> onPriorityChanged;
@@ -248,8 +248,8 @@ class _TaskDetailsColumn extends StatelessWidget {
     required this.notificationDateController,
     required this.onPickDueDate,
     required this.onPickNotificationDate,
-    required this.projectsAsync,
-    required this.selectedProjectId,
+    required this.areasAsync,
+    required this.selectedAreaId,
     required this.onProjectChanged,
     required this.selectedPriority,
     required this.onPriorityChanged,
@@ -321,18 +321,18 @@ class _TaskDetailsColumn extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 24),
-          projectsAsync.when(
-            data: (projectsList) {
+          areasAsync.when(
+            data: (areasList) {
               return AegisDropdown<int?>(
-                value: selectedProjectId,
-                labelText: 'Proyecto',
+                value: selectedAreaId,
+                labelText: 'Area',
                 prefixIcon: Icons.folder_outlined,
                 items: [
                   const DropdownMenuItem<int?>(
                     value: null,
-                    child: Text('Seleccionar proyecto'),
+                    child: Text('Seleccionar area'),
                   ),
-                  ...projectsList.map((p) => DropdownMenuItem<int?>(
+                  ...areasList.map((p) => DropdownMenuItem<int?>(
                         value: p.id,
                         child: Row(
                           children: [
@@ -354,7 +354,7 @@ class _TaskDetailsColumn extends StatelessWidget {
               );
             },
             loading: () => const Center(child: CircularProgressIndicator()),
-            error: (err, stack) => Text('Error al cargar proyectos: $err'),
+            error: (err, stack) => Text('Error al cargar areas: $err'),
           ),
           const SizedBox(height: 24),
           Text(

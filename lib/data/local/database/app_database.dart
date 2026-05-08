@@ -7,7 +7,7 @@ import 'package:path/path.dart' as p;
 
 part 'app_database.g.dart';
 
-class Projects extends Table {
+class Areas extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get name => text().withLength(min: 1, max: 50)();
   TextColumn get description => text().nullable()();
@@ -18,7 +18,7 @@ class Tasks extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get title => text().withLength(min: 1, max: 100)();
   TextColumn get description => text().nullable()();
-  IntColumn get projectId => integer().nullable().references(Projects, #id)();
+  IntColumn get areaId => integer().nullable().references(Areas, #id)();
   IntColumn get priority => integer().withDefault(const Constant(0))();
   IntColumn get estimatedDuration => integer().nullable()();
   IntColumn get actualDuration => integer().nullable()();
@@ -108,7 +108,7 @@ class Events extends Table {
 
 @DriftDatabase(tables: [
   Tasks,
-  Projects,
+  Areas,
   Tags,
   TaskTags,
   Subtasks,
@@ -134,16 +134,16 @@ class AppDatabase extends _$AppDatabase {
         await m.createAll();
 
         await batch((batch) {
-          batch.insertAll(projects, [
-            ProjectsCompanion.insert(
+          batch.insertAll(areas, [
+            AreasCompanion.insert(
               name: 'Personal',
               colorHex: const Value('#3B82F6'),
             ),
-            ProjectsCompanion.insert(
+            AreasCompanion.insert(
               name: 'Trabajo',
               colorHex: const Value('#10B981'),
             ),
-            ProjectsCompanion.insert(
+            AreasCompanion.insert(
               name: 'Estudios',
               colorHex: const Value('#8B5CF6'),
             ),
@@ -180,29 +180,29 @@ class AppDatabase extends _$AppDatabase {
     await delete(habits).go();
     await customStatement('PRAGMA foreign_keys = ON');
 
-    var existingProjects = await select(projects).get();
+    var existingAreas = await select(areas).get();
 
-    if (existingProjects.isEmpty) {
+    if (existingAreas.isEmpty) {
       await batch((batch) {
-        batch.insertAll(projects, [
-          ProjectsCompanion.insert(
+        batch.insertAll(areas, [
+          AreasCompanion.insert(
             name: 'Personal',
             colorHex: const Value('#3B82F6'),
           ),
-          ProjectsCompanion.insert(
+          AreasCompanion.insert(
             name: 'Trabajo',
             colorHex: const Value('#10B981'),
           ),
-          ProjectsCompanion.insert(
+          AreasCompanion.insert(
             name: 'Estudios',
             colorHex: const Value('#8B5CF6'),
           ),
         ]);
       });
-      existingProjects = await select(projects).get();
+      existingAreas = await select(areas).get();
     }
 
-    final projectIds = existingProjects.map((p) => p.id).toList();
+    final areaIds = existingAreas.map((p) => p.id).toList();
 
     final h1Id = await into(habits).insert(
       HabitsCompanion.insert(name: 'Leer 20 mins'),
@@ -243,8 +243,8 @@ class AppDatabase extends _$AppDatabase {
         await into(tasks).insert(
           TasksCompanion.insert(
             title: 'Tarea generada $j',
-            projectId: projectIds.isNotEmpty
-                ? Value(projectIds[random.nextInt(projectIds.length)])
+            areaId: areaIds.isNotEmpty
+                ? Value(areaIds[random.nextInt(areaIds.length)])
                 : const Value.absent(),
             estimatedDuration: Value(estSeconds),
             actualDuration:
@@ -277,7 +277,7 @@ class AppDatabase extends _$AppDatabase {
       await delete(taskTags).go();
       await delete(subtasks).go();
       await delete(tasks).go();
-      await delete(projects).go();
+      await delete(areas).go();
       await delete(tags).go();
       await delete(habits).go();
       await delete(settings).go();

@@ -31,7 +31,7 @@ class StatisticsState {
   final double estimationAccuracy;
   final int habitStreak;
   final List<ChartDataPoint> chartData;
-  final List<ProjectDistributionData> projectDistribution;
+  final List<ProjectDistributionData> areaDistribution;
 
   StatisticsState({
     this.isLoading = true,
@@ -44,7 +44,7 @@ class StatisticsState {
     this.estimationAccuracy = 0.0,
     this.habitStreak = 0,
     this.chartData = const [],
-    this.projectDistribution = const [],
+    this.areaDistribution = const [],
   });
 
   StatisticsState copyWith({
@@ -58,7 +58,7 @@ class StatisticsState {
     double? estimationAccuracy,
     int? habitStreak,
     List<ChartDataPoint>? chartData,
-    List<ProjectDistributionData>? projectDistribution,
+    List<ProjectDistributionData>? areaDistribution,
   }) {
     return StatisticsState(
       isLoading: isLoading ?? this.isLoading,
@@ -71,7 +71,7 @@ class StatisticsState {
       estimationAccuracy: estimationAccuracy ?? this.estimationAccuracy,
       habitStreak: habitStreak ?? this.habitStreak,
       chartData: chartData ?? this.chartData,
-      projectDistribution: projectDistribution ?? this.projectDistribution,
+      areaDistribution: areaDistribution ?? this.areaDistribution,
     );
   }
 }
@@ -115,7 +115,7 @@ class StatisticsViewModel extends StateNotifier<StatisticsState> {
     final focusTime = await _repository.getFocusTimeByDate(start, end);
     final totalCompleted = await _repository.getCompletedTasksCount(start, end);
     final distractions = await _repository.getDistractionsCount(start, end);
-    final projectsData =
+    final areasData =
         await _repository.getTaskDistributionByProject(start, end);
 
     final tasksWithDurations =
@@ -257,7 +257,7 @@ class StatisticsViewModel extends StateNotifier<StatisticsState> {
       estimationAccuracy: accuracy,
       habitStreak: streak,
       chartData: generatedChartData,
-      projectDistribution: projectsData,
+      areaDistribution: areasData,
     );
   }
 }

@@ -7,7 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:aegis/core/utils/color_utils.dart';
 import 'package:aegis/data/local/database/app_database.dart';
 import 'package:aegis/presentation/viewmodels/tag_list_viewmodel.dart';
-import 'package:aegis/presentation/viewmodels/project_list_viewmodel.dart';
+import 'package:aegis/presentation/viewmodels/area_list_viewmodel.dart';
 import 'package:aegis/core/providers/repository_providers.dart';
 
 class TaskDetailsContent extends ConsumerWidget {
@@ -22,15 +22,14 @@ class TaskDetailsContent extends ConsumerWidget {
 
     final tagIdsAsync = ref.watch(taskTagsProvider(task.id));
     final allTagsAsync = ref.watch(tagListViewModelProvider);
-    final projectsAsync = ref.watch(projectListViewModelProvider);
+    final areasAsync = ref.watch(areaListViewModelProvider);
 
-    String? projectName;
-    if (task.projectId != null) {
-      final projectList = projectsAsync.value;
-      if (projectList != null) {
-        final project =
-            projectList.where((p) => p.id == task.projectId).firstOrNull;
-        if (project != null) projectName = project.name;
+    String? areaName;
+    if (task.areaId != null) {
+      final areaList = areasAsync.value;
+      if (areaList != null) {
+        final area = areaList.where((p) => p.id == task.areaId).firstOrNull;
+        if (area != null) areaName = area.name;
       }
     }
 
@@ -104,7 +103,7 @@ class TaskDetailsContent extends ConsumerWidget {
                     ),
                   ],
                 ),
-              if (projectName != null)
+              if (areaName != null)
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -112,7 +111,7 @@ class TaskDetailsContent extends ConsumerWidget {
                         size: 14, color: colorScheme.onSurface),
                     const SizedBox(width: 6),
                     Text(
-                      projectName,
+                      areaName,
                       style: textTheme.bodySmall?.copyWith(
                           fontWeight: FontWeight.w600,
                           color: colorScheme.onSurface),

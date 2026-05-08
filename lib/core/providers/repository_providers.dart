@@ -1,8 +1,8 @@
+import 'package:aegis/data/repositories/area_repository.dart';
 import 'package:aegis/data/repositories/blacklist_repository.dart';
 import 'package:aegis/data/repositories/diary_repository.dart';
 import 'package:aegis/data/repositories/events_repository.dart';
 import 'package:aegis/data/repositories/habits_repository.dart';
-import 'package:aegis/data/repositories/project_repository.dart';
 import 'package:aegis/data/repositories/sessions_repository.dart';
 import 'package:aegis/data/repositories/settings_repository.dart';
 import 'package:aegis/data/repositories/statistics_repository.dart';
@@ -16,9 +16,9 @@ final taskRepositoryProvider = Provider<TaskRepository>((ref) {
   return TaskRepository(database);
 });
 
-final projectRepositoryProvider = Provider<ProjectRepository>((ref) {
+final areaRepositoryProvider = Provider<AreaRepository>((ref) {
   final database = ref.watch(databaseProvider);
-  return ProjectRepository(database);
+  return AreaRepository(database);
 });
 
 final tagRepositoryProvider = Provider<TagRepository>((ref) {

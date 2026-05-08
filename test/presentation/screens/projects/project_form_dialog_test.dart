@@ -1,34 +1,34 @@
-import 'package:aegis/presentation/screens/projects/components/project_form_dialog.dart';
+import 'package:aegis/presentation/screens/areas/components/area_form_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:aegis/data/repositories/project_repository.dart';
+import 'package:aegis/data/repositories/area_repository.dart';
 import 'package:aegis/data/local/database/app_database.dart';
 import 'package:aegis/core/providers/repository_providers.dart';
 
-class MockProjectRepository extends Mock implements ProjectRepository {}
+class MockAreaRepository extends Mock implements AreaRepository {}
 
-class FakeProjectsCompanion extends Fake implements ProjectsCompanion {}
+class FakeAreasCompanion extends Fake implements AreasCompanion {}
 
 void main() {
-  late MockProjectRepository mockRepository;
+  late MockAreaRepository mockRepository;
 
   setUpAll(() {
-    registerFallbackValue(FakeProjectsCompanion());
+    registerFallbackValue(FakeAreasCompanion());
   });
 
   setUp(() {
-    mockRepository = MockProjectRepository();
+    mockRepository = MockAreaRepository();
 
-    when(() => mockRepository.watchAllProjects())
+    when(() => mockRepository.watchAllAreas())
         .thenAnswer((_) => Stream.value([]));
   });
 
-  Widget buildTestableDialog({Project? existingProject}) {
+  Widget buildTestableDialog({Area? existingArea}) {
     return ProviderScope(
       overrides: [
-        projectRepositoryProvider.overrideWithValue(mockRepository),
+        areaRepositoryProvider.overrideWithValue(mockRepository),
       ],
       child: MaterialApp(
         home: Scaffold(
@@ -39,7 +39,7 @@ void main() {
                   showDialog(
                     context: context,
                     builder: (context) =>
-                        ProjectFormDialog(existingProject: existingProject),
+                        AreaFormDialog(existingArea: existingArea),
                   );
                 },
                 child: const Text('Abrir Dialogo'),
@@ -51,7 +51,7 @@ void main() {
     );
   }
 
-  group('ProjectFormDialog Tests de Validacion', () {
+  group('AreaFormDialog Tests de Validacion', () {
     testWidgets('Muestra validacion si se intenta guardar sin nombre',
         (WidgetTester tester) async {
       await tester.pumpWidget(buildTestableDialog());
@@ -66,7 +66,7 @@ void main() {
 
       expect(find.byType(SnackBar), findsOneWidget);
 
-      verifyNever(() => mockRepository.insertProject(any()));
+      verifyNever(() => mockRepository.insertArea(any()));
 
       ScaffoldMessenger.of(tester.element(find.byType(Scaffold)))
           .clearSnackBars();
@@ -76,8 +76,7 @@ void main() {
     testWidgets(
         'Llama al repositorio y cierra el dialogo si el nombre es valido',
         (WidgetTester tester) async {
-      when(() => mockRepository.insertProject(any()))
-          .thenAnswer((_) async => 1);
+      when(() => mockRepository.insertArea(any())).thenAnswer((_) async => 1);
 
       await tester.pumpWidget(buildTestableDialog());
 
@@ -90,21 +89,20 @@ void main() {
       await tester.tap(find.text('Guardar'));
       await tester.pumpAndSettle();
 
-      verify(() => mockRepository.insertProject(any())).called(1);
+      verify(() => mockRepository.insertArea(any())).called(1);
 
       expect(find.text('Nuevo Proyecto'), findsNothing);
     });
 
     testWidgets('El formulario se pre-rellena en modo edicion',
         (WidgetTester tester) async {
-      final projectToEdit = Project(
+      final areaToEdit = Area(
         id: 1,
         name: 'Desarrollo App',
         colorHex: '#6366F1',
       );
 
-      await tester
-          .pumpWidget(buildTestableDialog(existingProject: projectToEdit));
+      await tester.pumpWidget(buildTestableDialog(existingArea: areaToEdit));
 
       await tester.tap(find.text('Abrir Dialogo'));
       await tester.pumpAndSettle();

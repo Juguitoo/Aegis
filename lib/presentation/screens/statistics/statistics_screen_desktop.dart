@@ -133,8 +133,8 @@ class _StatisticsScreenDesktopState
                           flex: 2,
                           child: ChartContainer(
                             title: 'Distribución por proyectos',
-                            child: ProjectPieChart(
-                                data: state.projectDistribution),
+                            child:
+                                ProjectPieChart(data: state.areaDistribution),
                           ),
                         ),
                       ],

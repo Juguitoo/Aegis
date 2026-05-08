@@ -3,30 +3,30 @@ import 'package:aegis/presentation/widgets/aegis_buttons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../data/local/database/app_database.dart';
-import '../../../viewmodels/project_list_viewmodel.dart';
-import 'project_form_dialog.dart';
+import '../../../viewmodels/area_list_viewmodel.dart';
+import 'area_form_dialog.dart';
 
-class ManageProjectsBottomSheet extends ConsumerStatefulWidget {
-  const ManageProjectsBottomSheet({super.key});
+class ManageAreasBottomSheet extends ConsumerStatefulWidget {
+  const ManageAreasBottomSheet({super.key});
 
   @override
-  ConsumerState<ManageProjectsBottomSheet> createState() =>
-      _ManageProjectsBottomSheetState();
+  ConsumerState<ManageAreasBottomSheet> createState() =>
+      _ManageAreasBottomSheetState();
 }
 
-class _ManageProjectsBottomSheetState
-    extends ConsumerState<ManageProjectsBottomSheet> {
-  void _showProjectDialog([Project? existingProject]) {
+class _ManageAreasBottomSheetState
+    extends ConsumerState<ManageAreasBottomSheet> {
+  void _showAreaDialog([Area? existingArea]) {
     showDialog(
       context: context,
-      builder: (context) => ProjectFormDialog(existingProject: existingProject),
+      builder: (context) => AreaFormDialog(existingArea: existingArea),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
-    final projectsAsync = ref.watch(projectListViewModelProvider);
+    final areasAsync = ref.watch(areaListViewModelProvider);
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
@@ -53,7 +53,7 @@ class _ManageProjectsBottomSheetState
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Gestionar proyectos',
+                  'Gestionar areas',
                   style: textTheme.displayMedium,
                 ),
                 IconButton(
@@ -65,14 +65,14 @@ class _ManageProjectsBottomSheetState
           ),
           Divider(color: colorScheme.outline.withValues(alpha: 0.2), height: 1),
           Flexible(
-            child: projectsAsync.when(
-              data: (projects) {
-                if (projects.isEmpty) {
+            child: areasAsync.when(
+              data: (areas) {
+                if (areas.isEmpty) {
                   return Padding(
                     padding: const EdgeInsets.all(32.0),
                     child: Center(
                       child: Text(
-                        'No tienes proyectos aún.',
+                        'No tienes areas aún.',
                         style: textTheme.bodyMedium,
                       ),
                     ),
@@ -80,9 +80,9 @@ class _ManageProjectsBottomSheetState
                 }
                 return ListView.builder(
                   shrinkWrap: true,
-                  itemCount: projects.length,
+                  itemCount: areas.length,
                   itemBuilder: (context, index) {
-                    final project = projects[index];
+                    final area = areas[index];
                     return ListTile(
                       contentPadding: const EdgeInsets.symmetric(
                           horizontal: 24, vertical: 4),
@@ -90,12 +90,12 @@ class _ManageProjectsBottomSheetState
                         width: 16,
                         height: 16,
                         decoration: BoxDecoration(
-                          color: ColorUtils.parseColor(project.colorHex),
+                          color: ColorUtils.parseColor(area.colorHex),
                           shape: BoxShape.circle,
                         ),
                       ),
                       title: Text(
-                        project.name,
+                        area.name,
                         style: textTheme.bodyLarge?.copyWith(
                           fontWeight: FontWeight.w600,
                         ),
@@ -106,15 +106,15 @@ class _ManageProjectsBottomSheetState
                           IconButton(
                             icon: Icon(Icons.edit_outlined,
                                 color: colorScheme.onSurfaceVariant, size: 20),
-                            onPressed: () => _showProjectDialog(project),
+                            onPressed: () => _showAreaDialog(area),
                           ),
                           IconButton(
                             icon: Icon(Icons.delete_outline,
                                 color: colorScheme.error, size: 20),
                             onPressed: () {
                               ref
-                                  .read(projectListViewModelProvider.notifier)
-                                  .deleteProject(project);
+                                  .read(areaListViewModelProvider.notifier)
+                                  .deleteArea(area);
                             },
                           ),
                         ],
@@ -137,8 +137,8 @@ class _ManageProjectsBottomSheetState
           Padding(
             padding: const EdgeInsets.all(24.0),
             child: AegisButton(
-              onPressed: () => _showProjectDialog(),
-              text: 'Crear nuevo proyecto',
+              onPressed: () => _showAreaDialog(),
+              text: 'Crear nuevo area',
               icon: Icons.add,
               type: ButtonType.secondary,
             ),

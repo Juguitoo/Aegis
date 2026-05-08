@@ -1,8 +1,8 @@
 import 'package:aegis/core/providers/general_providers.dart';
-import 'package:aegis/presentation/screens/projects/components/manage_projects_bottom_sheet.dart';
+import 'package:aegis/presentation/screens/areas/components/manage_area_bottom_sheet.dart';
 import 'package:aegis/presentation/screens/settings/settings_screen_mobile.dart';
 import 'package:aegis/presentation/screens/tags/components/manage_tags_bottom_sheet.dart';
-import 'package:aegis/presentation/screens/projects/components/project_form_dialog.dart';
+import 'package:aegis/presentation/screens/areas/components/area_form_dialog.dart';
 import 'package:aegis/presentation/screens/tags/components/tag_form_dialog.dart';
 import 'package:aegis/presentation/screens/tasks/components/mobile_habits_section.dart';
 import 'package:aegis/presentation/screens/tasks/components/manage_habits_bottom_sheet.dart';
@@ -118,7 +118,7 @@ class _TaskListScreenMobileState extends ConsumerState<TaskListScreenMobile> {
                     context: context,
                     isScrollControlled: true,
                     backgroundColor: Colors.transparent,
-                    builder: (context) => const ManageProjectsBottomSheet(),
+                    builder: (context) => const ManageAreasBottomSheet(),
                   );
                 } else if (value == 2) {
                   showModalBottomSheet(
@@ -147,7 +147,7 @@ class _TaskListScreenMobileState extends ConsumerState<TaskListScreenMobile> {
                       Icon(Icons.folder_outlined,
                           color: colorScheme.onSurfaceVariant, size: 20),
                       const SizedBox(width: 24),
-                      Text('Gestionar proyectos',
+                      Text('Gestionar areas',
                           style: textTheme.bodyMedium
                               ?.copyWith(color: colorScheme.onSurface)),
                     ],
@@ -230,7 +230,7 @@ class _TaskListScreenMobileState extends ConsumerState<TaskListScreenMobile> {
             onTap: () {
               showDialog(
                 context: context,
-                builder: (context) => const ProjectFormDialog(),
+                builder: (context) => const AreaFormDialog(),
               );
             },
           ),

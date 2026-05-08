@@ -19,7 +19,7 @@ mixin TaskFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
 
   DateTime? selectedDueDate;
   DateTime? selectedNotificationDate;
-  int? selectedProjectId;
+  int? selectedAreaId;
   int selectedPriority = 0;
   List<int> selectedTagIds = [];
   List<TaskChecklistItem> currentChecklist = [];
@@ -68,7 +68,7 @@ mixin TaskFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
         notificationDateController.text =
             DateFormat.yMd('es').add_Hm().format(task.notificationAt!);
       }
-      selectedProjectId = task.projectId;
+      selectedAreaId = task.areaId;
       selectedPriority = task.priority;
 
       try {
@@ -270,7 +270,7 @@ mixin TaskFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
             estimatedDuration: duration,
             dueDate: selectedDueDate,
             notificationAt: selectedNotificationDate,
-            projectId: selectedProjectId,
+            areaId: selectedAreaId,
             priority: selectedPriority,
             tagIds: selectedTagIds,
             checklist: validChecklist,
@@ -311,7 +311,7 @@ mixin TaskFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
       estimatedDuration: Value(duration),
       dueDate: Value(selectedDueDate),
       notificationAt: Value(selectedNotificationDate),
-      projectId: Value(selectedProjectId),
+      areaId: Value(selectedAreaId),
       priority: selectedPriority,
     );
 
@@ -376,7 +376,7 @@ mixin TaskFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
       notificationDateController.clear();
       selectedDueDate = null;
       selectedNotificationDate = null;
-      selectedProjectId = null;
+      selectedAreaId = null;
       selectedPriority = 0;
       selectedTagIds = [];
       currentChecklist = [];

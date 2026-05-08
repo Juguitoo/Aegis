@@ -4,13 +4,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:aegis/data/local/database/app_database.dart';
 import 'package:aegis/data/repositories/task_repository.dart';
 import 'package:aegis/data/repositories/tag_repository.dart';
-import 'package:aegis/data/repositories/project_repository.dart';
+import 'package:aegis/data/repositories/area_repository.dart';
 
 void main() {
   late AppDatabase db;
   late TaskRepository taskRepo;
   late TagRepository tagRepo;
-  late ProjectRepository projectRepo;
+  late AreaRepository areaRepo;
 
   setUp(() {
     db = AppDatabase.forTesting(NativeDatabase.memory(
@@ -20,7 +20,7 @@ void main() {
     ));
     taskRepo = TaskRepository(db);
     tagRepo = TagRepository(db);
-    projectRepo = ProjectRepository(db);
+    areaRepo = AreaRepository(db);
   });
 
   tearDown(() async {
@@ -78,9 +78,9 @@ void main() {
       expect(allIntermediateRows.isEmpty, true);
     });
 
-    test('Al borrar un proyecto, sus tareas pasan a la Bandeja de entrada',
+    test('Al borrar un area, sus tareas pasan a la Bandeja de entrada',
         () async {
-      final projectId = await projectRepo.insertProject(const ProjectsCompanion(
+      final areaId = await areaRepo.insertArea(const AreasCompanion(
         name: Value('TFG Test'),
         colorHex: Value('#00FF00'),
       ));
@@ -88,21 +88,21 @@ void main() {
       final taskId = await taskRepo.insertTask(TasksCompanion(
         title: const Value('Investigar Drift'),
         priority: const Value(2),
-        projectId: Value(projectId),
+        areaId: Value(areaId),
       ));
 
       var task = await (db.select(db.tasks)..where((t) => t.id.equals(taskId)))
           .getSingle();
-      expect(task.projectId, projectId);
+      expect(task.areaId, areaId);
 
-      final project = await (db.select(db.projects)
-            ..where((p) => p.id.equals(projectId)))
+      final area = await (db.select(db.areas)
+            ..where((p) => p.id.equals(areaId)))
           .getSingle();
-      await projectRepo.deleteProject(project);
+      await areaRepo.deleteArea(area);
 
       task = await (db.select(db.tasks)..where((t) => t.id.equals(taskId)))
           .getSingle();
-      expect(task.projectId, null);
+      expect(task.areaId, null);
     });
   });
 

@@ -1,14 +1,14 @@
+import 'package:aegis/presentation/screens/areas/components/manage_area_bottom_sheet.dart';
 import 'package:aegis/presentation/screens/tasks/components/manage_habits_bottom_sheet.dart';
 import 'package:aegis/presentation/widgets/aegis_buttons.dart';
 import 'package:aegis/presentation/widgets/aegis_inputs.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:aegis/core/utils/color_utils.dart';
-import 'package:aegis/presentation/viewmodels/project_list_viewmodel.dart';
+import 'package:aegis/presentation/viewmodels/area_list_viewmodel.dart';
 import 'package:aegis/presentation/viewmodels/task_list_viewmodel.dart';
 import 'package:aegis/presentation/viewmodels/tag_list_viewmodel.dart';
 import 'package:aegis/presentation/screens/tasks/components/task_form_desktop.dart';
-import 'package:aegis/presentation/screens/projects/components/manage_projects_bottom_sheet.dart';
 import 'package:aegis/presentation/screens/tags/components/manage_tags_bottom_sheet.dart';
 import 'package:aegis/presentation/screens/tags/components/tag_multi_selector.dart';
 
@@ -17,27 +17,26 @@ class DesktopFilterControls extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final selectedProjectId = ref.watch(projectFilterProvider);
+    final selectedAreaId = ref.watch(areaFilterProvider);
     final selectedTagIds = ref.watch(tagFilterProvider);
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    final projectsAsync = ref.watch(projectListViewModelProvider);
+    final areasAsync = ref.watch(areaListViewModelProvider);
     final tagsAsync = ref.watch(tagListViewModelProvider);
 
     String? activeProjectName;
     Color? activeProjectColor;
 
-    if (selectedProjectId == -1) {
+    if (selectedAreaId == -1) {
       activeProjectName = 'Bandeja de entrada';
       activeProjectColor = colorScheme.onSurfaceVariant;
-    } else if (selectedProjectId != null) {
-      final projectVal = projectsAsync.value
-          ?.where((p) => p.id == selectedProjectId)
-          .firstOrNull;
-      if (projectVal != null) {
-        activeProjectName = projectVal.name;
-        activeProjectColor = ColorUtils.parseColor(projectVal.colorHex);
+    } else if (selectedAreaId != null) {
+      final areaVal =
+          areasAsync.value?.where((p) => p.id == selectedAreaId).firstOrNull;
+      if (areaVal != null) {
+        activeProjectName = areaVal.name;
+        activeProjectColor = ColorUtils.parseColor(areaVal.colorHex);
       }
     }
 
@@ -90,7 +89,7 @@ class DesktopFilterControls extends ConsumerWidget {
                             cursor: SystemMouseCursors.click,
                             child: GestureDetector(
                               onTap: () {
-                                ref.read(projectFilterProvider.notifier).state =
+                                ref.read(areaFilterProvider.notifier).state =
                                     null;
                               },
                               child: Icon(
@@ -210,7 +209,7 @@ class _ActionButtonsRow extends StatelessWidget {
                   context: context,
                   isScrollControlled: true,
                   backgroundColor: Colors.transparent,
-                  builder: (context) => const ManageProjectsBottomSheet(),
+                  builder: (context) => const ManageAreasBottomSheet(),
                 );
               }
               if (value == 2) {
@@ -329,8 +328,8 @@ class TaskFiltersDialog extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final projectsAsync = ref.watch(projectListViewModelProvider);
-    final selectedProjectId = ref.watch(projectFilterProvider);
+    final areasAsync = ref.watch(areaListViewModelProvider);
+    final selectedAreaId = ref.watch(areaFilterProvider);
     final selectedTagIds = ref.watch(tagFilterProvider);
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
@@ -355,10 +354,10 @@ class TaskFiltersDialog extends ConsumerWidget {
                   textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 8),
-            projectsAsync.when(
-              data: (projects) {
+            areasAsync.when(
+              data: (areas) {
                 return AegisDropdown<int?>(
-                  value: selectedProjectId,
+                  value: selectedAreaId,
                   items: [
                     const DropdownMenuItem<int?>(
                       value: null,
@@ -377,7 +376,7 @@ class TaskFiltersDialog extends ConsumerWidget {
                         ],
                       ),
                     ),
-                    ...projects.map((p) => DropdownMenuItem<int?>(
+                    ...areas.map((p) => DropdownMenuItem<int?>(
                           value: p.id,
                           child: Row(
                             children: [
@@ -396,7 +395,7 @@ class TaskFiltersDialog extends ConsumerWidget {
                         ))
                   ],
                   onChanged: (val) {
-                    ref.read(projectFilterProvider.notifier).state = val;
+                    ref.read(areaFilterProvider.notifier).state = val;
                   },
                 );
               },
@@ -427,7 +426,7 @@ class TaskFiltersDialog extends ConsumerWidget {
                 text: 'Limpiar',
                 type: ButtonType.secondary,
                 onPressed: () {
-                  ref.read(projectFilterProvider.notifier).state = null;
+                  ref.read(areaFilterProvider.notifier).state = null;
                   ref.read(tagFilterProvider.notifier).state = [];
                 },
               ),

@@ -5,18 +5,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import '../../../../data/local/database/app_database.dart';
-import '../../../viewmodels/project_list_viewmodel.dart';
+import '../../../viewmodels/area_list_viewmodel.dart';
 
-class ProjectFormDialog extends ConsumerStatefulWidget {
-  final Project? existingProject;
+class AreaFormDialog extends ConsumerStatefulWidget {
+  final Area? existingArea;
 
-  const ProjectFormDialog({super.key, this.existingProject});
+  const AreaFormDialog({super.key, this.existingArea});
 
   @override
-  ConsumerState<ProjectFormDialog> createState() => _ProjectFormDialogState();
+  ConsumerState<AreaFormDialog> createState() => _AreaFormDialogState();
 }
 
-class _ProjectFormDialogState extends ConsumerState<ProjectFormDialog> {
+class _AreaFormDialogState extends ConsumerState<AreaFormDialog> {
   late TextEditingController nameController;
   late TextEditingController descriptionController;
   late TextEditingController hexController;
@@ -26,15 +26,15 @@ class _ProjectFormDialogState extends ConsumerState<ProjectFormDialog> {
   @override
   void initState() {
     super.initState();
-    final isEditing = widget.existingProject != null;
+    final isEditing = widget.existingArea != null;
 
     nameController =
-        TextEditingController(text: widget.existingProject?.name ?? '');
+        TextEditingController(text: widget.existingArea?.name ?? '');
     descriptionController =
-        TextEditingController(text: widget.existingProject?.description ?? '');
+        TextEditingController(text: widget.existingArea?.description ?? '');
 
     selectedColor = isEditing
-        ? ColorUtils.parseColor(widget.existingProject!.colorHex)
+        ? ColorUtils.parseColor(widget.existingArea!.colorHex)
         : const Color(0xFF3B82F6);
 
     hexController =
@@ -64,7 +64,7 @@ class _ProjectFormDialogState extends ConsumerState<ProjectFormDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final isEditing = widget.existingProject != null;
+    final isEditing = widget.existingArea != null;
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
@@ -74,7 +74,7 @@ class _ProjectFormDialogState extends ConsumerState<ProjectFormDialog> {
         borderRadius: BorderRadius.circular(20),
       ),
       title: Text(
-        isEditing ? 'Editar proyecto' : 'Nuevo proyecto',
+        isEditing ? 'Editar area' : 'Nueva area',
         style: textTheme.displayMedium?.copyWith(fontSize: 20),
       ),
       content: Container(
@@ -88,7 +88,7 @@ class _ProjectFormDialogState extends ConsumerState<ProjectFormDialog> {
               controller: nameController,
               textCapitalization: TextCapitalization.sentences,
               maxLength: 80,
-              labelText: 'Nombre del proyecto',
+              labelText: 'Nombre del area',
               hintText: "Universidad, Trabajo, Personal...",
               autofocus: true,
             ),
@@ -99,7 +99,7 @@ class _ProjectFormDialogState extends ConsumerState<ProjectFormDialog> {
               maxLength: 120,
               maxLines: 3,
               minLines: 1,
-              labelText: 'Descripción del proyecto',
+              labelText: 'Descripción del area',
               hintText: 'Detalles sobre el proyecto...',
             ),
             const SizedBox(height: 16),
@@ -203,8 +203,8 @@ class _ProjectFormDialogState extends ConsumerState<ProjectFormDialog> {
                   text: 'Eliminar',
                   onPressed: () {
                     ref
-                        .read(projectListViewModelProvider.notifier)
-                        .deleteProject(widget.existingProject!);
+                        .read(areaListViewModelProvider.notifier)
+                        .deleteArea(widget.existingArea!);
                     Navigator.pop(context);
                   },
                   type: ButtonType.destructive,
@@ -230,19 +230,17 @@ class _ProjectFormDialogState extends ConsumerState<ProjectFormDialog> {
                     final description = descriptionController.text.trim();
 
                     if (isEditing) {
-                      final updatedProject = Project(
-                        id: widget.existingProject!.id,
+                      final updatedArea = Area(
+                        id: widget.existingArea!.id,
                         name: nameController.text.trim(),
                         colorHex: hexToSave,
                         description: description,
                       );
                       ref
-                          .read(projectListViewModelProvider.notifier)
-                          .updateProject(updatedProject);
+                          .read(areaListViewModelProvider.notifier)
+                          .updateArea(updatedArea);
                     } else {
-                      ref
-                          .read(projectListViewModelProvider.notifier)
-                          .addProject(
+                      ref.read(areaListViewModelProvider.notifier).addArea(
                             nameController.text.trim(),
                             hexToSave,
                             description,
@@ -253,8 +251,8 @@ class _ProjectFormDialogState extends ConsumerState<ProjectFormDialog> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                           backgroundColor: colorScheme.error,
-                          content: const Text(
-                              'El nombre del proyecto es obligatorio')),
+                          content:
+                              const Text('El nombre del area es obligatorio')),
                     );
                   }
                 },

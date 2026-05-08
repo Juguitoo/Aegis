@@ -907,7 +907,7 @@ class _ProjectPieChartState extends State<ProjectPieChart> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          entry.value.projectName,
+                          entry.value.areaName,
                           style: TextStyle(
                               fontSize: 12,
                               color: colorScheme.onSurfaceVariant

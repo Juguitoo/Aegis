@@ -13,9 +13,8 @@ class BackupRepository {
   Future<void> exportDatabase() async {
     final data = {
       'version': 1,
-      'projects': (await _db.select(_db.projects).get())
-          .map((e) => e.toJson())
-          .toList(),
+      'areas':
+          (await _db.select(_db.areas).get()).map((e) => e.toJson()).toList(),
       'tasks':
           (await _db.select(_db.tasks).get()).map((e) => e.toJson()).toList(),
       'tags':
@@ -114,7 +113,7 @@ class BackupRepository {
       await _db.delete(_db.taskTags).go();
       await _db.delete(_db.subtasks).go();
       await _db.delete(_db.tasks).go();
-      await _db.delete(_db.projects).go();
+      await _db.delete(_db.areas).go();
       await _db.delete(_db.tags).go();
       await _db.delete(_db.settings).go();
       await _db.delete(_db.blacklistedApps).go();
@@ -123,11 +122,11 @@ class BackupRepository {
       await _db.delete(_db.habitEntries).go();
       await _db.delete(_db.habits).go();
 
-      if (data['projects'] != null) {
-        for (var item in data['projects']) {
+      if (data['areas'] != null) {
+        for (var item in data['areas']) {
           await _db
-              .into(_db.projects)
-              .insert(Project.fromJson(item as Map<String, dynamic>));
+              .into(_db.areas)
+              .insert(Area.fromJson(item as Map<String, dynamic>));
         }
       }
       if (data['tags'] != null) {

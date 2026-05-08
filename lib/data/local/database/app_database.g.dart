@@ -3,11 +3,11 @@
 part of 'app_database.dart';
 
 // ignore_for_file: type=lint
-class $ProjectsTable extends Projects with TableInfo<$ProjectsTable, Project> {
+class $AreasTable extends Areas with TableInfo<$AreasTable, Area> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
-  $ProjectsTable(this.attachedDatabase, [this._alias]);
+  $AreasTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
@@ -43,9 +43,9 @@ class $ProjectsTable extends Projects with TableInfo<$ProjectsTable, Project> {
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
-  static const String $name = 'projects';
+  static const String $name = 'areas';
   @override
-  VerificationContext validateIntegrity(Insertable<Project> instance,
+  VerificationContext validateIntegrity(Insertable<Area> instance,
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
@@ -74,9 +74,9 @@ class $ProjectsTable extends Projects with TableInfo<$ProjectsTable, Project> {
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  Project map(Map<String, dynamic> data, {String? tablePrefix}) {
+  Area map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return Project(
+    return Area(
       id: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
       name: attachedDatabase.typeMapping
@@ -89,17 +89,17 @@ class $ProjectsTable extends Projects with TableInfo<$ProjectsTable, Project> {
   }
 
   @override
-  $ProjectsTable createAlias(String alias) {
-    return $ProjectsTable(attachedDatabase, alias);
+  $AreasTable createAlias(String alias) {
+    return $AreasTable(attachedDatabase, alias);
   }
 }
 
-class Project extends DataClass implements Insertable<Project> {
+class Area extends DataClass implements Insertable<Area> {
   final int id;
   final String name;
   final String? description;
   final String? colorHex;
-  const Project(
+  const Area(
       {required this.id, required this.name, this.description, this.colorHex});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -115,8 +115,8 @@ class Project extends DataClass implements Insertable<Project> {
     return map;
   }
 
-  ProjectsCompanion toCompanion(bool nullToAbsent) {
-    return ProjectsCompanion(
+  AreasCompanion toCompanion(bool nullToAbsent) {
+    return AreasCompanion(
       id: Value(id),
       name: Value(name),
       description: description == null && nullToAbsent
@@ -128,10 +128,10 @@ class Project extends DataClass implements Insertable<Project> {
     );
   }
 
-  factory Project.fromJson(Map<String, dynamic> json,
+  factory Area.fromJson(Map<String, dynamic> json,
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return Project(
+    return Area(
       id: serializer.fromJson<int>(json['id']),
       name: serializer.fromJson<String>(json['name']),
       description: serializer.fromJson<String?>(json['description']),
@@ -149,19 +149,19 @@ class Project extends DataClass implements Insertable<Project> {
     };
   }
 
-  Project copyWith(
+  Area copyWith(
           {int? id,
           String? name,
           Value<String?> description = const Value.absent(),
           Value<String?> colorHex = const Value.absent()}) =>
-      Project(
+      Area(
         id: id ?? this.id,
         name: name ?? this.name,
         description: description.present ? description.value : this.description,
         colorHex: colorHex.present ? colorHex.value : this.colorHex,
       );
-  Project copyWithCompanion(ProjectsCompanion data) {
-    return Project(
+  Area copyWithCompanion(AreasCompanion data) {
+    return Area(
       id: data.id.present ? data.id.value : this.id,
       name: data.name.present ? data.name.value : this.name,
       description:
@@ -172,7 +172,7 @@ class Project extends DataClass implements Insertable<Project> {
 
   @override
   String toString() {
-    return (StringBuffer('Project(')
+    return (StringBuffer('Area(')
           ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('description: $description, ')
@@ -186,31 +186,31 @@ class Project extends DataClass implements Insertable<Project> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is Project &&
+      (other is Area &&
           other.id == this.id &&
           other.name == this.name &&
           other.description == this.description &&
           other.colorHex == this.colorHex);
 }
 
-class ProjectsCompanion extends UpdateCompanion<Project> {
+class AreasCompanion extends UpdateCompanion<Area> {
   final Value<int> id;
   final Value<String> name;
   final Value<String?> description;
   final Value<String?> colorHex;
-  const ProjectsCompanion({
+  const AreasCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
     this.description = const Value.absent(),
     this.colorHex = const Value.absent(),
   });
-  ProjectsCompanion.insert({
+  AreasCompanion.insert({
     this.id = const Value.absent(),
     required String name,
     this.description = const Value.absent(),
     this.colorHex = const Value.absent(),
   }) : name = Value(name);
-  static Insertable<Project> custom({
+  static Insertable<Area> custom({
     Expression<int>? id,
     Expression<String>? name,
     Expression<String>? description,
@@ -224,12 +224,12 @@ class ProjectsCompanion extends UpdateCompanion<Project> {
     });
   }
 
-  ProjectsCompanion copyWith(
+  AreasCompanion copyWith(
       {Value<int>? id,
       Value<String>? name,
       Value<String?>? description,
       Value<String?>? colorHex}) {
-    return ProjectsCompanion(
+    return AreasCompanion(
       id: id ?? this.id,
       name: name ?? this.name,
       description: description ?? this.description,
@@ -257,7 +257,7 @@ class ProjectsCompanion extends UpdateCompanion<Project> {
 
   @override
   String toString() {
-    return (StringBuffer('ProjectsCompanion(')
+    return (StringBuffer('AreasCompanion(')
           ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('description: $description, ')
@@ -295,15 +295,14 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
   late final GeneratedColumn<String> description = GeneratedColumn<String>(
       'description', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
-  static const VerificationMeta _projectIdMeta =
-      const VerificationMeta('projectId');
+  static const VerificationMeta _areaIdMeta = const VerificationMeta('areaId');
   @override
-  late final GeneratedColumn<int> projectId = GeneratedColumn<int>(
-      'project_id', aliasedName, true,
+  late final GeneratedColumn<int> areaId = GeneratedColumn<int>(
+      'area_id', aliasedName, true,
       type: DriftSqlType.int,
       requiredDuringInsert: false,
       defaultConstraints:
-          GeneratedColumn.constraintIsAlways('REFERENCES projects (id)'));
+          GeneratedColumn.constraintIsAlways('REFERENCES areas (id)'));
   static const VerificationMeta _priorityMeta =
       const VerificationMeta('priority');
   @override
@@ -352,7 +351,7 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
         id,
         title,
         description,
-        projectId,
+        areaId,
         priority,
         estimatedDuration,
         actualDuration,
@@ -386,9 +385,9 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
           description.isAcceptableOrUnknown(
               data['description']!, _descriptionMeta));
     }
-    if (data.containsKey('project_id')) {
-      context.handle(_projectIdMeta,
-          projectId.isAcceptableOrUnknown(data['project_id']!, _projectIdMeta));
+    if (data.containsKey('area_id')) {
+      context.handle(_areaIdMeta,
+          areaId.isAcceptableOrUnknown(data['area_id']!, _areaIdMeta));
     }
     if (data.containsKey('priority')) {
       context.handle(_priorityMeta,
@@ -441,8 +440,8 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
           .read(DriftSqlType.string, data['${effectivePrefix}title'])!,
       description: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}description']),
-      projectId: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}project_id']),
+      areaId: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}area_id']),
       priority: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}priority'])!,
       estimatedDuration: attachedDatabase.typeMapping
@@ -470,7 +469,7 @@ class Task extends DataClass implements Insertable<Task> {
   final int id;
   final String title;
   final String? description;
-  final int? projectId;
+  final int? areaId;
   final int priority;
   final int? estimatedDuration;
   final int? actualDuration;
@@ -482,7 +481,7 @@ class Task extends DataClass implements Insertable<Task> {
       {required this.id,
       required this.title,
       this.description,
-      this.projectId,
+      this.areaId,
       required this.priority,
       this.estimatedDuration,
       this.actualDuration,
@@ -498,8 +497,8 @@ class Task extends DataClass implements Insertable<Task> {
     if (!nullToAbsent || description != null) {
       map['description'] = Variable<String>(description);
     }
-    if (!nullToAbsent || projectId != null) {
-      map['project_id'] = Variable<int>(projectId);
+    if (!nullToAbsent || areaId != null) {
+      map['area_id'] = Variable<int>(areaId);
     }
     map['priority'] = Variable<int>(priority);
     if (!nullToAbsent || estimatedDuration != null) {
@@ -530,9 +529,8 @@ class Task extends DataClass implements Insertable<Task> {
       description: description == null && nullToAbsent
           ? const Value.absent()
           : Value(description),
-      projectId: projectId == null && nullToAbsent
-          ? const Value.absent()
-          : Value(projectId),
+      areaId:
+          areaId == null && nullToAbsent ? const Value.absent() : Value(areaId),
       priority: Value(priority),
       estimatedDuration: estimatedDuration == null && nullToAbsent
           ? const Value.absent()
@@ -561,7 +559,7 @@ class Task extends DataClass implements Insertable<Task> {
       id: serializer.fromJson<int>(json['id']),
       title: serializer.fromJson<String>(json['title']),
       description: serializer.fromJson<String?>(json['description']),
-      projectId: serializer.fromJson<int?>(json['projectId']),
+      areaId: serializer.fromJson<int?>(json['areaId']),
       priority: serializer.fromJson<int>(json['priority']),
       estimatedDuration: serializer.fromJson<int?>(json['estimatedDuration']),
       actualDuration: serializer.fromJson<int?>(json['actualDuration']),
@@ -578,7 +576,7 @@ class Task extends DataClass implements Insertable<Task> {
       'id': serializer.toJson<int>(id),
       'title': serializer.toJson<String>(title),
       'description': serializer.toJson<String?>(description),
-      'projectId': serializer.toJson<int?>(projectId),
+      'areaId': serializer.toJson<int?>(areaId),
       'priority': serializer.toJson<int>(priority),
       'estimatedDuration': serializer.toJson<int?>(estimatedDuration),
       'actualDuration': serializer.toJson<int?>(actualDuration),
@@ -593,7 +591,7 @@ class Task extends DataClass implements Insertable<Task> {
           {int? id,
           String? title,
           Value<String?> description = const Value.absent(),
-          Value<int?> projectId = const Value.absent(),
+          Value<int?> areaId = const Value.absent(),
           int? priority,
           Value<int?> estimatedDuration = const Value.absent(),
           Value<int?> actualDuration = const Value.absent(),
@@ -605,7 +603,7 @@ class Task extends DataClass implements Insertable<Task> {
         id: id ?? this.id,
         title: title ?? this.title,
         description: description.present ? description.value : this.description,
-        projectId: projectId.present ? projectId.value : this.projectId,
+        areaId: areaId.present ? areaId.value : this.areaId,
         priority: priority ?? this.priority,
         estimatedDuration: estimatedDuration.present
             ? estimatedDuration.value
@@ -624,7 +622,7 @@ class Task extends DataClass implements Insertable<Task> {
       title: data.title.present ? data.title.value : this.title,
       description:
           data.description.present ? data.description.value : this.description,
-      projectId: data.projectId.present ? data.projectId.value : this.projectId,
+      areaId: data.areaId.present ? data.areaId.value : this.areaId,
       priority: data.priority.present ? data.priority.value : this.priority,
       estimatedDuration: data.estimatedDuration.present
           ? data.estimatedDuration.value
@@ -648,7 +646,7 @@ class Task extends DataClass implements Insertable<Task> {
           ..write('id: $id, ')
           ..write('title: $title, ')
           ..write('description: $description, ')
-          ..write('projectId: $projectId, ')
+          ..write('areaId: $areaId, ')
           ..write('priority: $priority, ')
           ..write('estimatedDuration: $estimatedDuration, ')
           ..write('actualDuration: $actualDuration, ')
@@ -665,7 +663,7 @@ class Task extends DataClass implements Insertable<Task> {
       id,
       title,
       description,
-      projectId,
+      areaId,
       priority,
       estimatedDuration,
       actualDuration,
@@ -680,7 +678,7 @@ class Task extends DataClass implements Insertable<Task> {
           other.id == this.id &&
           other.title == this.title &&
           other.description == this.description &&
-          other.projectId == this.projectId &&
+          other.areaId == this.areaId &&
           other.priority == this.priority &&
           other.estimatedDuration == this.estimatedDuration &&
           other.actualDuration == this.actualDuration &&
@@ -694,7 +692,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
   final Value<int> id;
   final Value<String> title;
   final Value<String?> description;
-  final Value<int?> projectId;
+  final Value<int?> areaId;
   final Value<int> priority;
   final Value<int?> estimatedDuration;
   final Value<int?> actualDuration;
@@ -706,7 +704,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
     this.id = const Value.absent(),
     this.title = const Value.absent(),
     this.description = const Value.absent(),
-    this.projectId = const Value.absent(),
+    this.areaId = const Value.absent(),
     this.priority = const Value.absent(),
     this.estimatedDuration = const Value.absent(),
     this.actualDuration = const Value.absent(),
@@ -719,7 +717,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
     this.id = const Value.absent(),
     required String title,
     this.description = const Value.absent(),
-    this.projectId = const Value.absent(),
+    this.areaId = const Value.absent(),
     this.priority = const Value.absent(),
     this.estimatedDuration = const Value.absent(),
     this.actualDuration = const Value.absent(),
@@ -732,7 +730,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
     Expression<int>? id,
     Expression<String>? title,
     Expression<String>? description,
-    Expression<int>? projectId,
+    Expression<int>? areaId,
     Expression<int>? priority,
     Expression<int>? estimatedDuration,
     Expression<int>? actualDuration,
@@ -745,7 +743,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
       if (id != null) 'id': id,
       if (title != null) 'title': title,
       if (description != null) 'description': description,
-      if (projectId != null) 'project_id': projectId,
+      if (areaId != null) 'area_id': areaId,
       if (priority != null) 'priority': priority,
       if (estimatedDuration != null) 'estimated_duration': estimatedDuration,
       if (actualDuration != null) 'actual_duration': actualDuration,
@@ -760,7 +758,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
       {Value<int>? id,
       Value<String>? title,
       Value<String?>? description,
-      Value<int?>? projectId,
+      Value<int?>? areaId,
       Value<int>? priority,
       Value<int?>? estimatedDuration,
       Value<int?>? actualDuration,
@@ -772,7 +770,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
       id: id ?? this.id,
       title: title ?? this.title,
       description: description ?? this.description,
-      projectId: projectId ?? this.projectId,
+      areaId: areaId ?? this.areaId,
       priority: priority ?? this.priority,
       estimatedDuration: estimatedDuration ?? this.estimatedDuration,
       actualDuration: actualDuration ?? this.actualDuration,
@@ -795,8 +793,8 @@ class TasksCompanion extends UpdateCompanion<Task> {
     if (description.present) {
       map['description'] = Variable<String>(description.value);
     }
-    if (projectId.present) {
-      map['project_id'] = Variable<int>(projectId.value);
+    if (areaId.present) {
+      map['area_id'] = Variable<int>(areaId.value);
     }
     if (priority.present) {
       map['priority'] = Variable<int>(priority.value);
@@ -828,7 +826,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
           ..write('id: $id, ')
           ..write('title: $title, ')
           ..write('description: $description, ')
-          ..write('projectId: $projectId, ')
+          ..write('areaId: $areaId, ')
           ..write('priority: $priority, ')
           ..write('estimatedDuration: $estimatedDuration, ')
           ..write('actualDuration: $actualDuration, ')
@@ -3468,7 +3466,7 @@ class EventsCompanion extends UpdateCompanion<Event> {
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
-  late final $ProjectsTable projects = $ProjectsTable(this);
+  late final $AreasTable areas = $AreasTable(this);
   late final $TasksTable tasks = $TasksTable(this);
   late final $TagsTable tags = $TagsTable(this);
   late final $TaskTagsTable taskTags = $TaskTagsTable(this);
@@ -3486,7 +3484,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities => [
-        projects,
+        areas,
         tasks,
         tags,
         taskTags,
@@ -3501,31 +3499,31 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       ];
 }
 
-typedef $$ProjectsTableCreateCompanionBuilder = ProjectsCompanion Function({
+typedef $$AreasTableCreateCompanionBuilder = AreasCompanion Function({
   Value<int> id,
   required String name,
   Value<String?> description,
   Value<String?> colorHex,
 });
-typedef $$ProjectsTableUpdateCompanionBuilder = ProjectsCompanion Function({
+typedef $$AreasTableUpdateCompanionBuilder = AreasCompanion Function({
   Value<int> id,
   Value<String> name,
   Value<String?> description,
   Value<String?> colorHex,
 });
 
-final class $$ProjectsTableReferences
-    extends BaseReferences<_$AppDatabase, $ProjectsTable, Project> {
-  $$ProjectsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+final class $$AreasTableReferences
+    extends BaseReferences<_$AppDatabase, $AreasTable, Area> {
+  $$AreasTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
   static MultiTypedResultKey<$TasksTable, List<Task>> _tasksRefsTable(
           _$AppDatabase db) =>
       MultiTypedResultKey.fromTable(db.tasks,
-          aliasName: $_aliasNameGenerator(db.projects.id, db.tasks.projectId));
+          aliasName: $_aliasNameGenerator(db.areas.id, db.tasks.areaId));
 
   $$TasksTableProcessedTableManager get tasksRefs {
     final manager = $$TasksTableTableManager($_db, $_db.tasks)
-        .filter((f) => f.projectId.id.sqlEquals($_itemColumn<int>('id')!));
+        .filter((f) => f.areaId.id.sqlEquals($_itemColumn<int>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_tasksRefsTable($_db));
     return ProcessedTableManager(
@@ -3533,9 +3531,8 @@ final class $$ProjectsTableReferences
   }
 }
 
-class $$ProjectsTableFilterComposer
-    extends Composer<_$AppDatabase, $ProjectsTable> {
-  $$ProjectsTableFilterComposer({
+class $$AreasTableFilterComposer extends Composer<_$AppDatabase, $AreasTable> {
+  $$AreasTableFilterComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -3560,7 +3557,7 @@ class $$ProjectsTableFilterComposer
         composer: this,
         getCurrentColumn: (t) => t.id,
         referencedTable: $db.tasks,
-        getReferencedColumn: (t) => t.projectId,
+        getReferencedColumn: (t) => t.areaId,
         builder: (joinBuilder,
                 {$addJoinBuilderToRootComposer,
                 $removeJoinBuilderFromRootComposer}) =>
@@ -3576,9 +3573,9 @@ class $$ProjectsTableFilterComposer
   }
 }
 
-class $$ProjectsTableOrderingComposer
-    extends Composer<_$AppDatabase, $ProjectsTable> {
-  $$ProjectsTableOrderingComposer({
+class $$AreasTableOrderingComposer
+    extends Composer<_$AppDatabase, $AreasTable> {
+  $$AreasTableOrderingComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -3598,9 +3595,9 @@ class $$ProjectsTableOrderingComposer
       column: $table.colorHex, builder: (column) => ColumnOrderings(column));
 }
 
-class $$ProjectsTableAnnotationComposer
-    extends Composer<_$AppDatabase, $ProjectsTable> {
-  $$ProjectsTableAnnotationComposer({
+class $$AreasTableAnnotationComposer
+    extends Composer<_$AppDatabase, $AreasTable> {
+  $$AreasTableAnnotationComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -3625,7 +3622,7 @@ class $$ProjectsTableAnnotationComposer
         composer: this,
         getCurrentColumn: (t) => t.id,
         referencedTable: $db.tasks,
-        getReferencedColumn: (t) => t.projectId,
+        getReferencedColumn: (t) => t.areaId,
         builder: (joinBuilder,
                 {$addJoinBuilderToRootComposer,
                 $removeJoinBuilderFromRootComposer}) =>
@@ -3641,35 +3638,35 @@ class $$ProjectsTableAnnotationComposer
   }
 }
 
-class $$ProjectsTableTableManager extends RootTableManager<
+class $$AreasTableTableManager extends RootTableManager<
     _$AppDatabase,
-    $ProjectsTable,
-    Project,
-    $$ProjectsTableFilterComposer,
-    $$ProjectsTableOrderingComposer,
-    $$ProjectsTableAnnotationComposer,
-    $$ProjectsTableCreateCompanionBuilder,
-    $$ProjectsTableUpdateCompanionBuilder,
-    (Project, $$ProjectsTableReferences),
-    Project,
+    $AreasTable,
+    Area,
+    $$AreasTableFilterComposer,
+    $$AreasTableOrderingComposer,
+    $$AreasTableAnnotationComposer,
+    $$AreasTableCreateCompanionBuilder,
+    $$AreasTableUpdateCompanionBuilder,
+    (Area, $$AreasTableReferences),
+    Area,
     PrefetchHooks Function({bool tasksRefs})> {
-  $$ProjectsTableTableManager(_$AppDatabase db, $ProjectsTable table)
+  $$AreasTableTableManager(_$AppDatabase db, $AreasTable table)
       : super(TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
-              $$ProjectsTableFilterComposer($db: db, $table: table),
+              $$AreasTableFilterComposer($db: db, $table: table),
           createOrderingComposer: () =>
-              $$ProjectsTableOrderingComposer($db: db, $table: table),
+              $$AreasTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
-              $$ProjectsTableAnnotationComposer($db: db, $table: table),
+              $$AreasTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
             Value<int> id = const Value.absent(),
             Value<String> name = const Value.absent(),
             Value<String?> description = const Value.absent(),
             Value<String?> colorHex = const Value.absent(),
           }) =>
-              ProjectsCompanion(
+              AreasCompanion(
             id: id,
             name: name,
             description: description,
@@ -3681,7 +3678,7 @@ class $$ProjectsTableTableManager extends RootTableManager<
             Value<String?> description = const Value.absent(),
             Value<String?> colorHex = const Value.absent(),
           }) =>
-              ProjectsCompanion.insert(
+              AreasCompanion.insert(
             id: id,
             name: name,
             description: description,
@@ -3689,7 +3686,7 @@ class $$ProjectsTableTableManager extends RootTableManager<
           ),
           withReferenceMapper: (p0) => p0
               .map((e) =>
-                  (e.readTable(table), $$ProjectsTableReferences(db, table, e)))
+                  (e.readTable(table), $$AreasTableReferences(db, table, e)))
               .toList(),
           prefetchHooksCallback: ({tasksRefs = false}) {
             return PrefetchHooks(
@@ -3699,15 +3696,15 @@ class $$ProjectsTableTableManager extends RootTableManager<
               getPrefetchedDataCallback: (items) async {
                 return [
                   if (tasksRefs)
-                    await $_getPrefetchedData<Project, $ProjectsTable, Task>(
+                    await $_getPrefetchedData<Area, $AreasTable, Task>(
                         currentTable: table,
                         referencedTable:
-                            $$ProjectsTableReferences._tasksRefsTable(db),
+                            $$AreasTableReferences._tasksRefsTable(db),
                         managerFromTypedResult: (p0) =>
-                            $$ProjectsTableReferences(db, table, p0).tasksRefs,
-                        referencedItemsForCurrentItem:
-                            (item, referencedItems) => referencedItems
-                                .where((e) => e.projectId == item.id),
+                            $$AreasTableReferences(db, table, p0).tasksRefs,
+                        referencedItemsForCurrentItem: (item,
+                                referencedItems) =>
+                            referencedItems.where((e) => e.areaId == item.id),
                         typedResults: items)
                 ];
               },
@@ -3716,23 +3713,23 @@ class $$ProjectsTableTableManager extends RootTableManager<
         ));
 }
 
-typedef $$ProjectsTableProcessedTableManager = ProcessedTableManager<
+typedef $$AreasTableProcessedTableManager = ProcessedTableManager<
     _$AppDatabase,
-    $ProjectsTable,
-    Project,
-    $$ProjectsTableFilterComposer,
-    $$ProjectsTableOrderingComposer,
-    $$ProjectsTableAnnotationComposer,
-    $$ProjectsTableCreateCompanionBuilder,
-    $$ProjectsTableUpdateCompanionBuilder,
-    (Project, $$ProjectsTableReferences),
-    Project,
+    $AreasTable,
+    Area,
+    $$AreasTableFilterComposer,
+    $$AreasTableOrderingComposer,
+    $$AreasTableAnnotationComposer,
+    $$AreasTableCreateCompanionBuilder,
+    $$AreasTableUpdateCompanionBuilder,
+    (Area, $$AreasTableReferences),
+    Area,
     PrefetchHooks Function({bool tasksRefs})>;
 typedef $$TasksTableCreateCompanionBuilder = TasksCompanion Function({
   Value<int> id,
   required String title,
   Value<String?> description,
-  Value<int?> projectId,
+  Value<int?> areaId,
   Value<int> priority,
   Value<int?> estimatedDuration,
   Value<int?> actualDuration,
@@ -3745,7 +3742,7 @@ typedef $$TasksTableUpdateCompanionBuilder = TasksCompanion Function({
   Value<int> id,
   Value<String> title,
   Value<String?> description,
-  Value<int?> projectId,
+  Value<int?> areaId,
   Value<int> priority,
   Value<int?> estimatedDuration,
   Value<int?> actualDuration,
@@ -3759,15 +3756,15 @@ final class $$TasksTableReferences
     extends BaseReferences<_$AppDatabase, $TasksTable, Task> {
   $$TasksTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
-  static $ProjectsTable _projectIdTable(_$AppDatabase db) => db.projects
-      .createAlias($_aliasNameGenerator(db.tasks.projectId, db.projects.id));
+  static $AreasTable _areaIdTable(_$AppDatabase db) =>
+      db.areas.createAlias($_aliasNameGenerator(db.tasks.areaId, db.areas.id));
 
-  $$ProjectsTableProcessedTableManager? get projectId {
-    final $_column = $_itemColumn<int>('project_id');
+  $$AreasTableProcessedTableManager? get areaId {
+    final $_column = $_itemColumn<int>('area_id');
     if ($_column == null) return null;
-    final manager = $$ProjectsTableTableManager($_db, $_db.projects)
+    final manager = $$AreasTableTableManager($_db, $_db.areas)
         .filter((f) => f.id.sqlEquals($_column));
-    final item = $_typedResult.readTableOrNull(_projectIdTable($_db));
+    final item = $_typedResult.readTableOrNull(_areaIdTable($_db));
     if (item == null) return manager;
     return ProcessedTableManager(
         manager.$state.copyWith(prefetchedData: [item]));
@@ -3843,18 +3840,18 @@ class $$TasksTableFilterComposer extends Composer<_$AppDatabase, $TasksTable> {
       column: $table.notificationAt,
       builder: (column) => ColumnFilters(column));
 
-  $$ProjectsTableFilterComposer get projectId {
-    final $$ProjectsTableFilterComposer composer = $composerBuilder(
+  $$AreasTableFilterComposer get areaId {
+    final $$AreasTableFilterComposer composer = $composerBuilder(
         composer: this,
-        getCurrentColumn: (t) => t.projectId,
-        referencedTable: $db.projects,
+        getCurrentColumn: (t) => t.areaId,
+        referencedTable: $db.areas,
         getReferencedColumn: (t) => t.id,
         builder: (joinBuilder,
                 {$addJoinBuilderToRootComposer,
                 $removeJoinBuilderFromRootComposer}) =>
-            $$ProjectsTableFilterComposer(
+            $$AreasTableFilterComposer(
               $db: $db,
-              $table: $db.projects,
+              $table: $db.areas,
               $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
               joinBuilder: joinBuilder,
               $removeJoinBuilderFromRootComposer:
@@ -3948,18 +3945,18 @@ class $$TasksTableOrderingComposer
       column: $table.notificationAt,
       builder: (column) => ColumnOrderings(column));
 
-  $$ProjectsTableOrderingComposer get projectId {
-    final $$ProjectsTableOrderingComposer composer = $composerBuilder(
+  $$AreasTableOrderingComposer get areaId {
+    final $$AreasTableOrderingComposer composer = $composerBuilder(
         composer: this,
-        getCurrentColumn: (t) => t.projectId,
-        referencedTable: $db.projects,
+        getCurrentColumn: (t) => t.areaId,
+        referencedTable: $db.areas,
         getReferencedColumn: (t) => t.id,
         builder: (joinBuilder,
                 {$addJoinBuilderToRootComposer,
                 $removeJoinBuilderFromRootComposer}) =>
-            $$ProjectsTableOrderingComposer(
+            $$AreasTableOrderingComposer(
               $db: $db,
-              $table: $db.projects,
+              $table: $db.areas,
               $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
               joinBuilder: joinBuilder,
               $removeJoinBuilderFromRootComposer:
@@ -4008,18 +4005,18 @@ class $$TasksTableAnnotationComposer
   GeneratedColumn<DateTime> get notificationAt => $composableBuilder(
       column: $table.notificationAt, builder: (column) => column);
 
-  $$ProjectsTableAnnotationComposer get projectId {
-    final $$ProjectsTableAnnotationComposer composer = $composerBuilder(
+  $$AreasTableAnnotationComposer get areaId {
+    final $$AreasTableAnnotationComposer composer = $composerBuilder(
         composer: this,
-        getCurrentColumn: (t) => t.projectId,
-        referencedTable: $db.projects,
+        getCurrentColumn: (t) => t.areaId,
+        referencedTable: $db.areas,
         getReferencedColumn: (t) => t.id,
         builder: (joinBuilder,
                 {$addJoinBuilderToRootComposer,
                 $removeJoinBuilderFromRootComposer}) =>
-            $$ProjectsTableAnnotationComposer(
+            $$AreasTableAnnotationComposer(
               $db: $db,
-              $table: $db.projects,
+              $table: $db.areas,
               $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
               joinBuilder: joinBuilder,
               $removeJoinBuilderFromRootComposer:
@@ -4083,7 +4080,7 @@ class $$TasksTableTableManager extends RootTableManager<
     (Task, $$TasksTableReferences),
     Task,
     PrefetchHooks Function(
-        {bool projectId, bool taskTagsRefs, bool subtasksRefs})> {
+        {bool areaId, bool taskTagsRefs, bool subtasksRefs})> {
   $$TasksTableTableManager(_$AppDatabase db, $TasksTable table)
       : super(TableManagerState(
           db: db,
@@ -4098,7 +4095,7 @@ class $$TasksTableTableManager extends RootTableManager<
             Value<int> id = const Value.absent(),
             Value<String> title = const Value.absent(),
             Value<String?> description = const Value.absent(),
-            Value<int?> projectId = const Value.absent(),
+            Value<int?> areaId = const Value.absent(),
             Value<int> priority = const Value.absent(),
             Value<int?> estimatedDuration = const Value.absent(),
             Value<int?> actualDuration = const Value.absent(),
@@ -4111,7 +4108,7 @@ class $$TasksTableTableManager extends RootTableManager<
             id: id,
             title: title,
             description: description,
-            projectId: projectId,
+            areaId: areaId,
             priority: priority,
             estimatedDuration: estimatedDuration,
             actualDuration: actualDuration,
@@ -4124,7 +4121,7 @@ class $$TasksTableTableManager extends RootTableManager<
             Value<int> id = const Value.absent(),
             required String title,
             Value<String?> description = const Value.absent(),
-            Value<int?> projectId = const Value.absent(),
+            Value<int?> areaId = const Value.absent(),
             Value<int> priority = const Value.absent(),
             Value<int?> estimatedDuration = const Value.absent(),
             Value<int?> actualDuration = const Value.absent(),
@@ -4137,7 +4134,7 @@ class $$TasksTableTableManager extends RootTableManager<
             id: id,
             title: title,
             description: description,
-            projectId: projectId,
+            areaId: areaId,
             priority: priority,
             estimatedDuration: estimatedDuration,
             actualDuration: actualDuration,
@@ -4151,7 +4148,7 @@ class $$TasksTableTableManager extends RootTableManager<
                   (e.readTable(table), $$TasksTableReferences(db, table, e)))
               .toList(),
           prefetchHooksCallback: (
-              {projectId = false, taskTagsRefs = false, subtasksRefs = false}) {
+              {areaId = false, taskTagsRefs = false, subtasksRefs = false}) {
             return PrefetchHooks(
               db: db,
               explicitlyWatchedTables: [
@@ -4171,13 +4168,13 @@ class $$TasksTableTableManager extends RootTableManager<
                       dynamic,
                       dynamic,
                       dynamic>>(state) {
-                if (projectId) {
+                if (areaId) {
                   state = state.withJoin(
                     currentTable: table,
-                    currentColumn: table.projectId,
-                    referencedTable: $$TasksTableReferences._projectIdTable(db),
+                    currentColumn: table.areaId,
+                    referencedTable: $$TasksTableReferences._areaIdTable(db),
                     referencedColumn:
-                        $$TasksTableReferences._projectIdTable(db).id,
+                        $$TasksTableReferences._areaIdTable(db).id,
                   ) as T;
                 }
 
@@ -4226,7 +4223,7 @@ typedef $$TasksTableProcessedTableManager = ProcessedTableManager<
     (Task, $$TasksTableReferences),
     Task,
     PrefetchHooks Function(
-        {bool projectId, bool taskTagsRefs, bool subtasksRefs})>;
+        {bool areaId, bool taskTagsRefs, bool subtasksRefs})>;
 typedef $$TagsTableCreateCompanionBuilder = TagsCompanion Function({
   Value<int> id,
   required String name,
@@ -6262,8 +6259,8 @@ typedef $$EventsTableProcessedTableManager = ProcessedTableManager<
 class $AppDatabaseManager {
   final _$AppDatabase _db;
   $AppDatabaseManager(this._db);
-  $$ProjectsTableTableManager get projects =>
-      $$ProjectsTableTableManager(_db, _db.projects);
+  $$AreasTableTableManager get areas =>
+      $$AreasTableTableManager(_db, _db.areas);
   $$TasksTableTableManager get tasks =>
       $$TasksTableTableManager(_db, _db.tasks);
   $$TagsTableTableManager get tags => $$TagsTableTableManager(_db, _db.tags);
