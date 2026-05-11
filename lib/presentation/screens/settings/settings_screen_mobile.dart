@@ -104,7 +104,6 @@ class SettingsScreenMobile extends ConsumerWidget {
     });
 
     final isBackupLoading = ref.watch(backupViewModelProvider).isLoading;
-    final isDevMode = ref.watch(devModeProvider);
     final themeMode = ref.watch(themeModeProvider);
     final isDark = themeMode == ThemeMode.dark;
 
@@ -283,31 +282,6 @@ class SettingsScreenMobile extends ConsumerWidget {
                 onTap: () {
                   ref.read(themeModeProvider.notifier).state =
                       isDark ? ThemeMode.light : ThemeMode.dark;
-                },
-              ),
-              const SizedBox(height: 32),
-              Padding(
-                padding: const EdgeInsets.only(left: 8.0, bottom: 12.0),
-                child: Text('AVANZADO',
-                    style: textTheme.labelSmall?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 1.2)),
-              ),
-              _SettingsTile(
-                icon: Icons.developer_mode,
-                title: 'Modo desarrollador',
-                subtitle: 'Habilita herramientas y botones de prueba',
-                iconColor: Colors.deepPurpleAccent,
-                trailing: Switch(
-                  value: isDevMode,
-                  activeThumbColor: colorScheme.primary,
-                  onChanged: (bool newValue) {
-                    ref.read(devModeProvider.notifier).state = newValue;
-                  },
-                ),
-                onTap: () {
-                  ref.read(devModeProvider.notifier).state = !isDevMode;
                 },
               ),
               const SizedBox(height: 32),

@@ -48,7 +48,6 @@ class AegisApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Obtenemos el factor de escala interno de la app
     final textScale = ref.watch(textScaleProvider);
 
     return MaterialApp(

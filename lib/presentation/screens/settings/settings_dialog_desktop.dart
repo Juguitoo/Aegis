@@ -1,4 +1,3 @@
-import 'package:aegis/core/providers/general_providers.dart';
 import 'package:aegis/data/local/database/app_database.dart';
 import 'package:aegis/presentation/viewmodels/settings_viewmodel.dart';
 import 'package:aegis/presentation/viewmodels/backup_viewmodel.dart';
@@ -170,7 +169,6 @@ class _SettingsDialogState extends ConsumerState<SettingsDialogDesktop> {
     });
 
     final isBackupLoading = ref.watch(backupViewModelProvider).isLoading;
-    final isDevMode = ref.watch(devModeProvider);
 
     return AlertDialog(
       backgroundColor: colorScheme.surface,
@@ -251,27 +249,6 @@ class _SettingsDialogState extends ConsumerState<SettingsDialogDesktop> {
                           icon: Icons.delete_forever_rounded,
                           text: 'Borrar toda la base de datos',
                           type: ButtonType.destructive,
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  _buildSectionCard(
-                    context: context,
-                    title: 'Opciones avanzadas',
-                    icon: Icons.developer_mode,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('Modo desarrollador',
-                            style: textTheme.bodyLarge
-                                ?.copyWith(fontWeight: FontWeight.w600)),
-                        Switch(
-                          value: isDevMode,
-                          activeThumbColor: colorScheme.primary,
-                          onChanged: (bool newValue) {
-                            ref.read(devModeProvider.notifier).state = newValue;
-                          },
                         ),
                       ],
                     ),

@@ -132,42 +132,6 @@ class AppDatabase extends _$AppDatabase {
     return MigrationStrategy(
       onCreate: (Migrator m) async {
         await m.createAll();
-
-        await batch((batch) {
-          batch.insertAll(areas, [
-            AreasCompanion.insert(
-              name: 'Personal',
-              colorHex: const Value('#3B82F6'),
-            ),
-            AreasCompanion.insert(
-              name: 'Trabajo',
-              colorHex: const Value('#10B981'),
-            ),
-            AreasCompanion.insert(
-              name: 'Estudios',
-              colorHex: const Value('#8B5CF6'),
-            ),
-          ]);
-
-          batch.insertAll(tags, [
-            TagsCompanion.insert(
-              name: 'Urgente',
-              colorHex: const Value('#EF4444'),
-            ),
-            TagsCompanion.insert(
-              name: 'Salud',
-              colorHex: const Value('#EC4899'),
-            ),
-            TagsCompanion.insert(
-              name: 'Casa',
-              colorHex: const Value('#F59E0B'),
-            ),
-            TagsCompanion.insert(
-              name: 'Ocio',
-              colorHex: const Value('#06B6D4'),
-            ),
-          ]);
-        });
       },
     );
   }
