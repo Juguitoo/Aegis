@@ -8,6 +8,119 @@ import 'package:intl/intl.dart';
 class MobileHabitsSection extends ConsumerWidget {
   const MobileHabitsSection({super.key});
 
+  void _showHabitDialog(BuildContext context, WidgetRef ref,
+      {dynamic habitData}) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    final controller = TextEditingController(text: habitData?.habit.name ?? '');
+
+    void submitHabit(BuildContext dialogContext, String value) {
+      if (value.trim().isEmpty) {
+        final screenSize = MediaQuery.of(dialogContext).size;
+        final sideMargin =
+            screenSize.width > 600 ? (screenSize.width - 400) / 2 : 16.0;
+        final bottomMargin = (screenSize.height - 120).clamp(16.0, 4000.0);
+
+        ScaffoldMessenger.of(dialogContext).hideCurrentSnackBar();
+        ScaffoldMessenger.of(dialogContext).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.error_outline, color: Colors.white),
+                const SizedBox(width: 12),
+                const Expanded(
+                  child: Text(
+                    'El nombre del hábito no puede estar vacío',
+                    style: TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.w600),
+                  ),
+                ),
+              ],
+            ),
+            backgroundColor: colorScheme.error,
+            behavior: SnackBarBehavior.floating,
+            margin: EdgeInsets.only(
+                bottom: bottomMargin, left: sideMargin, right: sideMargin),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            elevation: 6,
+            dismissDirection: DismissDirection.up,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+        return;
+      }
+
+      if (habitData == null) {
+        ref.read(habitsViewModelProvider.notifier).addHabit(value.trim());
+      } else {
+        ref
+            .read(habitsViewModelProvider.notifier)
+            .updateHabit(habitData.habit.id, value.trim());
+      }
+
+      Navigator.pop(dialogContext);
+    }
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return Dialog(
+          backgroundColor: colorScheme.surface,
+          surfaceTintColor: Colors.transparent,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
+          ),
+          insetPadding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  habitData == null ? 'Nuevo hábito' : 'Editar hábito',
+                  style: textTheme.displayLarge?.copyWith(fontSize: 18),
+                ),
+                const SizedBox(height: 16),
+                AegisTextField(
+                  controller: controller,
+                  hintText: 'Ej. Beber 2L de agua',
+                  minLines: 1,
+                  maxLines: 3,
+                  maxLength: 80,
+                  autofocus: true,
+                  onSubmitted: (val) => submitHabit(dialogContext, val),
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  children: [
+                    Expanded(
+                      child: AegisButton(
+                        text: 'Cancelar',
+                        type: ButtonType.secondary,
+                        onPressed: () => Navigator.pop(dialogContext),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: AegisButton(
+                        text: habitData == null ? 'Añadir' : 'Guardar',
+                        type: ButtonType.primary,
+                        onPressed: () =>
+                            submitHabit(dialogContext, controller.text),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final habitsAsync = ref.watch(habitsViewModelProvider);
@@ -40,74 +153,12 @@ class MobileHabitsSection extends ConsumerWidget {
                 style: textTheme.displayMedium,
               ),
               IconButton(
-                icon: const Icon(Icons.add_circle_outline),
+                icon: const Icon(Icons.add),
                 color: colorScheme.primary,
                 iconSize: 24,
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (dialogContext) {
-                      final controller = TextEditingController();
-
-                      void submitHabit(String value) {
-                        if (value.trim().isEmpty) {
-                          ScaffoldMessenger.of(dialogContext).showSnackBar(
-                            SnackBar(
-                              content: const Text(
-                                  'El nombre del hábito no puede estar vacío'),
-                              backgroundColor: colorScheme.error,
-                              behavior: SnackBarBehavior.floating,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8)),
-                            ),
-                          );
-                          return;
-                        }
-                        ref
-                            .read(habitsViewModelProvider.notifier)
-                            .addHabit(value.trim());
-                        Navigator.pop(dialogContext);
-                      }
-
-                      return AlertDialog(
-                        backgroundColor: colorScheme.surface,
-                        surfaceTintColor: Colors.transparent,
-                        title: Text('Nuevo hábito',
-                            style:
-                                textTheme.displayLarge?.copyWith(fontSize: 18)),
-                        content: AegisTextField(
-                          controller: controller,
-                          hintText: 'Ej. Beber 2L de agua',
-                          autofocus: true,
-                          onSubmitted: submitHabit,
-                        ),
-                        actions: [
-                          Row(
-                            children: [
-                              Expanded(
-                                child: AegisButton(
-                                  text: 'Cancelar',
-                                  type: ButtonType.secondary,
-                                  onPressed: () => Navigator.pop(dialogContext),
-                                ),
-                              ),
-                              const SizedBox(width: 16),
-                              Expanded(
-                                child: AegisButton(
-                                  text: 'Añadir',
-                                  type: ButtonType.primary,
-                                  onPressed: () => submitHabit(controller.text),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                },
+                onPressed: () => _showHabitDialog(context, ref),
               ),
             ],
           ),
@@ -222,90 +273,9 @@ class MobileHabitsSection extends ConsumerWidget {
                                 children: [
                                   Expanded(
                                     child: GestureDetector(
-                                      onTap: () {
-                                        showDialog(
-                                          context: context,
-                                          builder: (dialogContext) {
-                                            final controller =
-                                                TextEditingController(
-                                                    text: habitData.habit.name);
-
-                                            void submitHabit(String value) {
-                                              if (value.trim().isEmpty) {
-                                                ScaffoldMessenger.of(
-                                                        dialogContext)
-                                                    .showSnackBar(
-                                                  SnackBar(
-                                                    content: const Text(
-                                                        'El nombre del hábito no puede estar vacío'),
-                                                    backgroundColor:
-                                                        colorScheme.error,
-                                                    behavior: SnackBarBehavior
-                                                        .floating,
-                                                    shape:
-                                                        RoundedRectangleBorder(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        8)),
-                                                  ),
-                                                );
-                                                return;
-                                              }
-                                              ref
-                                                  .read(habitsViewModelProvider
-                                                      .notifier)
-                                                  .updateHabit(
-                                                      habitData.habit.id,
-                                                      value.trim());
-                                              Navigator.pop(dialogContext);
-                                            }
-
-                                            return AlertDialog(
-                                              backgroundColor:
-                                                  colorScheme.surface,
-                                              surfaceTintColor:
-                                                  Colors.transparent,
-                                              title: Text('Editar hábito',
-                                                  style: textTheme.displayMedium
-                                                      ?.copyWith(fontSize: 18)),
-                                              content: AegisTextField(
-                                                controller: controller,
-                                                autofocus: true,
-                                                onSubmitted: submitHabit,
-                                              ),
-                                              actions: [
-                                                Row(
-                                                  children: [
-                                                    Expanded(
-                                                      child: AegisButton(
-                                                        text: 'Cancelar',
-                                                        type: ButtonType
-                                                            .secondary,
-                                                        onPressed: () =>
-                                                            Navigator.pop(
-                                                                dialogContext),
-                                                      ),
-                                                    ),
-                                                    const SizedBox(width: 16),
-                                                    Expanded(
-                                                      child: AegisButton(
-                                                        text: 'Guardar',
-                                                        type:
-                                                            ButtonType.primary,
-                                                        onPressed: () =>
-                                                            submitHabit(
-                                                                controller
-                                                                    .text),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ],
-                                            );
-                                          },
-                                        );
-                                      },
+                                      onTap: () => _showHabitDialog(
+                                          context, ref,
+                                          habitData: habitData),
                                       child: Text(
                                         habitData.habit.name,
                                         style: textTheme.bodyLarge?.copyWith(

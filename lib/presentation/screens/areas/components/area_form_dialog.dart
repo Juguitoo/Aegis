@@ -248,11 +248,43 @@ class _AreaFormDialogState extends ConsumerState<AreaFormDialog> {
                     }
                     Navigator.pop(context);
                   } else {
+                    final screenSize = MediaQuery.of(context).size;
+                    final sideMargin = screenSize.width > 600
+                        ? (screenSize.width - 400) / 2
+                        : 16.0;
+                    final bottomMargin =
+                        (screenSize.height - 120).clamp(16.0, 4000.0);
+
+                    ScaffoldMessenger.of(context).hideCurrentSnackBar();
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                          backgroundColor: colorScheme.error,
-                          content:
-                              const Text('El nombre del area es obligatorio')),
+                        content: Row(
+                          children: [
+                            const Icon(Icons.error_outline,
+                                color: Colors.white),
+                            const SizedBox(width: 12),
+                            const Expanded(
+                              child: Text(
+                                'El nombre del área es obligatorio',
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600),
+                              ),
+                            ),
+                          ],
+                        ),
+                        backgroundColor: colorScheme.error,
+                        behavior: SnackBarBehavior.floating,
+                        margin: EdgeInsets.only(
+                            bottom: bottomMargin,
+                            left: sideMargin,
+                            right: sideMargin),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12)),
+                        elevation: 6,
+                        dismissDirection: DismissDirection.up,
+                        duration: const Duration(seconds: 3),
+                      ),
                     );
                   }
                 },

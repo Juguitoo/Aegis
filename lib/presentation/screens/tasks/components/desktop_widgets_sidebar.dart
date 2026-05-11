@@ -66,7 +66,7 @@ class _DesktopHabitsWidget extends ConsumerWidget {
                 style: textTheme.displayLarge?.copyWith(fontSize: 24),
               ),
               IconButton(
-                icon: const Icon(Icons.add_circle_outline),
+                icon: const Icon(Icons.add),
                 color: colorScheme.primary,
                 iconSize: 28,
                 padding: EdgeInsets.zero,
@@ -384,7 +384,7 @@ class _PomodoroPromoCard extends StatelessWidget {
           );
         },
         child: Container(
-          padding: const EdgeInsets.all(32),
+          clipBehavior: Clip.hardEdge,
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [colorScheme.primary, const Color(0xFF4F46E5)],
@@ -400,48 +400,89 @@ class _PomodoroPromoCard extends StatelessWidget {
               ),
             ],
           ),
-          child: Center(
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Mantente Enfocado',
-                    style: TextStyle(
-                      color: colorScheme.onPrimary,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
+          child: Stack(
+            children: [
+              Positioned(
+                top: -50,
+                right: -30,
+                child: Container(
+                  width: 150,
+                  height: 150,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white.withValues(alpha: 0.1),
                   ),
-                  const SizedBox(height: 12),
-                  Text(
-                    'Recuerda tomar descansos largos\ndespués de cada hora de trabajo.',
-                    style: TextStyle(
-                      color: colorScheme.onPrimary.withValues(alpha: 0.7),
-                      fontSize: 14,
-                      height: 1.5,
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: colorScheme.onPrimary,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      'Iniciar Pomodoro',
-                      style: TextStyle(
-                        color: colorScheme.primary,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               ),
-            ),
+              Positioned(
+                bottom: -80,
+                right: 40,
+                child: Container(
+                  width: 200,
+                  height: 200,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white.withValues(alpha: 0.1),
+                  ),
+                ),
+              ),
+              Positioned(
+                top: 40,
+                left: -40,
+                child: Container(
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white.withValues(alpha: 0.05),
+                  ),
+                ),
+              ),
+              Center(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(32),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Mantente Enfocado',
+                        style: TextStyle(
+                          color: colorScheme.onPrimary,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        'Recuerda tomar descansos largos\ndespués de cada hora de trabajo.',
+                        style: TextStyle(
+                          color: colorScheme.onPrimary.withValues(alpha: 0.8),
+                          fontSize: 14,
+                          height: 1.5,
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: colorScheme.onPrimary,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          'Iniciar Pomodoro',
+                          style: TextStyle(
+                            color: colorScheme.primary,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),

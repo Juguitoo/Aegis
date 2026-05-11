@@ -76,7 +76,7 @@ class _TagFormDialogState extends ConsumerState<TagFormDialog> {
       title: Text(isEditing ? 'Editar etiqueta' : 'Nueva etiqueta',
           style: textTheme.displayMedium),
       content: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 400),
+        constraints: const BoxConstraints(maxWidth: 400, minWidth: 400),
         child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -85,6 +85,8 @@ class _TagFormDialogState extends ConsumerState<TagFormDialog> {
               AegisTextField(
                 controller: nameController,
                 textCapitalization: TextCapitalization.sentences,
+                maxLines: 3,
+                minLines: 1,
                 maxLength: 80,
                 labelText: 'Nombre de la etiqueta',
                 hintText: "Email, 5mins...",
@@ -247,11 +249,43 @@ class _TagFormDialogState extends ConsumerState<TagFormDialog> {
                       }
                       Navigator.pop(context);
                     } else {
+                      final screenSize = MediaQuery.of(context).size;
+                      final sideMargin = screenSize.width > 600
+                          ? (screenSize.width - 400) / 2
+                          : 16.0;
+                      final bottomMargin =
+                          (screenSize.height - 120).clamp(16.0, 4000.0);
+
+                      ScaffoldMessenger.of(context).hideCurrentSnackBar();
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                            backgroundColor: colorScheme.error,
-                            content: Text(
-                                'El nombre de la etiqueta es obligatorio')),
+                          content: Row(
+                            children: [
+                              const Icon(Icons.error_outline,
+                                  color: Colors.white),
+                              const SizedBox(width: 12),
+                              const Expanded(
+                                child: Text(
+                                  'El nombre de la etiqueta es obligatorio',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                              ),
+                            ],
+                          ),
+                          backgroundColor: colorScheme.error,
+                          behavior: SnackBarBehavior.floating,
+                          margin: EdgeInsets.only(
+                              bottom: bottomMargin,
+                              left: sideMargin,
+                              right: sideMargin),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12)),
+                          elevation: 6,
+                          dismissDirection: DismissDirection.up,
+                          duration: const Duration(seconds: 3),
+                        ),
                       );
                     }
                   },
