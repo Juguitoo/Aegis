@@ -241,12 +241,12 @@ class _TaskDetailsTab extends StatelessWidget {
             data: (areasList) {
               return AegisDropdown<int?>(
                 value: selectedAreaId,
-                labelText: 'Area',
+                labelText: 'Área',
                 prefixIcon: Icons.folder_outlined,
                 items: [
                   const DropdownMenuItem<int?>(
                     value: null,
-                    child: Text('Seleccionar area'),
+                    child: Text('Seleccionar área'),
                   ),
                   ...areasList.map((p) => DropdownMenuItem<int?>(
                         value: p.id,
@@ -270,7 +270,7 @@ class _TaskDetailsTab extends StatelessWidget {
               );
             },
             loading: () => const Center(child: CircularProgressIndicator()),
-            error: (err, stack) => Text('Error al cargar proyectos: $err'),
+            error: (err, stack) => Text('Error al cargar áreas: $err'),
           ),
           const SizedBox(height: 16),
           Text(

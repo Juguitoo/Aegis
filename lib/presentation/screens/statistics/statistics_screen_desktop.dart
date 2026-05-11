@@ -132,7 +132,7 @@ class _StatisticsScreenDesktopState
                         Expanded(
                           flex: 2,
                           child: ChartContainer(
-                            title: 'Distribución por areas',
+                            title: 'Distribución por áreas',
                             child: AreaPieChart(data: state.areaDistribution),
                           ),
                         ),

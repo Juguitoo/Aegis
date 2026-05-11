@@ -211,7 +211,7 @@ class _StatisticsScreenMobileState
                       const SizedBox(height: 24),
                       ChartContainer(
                         height: 320,
-                        title: 'Distribución por areas',
+                        title: 'Distribución por áreas',
                         child: AreaPieChart(data: state.areaDistribution),
                       ),
                       const SizedBox(height: 80),

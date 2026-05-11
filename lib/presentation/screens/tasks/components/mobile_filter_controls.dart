@@ -100,7 +100,7 @@ class MobileFilterControls extends ConsumerWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            'Area: $activeAreaName',
+                            'Área: $activeAreaName',
                             style: textTheme.bodySmall?.copyWith(
                               color: activeAreaColor ??
                                   colorScheme.onSurfaceVariant,
@@ -219,7 +219,7 @@ class MobileTaskFiltersBottomSheet extends ConsumerWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            'Area',
+            'Área',
             style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 8),
@@ -230,7 +230,7 @@ class MobileTaskFiltersBottomSheet extends ConsumerWidget {
                 items: [
                   const DropdownMenuItem<int?>(
                     value: null,
-                    child: Text('Todas las areas'),
+                    child: Text('Todas las áreas'),
                   ),
                   DropdownMenuItem<int?>(
                     value: -1,

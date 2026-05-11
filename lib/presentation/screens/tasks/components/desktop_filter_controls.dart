@@ -78,7 +78,7 @@ class DesktopFilterControls extends ConsumerWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            'Proyecto: $activeProjectName',
+                            'Área: $activeProjectName',
                             style: textTheme.bodySmall?.copyWith(
                               color: activeProjectColor ??
                                   colorScheme.onSurfaceVariant,
@@ -237,7 +237,7 @@ class _ActionButtonsRow extends StatelessWidget {
                     Icon(Icons.folder_open_outlined,
                         color: colorScheme.onSurfaceVariant, size: 20),
                     const SizedBox(width: 12),
-                    Text('Gestionar Proyectos',
+                    Text('Gestionar áreas',
                         style: TextStyle(color: colorScheme.onSurface)),
                   ],
                 ),
@@ -249,7 +249,7 @@ class _ActionButtonsRow extends StatelessWidget {
                     Icon(Icons.label_outlined,
                         color: colorScheme.onSurfaceVariant, size: 20),
                     const SizedBox(width: 12),
-                    Text('Gestionar Etiquetas',
+                    Text('Gestionar etiquetas',
                         style: TextStyle(color: colorScheme.onSurface)),
                   ],
                 ),
@@ -261,7 +261,7 @@ class _ActionButtonsRow extends StatelessWidget {
                     Icon(Icons.auto_graph_outlined,
                         color: colorScheme.onSurfaceVariant, size: 20),
                     const SizedBox(width: 12),
-                    Text('Gestionar Hábitos',
+                    Text('Gestionar hábitos',
                         style: TextStyle(color: colorScheme.onSurface)),
                   ],
                 ),
@@ -349,7 +349,7 @@ class TaskFiltersDialog extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Proyecto',
+              'Área',
               style:
                   textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
             ),
@@ -361,7 +361,7 @@ class TaskFiltersDialog extends ConsumerWidget {
                   items: [
                     const DropdownMenuItem<int?>(
                       value: null,
-                      child: Text('Todos los proyectos'),
+                      child: Text('Todas las áreas'),
                     ),
                     DropdownMenuItem<int?>(
                       value: -1,

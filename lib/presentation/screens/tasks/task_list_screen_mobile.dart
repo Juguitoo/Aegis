@@ -147,7 +147,7 @@ class _TaskListScreenMobileState extends ConsumerState<TaskListScreenMobile> {
                       Icon(Icons.folder_outlined,
                           color: colorScheme.onSurfaceVariant, size: 20),
                       const SizedBox(width: 24),
-                      Text('Gestionar areas',
+                      Text('Gestionar áreas',
                           style: textTheme.bodyMedium
                               ?.copyWith(color: colorScheme.onSurface)),
                     ],

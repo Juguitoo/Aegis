@@ -75,8 +75,9 @@ class _TagFormDialogState extends ConsumerState<TagFormDialog> {
       ),
       title: Text(isEditing ? 'Editar etiqueta' : 'Nueva etiqueta',
           style: textTheme.displayMedium),
-      content: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 400, minWidth: 400),
+      content: Container(
+        constraints: const BoxConstraints(maxWidth: 400),
+        width: double.maxFinite,
         child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -87,7 +88,7 @@ class _TagFormDialogState extends ConsumerState<TagFormDialog> {
                 textCapitalization: TextCapitalization.sentences,
                 maxLines: 3,
                 minLines: 1,
-                maxLength: 80,
+                maxLength: 30,
                 labelText: 'Nombre de la etiqueta',
                 hintText: "Email, 5mins...",
                 autofocus: true,
@@ -194,105 +195,104 @@ class _TagFormDialogState extends ConsumerState<TagFormDialog> {
         ),
       ),
       actions: [
-        Expanded(
-          child: Row(
-            children: [
-              if (isEditing)
-                Expanded(
-                  child: AegisButton(
-                    height: 44,
-                    text: 'Eliminar',
-                    onPressed: () {
-                      ref
-                          .read(tagListViewModelProvider.notifier)
-                          .deleteTag(widget.existingTag!);
-                      Navigator.pop(context);
-                    },
-                    type: ButtonType.destructive,
-                  ),
-                )
-              else
-                Expanded(
-                  child: AegisButton(
-                    height: 44,
-                    text: 'Cancelar',
-                    onPressed: () => Navigator.pop(context),
-                    type: ButtonType.secondary,
-                  ),
-                ),
-              const SizedBox(width: 16),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (isEditing)
               Expanded(
                 child: AegisButton(
                   height: 44,
-                  text: isEditing ? 'Actualizar' : 'Guardar',
+                  text: 'Eliminar',
                   onPressed: () {
-                    if (nameController.text.trim().isNotEmpty) {
-                      final hexToSave = ColorUtils.colorToHex(selectedColor);
-                      final description = descriptionController.text.trim();
-
-                      if (isEditing) {
-                        final updatedTag = Tag(
-                          id: widget.existingTag!.id,
-                          name: nameController.text.trim(),
-                          colorHex: hexToSave,
-                          description: description,
-                        );
-                        ref
-                            .read(tagListViewModelProvider.notifier)
-                            .updateTag(updatedTag);
-                      } else {
-                        ref.read(tagListViewModelProvider.notifier).addTag(
-                              nameController.text.trim(),
-                              hexToSave,
-                              description,
-                            );
-                      }
-                      Navigator.pop(context);
-                    } else {
-                      final screenSize = MediaQuery.of(context).size;
-                      final sideMargin = screenSize.width > 600
-                          ? (screenSize.width - 400) / 2
-                          : 16.0;
-                      final bottomMargin =
-                          (screenSize.height - 120).clamp(16.0, 4000.0);
-
-                      ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Row(
-                            children: [
-                              const Icon(Icons.error_outline,
-                                  color: Colors.white),
-                              const SizedBox(width: 12),
-                              const Expanded(
-                                child: Text(
-                                  'El nombre de la etiqueta es obligatorio',
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w600),
-                                ),
-                              ),
-                            ],
-                          ),
-                          backgroundColor: colorScheme.error,
-                          behavior: SnackBarBehavior.floating,
-                          margin: EdgeInsets.only(
-                              bottom: bottomMargin,
-                              left: sideMargin,
-                              right: sideMargin),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12)),
-                          elevation: 6,
-                          dismissDirection: DismissDirection.up,
-                          duration: const Duration(seconds: 3),
-                        ),
-                      );
-                    }
+                    ref
+                        .read(tagListViewModelProvider.notifier)
+                        .deleteTag(widget.existingTag!);
+                    Navigator.pop(context);
                   },
+                  type: ButtonType.destructive,
                 ),
               )
-            ],
-          ),
+            else
+              Expanded(
+                child: AegisButton(
+                  height: 44,
+                  text: 'Cancelar',
+                  onPressed: () => Navigator.pop(context),
+                  type: ButtonType.secondary,
+                ),
+              ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: AegisButton(
+                height: 44,
+                text: isEditing ? 'Actualizar' : 'Guardar',
+                onPressed: () {
+                  if (nameController.text.trim().isNotEmpty) {
+                    final hexToSave = ColorUtils.colorToHex(selectedColor);
+                    final description = descriptionController.text.trim();
+
+                    if (isEditing) {
+                      final updatedTag = Tag(
+                        id: widget.existingTag!.id,
+                        name: nameController.text.trim(),
+                        colorHex: hexToSave,
+                        description: description,
+                      );
+                      ref
+                          .read(tagListViewModelProvider.notifier)
+                          .updateTag(updatedTag);
+                    } else {
+                      ref.read(tagListViewModelProvider.notifier).addTag(
+                            nameController.text.trim(),
+                            hexToSave,
+                            description,
+                          );
+                    }
+                    Navigator.pop(context);
+                  } else {
+                    final screenSize = MediaQuery.of(context).size;
+                    final sideMargin = screenSize.width > 600
+                        ? (screenSize.width - 400) / 2
+                        : 16.0;
+                    final bottomMargin =
+                        (screenSize.height - 120).clamp(16.0, 4000.0);
+
+                    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Row(
+                          children: [
+                            const Icon(Icons.error_outline,
+                                color: Colors.white),
+                            const SizedBox(width: 12),
+                            const Expanded(
+                              child: Text(
+                                'El nombre de la etiqueta es obligatorio',
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600),
+                              ),
+                            ),
+                          ],
+                        ),
+                        backgroundColor: colorScheme.error,
+                        behavior: SnackBarBehavior.floating,
+                        margin: EdgeInsets.only(
+                            bottom: bottomMargin,
+                            left: sideMargin,
+                            right: sideMargin),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12)),
+                        elevation: 6,
+                        dismissDirection: DismissDirection.up,
+                        duration: const Duration(seconds: 3),
+                      ),
+                    );
+                  }
+                },
+              ),
+            )
+          ],
         ),
       ],
     );

@@ -53,7 +53,7 @@ class _ManageAreasBottomSheetState
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Gestionar areas',
+                  'Gestionar áreas',
                   style: textTheme.displayMedium,
                 ),
                 IconButton(
@@ -72,7 +72,7 @@ class _ManageAreasBottomSheetState
                     padding: const EdgeInsets.all(32.0),
                     child: Center(
                       child: Text(
-                        'No tienes areas aún.',
+                        'No tienes áreas aún.',
                         style: textTheme.bodyMedium,
                       ),
                     ),
@@ -138,7 +138,7 @@ class _ManageAreasBottomSheetState
             padding: const EdgeInsets.all(24.0),
             child: AegisButton(
               onPressed: () => _showAreaDialog(),
-              text: 'Crear nuevo area',
+              text: 'Crear nuevo área',
               icon: Icons.add,
               type: ButtonType.secondary,
             ),

@@ -74,7 +74,7 @@ class _AreaFormDialogState extends ConsumerState<AreaFormDialog> {
         borderRadius: BorderRadius.circular(20),
       ),
       title: Text(
-        isEditing ? 'Editar area' : 'Nueva area',
+        isEditing ? 'Editar area' : 'Nuevo área',
         style: textTheme.displayMedium?.copyWith(fontSize: 20),
       ),
       content: Container(
@@ -88,7 +88,7 @@ class _AreaFormDialogState extends ConsumerState<AreaFormDialog> {
               controller: nameController,
               textCapitalization: TextCapitalization.sentences,
               maxLength: 80,
-              labelText: 'Nombre del area',
+              labelText: 'Nombre del área',
               hintText: "Universidad, Trabajo, Personal...",
               autofocus: true,
             ),
@@ -99,7 +99,7 @@ class _AreaFormDialogState extends ConsumerState<AreaFormDialog> {
               maxLength: 120,
               maxLines: 3,
               minLines: 1,
-              labelText: 'Descripción del area',
+              labelText: 'Descripción del área',
               hintText: 'Detalles sobre el proyecto...',
             ),
             const SizedBox(height: 16),
