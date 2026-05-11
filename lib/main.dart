@@ -48,6 +48,9 @@ class AegisApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Obtenemos el factor de escala interno de la app
+    final textScale = ref.watch(textScaleProvider);
+
     return MaterialApp(
       title: 'Aegis Productivity',
       debugShowCheckedModeBanner: false,
@@ -71,6 +74,14 @@ class AegisApp extends ConsumerWidget {
       themeMode: ref.watch(themeModeProvider),
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
+      builder: (context, child) {
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(
+            textScaler: TextScaler.linear(textScale),
+          ),
+          child: child!,
+        );
+      },
       home: LayoutBuilder(
         builder: (context, constraints) {
           if (constraints.maxWidth < 800) {

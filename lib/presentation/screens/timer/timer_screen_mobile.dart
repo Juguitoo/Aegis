@@ -220,27 +220,30 @@ class TimerScreenMobile extends ConsumerWidget {
         ],
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "Modo Dinámico",
-                style: textTheme.bodyLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
+          Expanded(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Modo Dinámico",
+                  style: textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-              Text(
-                "Ajuste inteligente de intervalos",
-                style: textTheme.bodySmall?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
+                Text(
+                  "Ajuste inteligente de intervalos",
+                  style: textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
+          const SizedBox(width: 8),
           Row(
-            mainAxisAlignment: MainAxisAlignment.end,
+            mainAxisSize: MainAxisSize.min,
             children: [
               IconButton(
                 icon: Icon(
@@ -280,7 +283,6 @@ class TimerScreenMobile extends ConsumerWidget {
                   );
                 },
               ),
-              const SizedBox(width: 8),
               Switch(
                 value: state.isDynamicModeActive,
                 onChanged: (value) {

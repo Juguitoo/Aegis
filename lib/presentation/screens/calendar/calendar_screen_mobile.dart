@@ -39,7 +39,7 @@ class CalendarScreenMobile extends ConsumerWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Text(
             'Calendario',
-            style: textTheme.displayMedium,
+            style: textTheme.displayLarge,
           ),
         ),
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -74,6 +74,7 @@ class CalendarScreenMobile extends ConsumerWidget {
               firstDay: DateTime.utc(2020, 1, 1),
               lastDay: DateTime.utc(2050, 12, 31),
               focusedDay: state.focusedDay,
+              daysOfWeekHeight: 32,
               selectedDayPredicate: (day) => isSameDay(state.selectedDay, day),
               onDaySelected: (selectedDay, focusedDay) {
                 ref
@@ -207,8 +208,6 @@ class CalendarScreenMobile extends ConsumerWidget {
                       ),
                     ),
                     IconButton(
-                      icon:
-                          Icon(Icons.add, color: colorScheme.primary, size: 28),
                       onPressed: () {
                         showModalBottomSheet(
                           context: context,
@@ -218,6 +217,15 @@ class CalendarScreenMobile extends ConsumerWidget {
                           builder: (context) => const EventFormMobile(),
                         );
                       },
+                      icon: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: colorScheme.primary.withValues(alpha: 0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(Icons.add,
+                            color: colorScheme.primary, size: 20),
+                      ),
                     ),
                   ],
                 ),

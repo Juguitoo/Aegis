@@ -225,6 +225,42 @@ class SettingsScreenMobile extends ConsumerWidget {
               const SizedBox(height: 32),
               Padding(
                 padding: const EdgeInsets.only(left: 8.0, bottom: 12.0),
+                child: Text('ACCESIBILIDAD',
+                    style: textTheme.labelSmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1.2)),
+              ),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: colorScheme.surface,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                      color: colorScheme.outline.withValues(alpha: 0.2)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.format_size, color: colorScheme.primary),
+                        const SizedBox(width: 16),
+                        Text(
+                          'Tamaño de texto',
+                          style: textTheme.bodyLarge
+                              ?.copyWith(fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    const _TextScaleSlider(),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 32),
+              Padding(
+                padding: const EdgeInsets.only(left: 8.0, bottom: 12.0),
                 child: Text('APARIENCIA',
                     style: textTheme.labelSmall?.copyWith(
                         color: colorScheme.onSurfaceVariant,
@@ -286,6 +322,52 @@ class SettingsScreenMobile extends ConsumerWidget {
             ),
         ],
       ),
+    );
+  }
+}
+
+class _TextScaleSlider extends ConsumerStatefulWidget {
+  const _TextScaleSlider();
+  @override
+  ConsumerState<_TextScaleSlider> createState() => _TextScaleSliderState();
+}
+
+class _TextScaleSliderState extends ConsumerState<_TextScaleSlider> {
+  double? _localScale;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final globalScale = ref.watch(textScaleProvider);
+    final currentScale = _localScale ?? globalScale;
+
+    return Row(
+      children: [
+        const Text('A', style: TextStyle(fontSize: 14)),
+        Expanded(
+          child: SliderTheme(
+            data: SliderTheme.of(context).copyWith(
+              activeTrackColor: colorScheme.primary,
+              thumbColor: colorScheme.primary,
+            ),
+            child: Slider(
+              value: currentScale,
+              min: 0.8,
+              max: 1.2,
+              divisions: 6,
+              label: '${(currentScale * 100).toInt()}%',
+              onChanged: (newValue) {
+                setState(() => _localScale = newValue);
+              },
+              onChangeEnd: (newValue) {
+                ref.read(textScaleProvider.notifier).state = newValue;
+              },
+            ),
+          ),
+        ),
+        const Text('A',
+            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+      ],
     );
   }
 }

@@ -273,33 +273,33 @@ class KpiCard extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
 
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: colorScheme.outline.withValues(alpha: 0.1)),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            title,
-            style: textTheme.bodySmall?.copyWith(
-              fontWeight: FontWeight.w600,
-              color: colorScheme.onSurfaceVariant,
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        alignment: Alignment.centerLeft,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              title,
+              style: textTheme.bodySmall?.copyWith(
+                fontWeight: FontWeight.w600,
+                color: colorScheme.onSurfaceVariant,
+              ),
             ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(height: 8),
-          Text(
-            value,
-            style: textTheme.displayMedium?.copyWith(fontSize: 24),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
+            const SizedBox(height: 8),
+            Text(
+              value,
+              style: textTheme.displayMedium?.copyWith(fontSize: 24),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -339,14 +339,19 @@ class ChartContainer extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(title,
-                  style: textTheme.bodyLarge
-                      ?.copyWith(fontWeight: FontWeight.bold)),
+              Expanded(
+                child: Text(title,
+                    style: textTheme.bodyLarge
+                        ?.copyWith(fontWeight: FontWeight.bold)),
+              ),
               if (trailing != null)
-                Text(trailing!,
-                    style: textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: colorScheme.onSurfaceVariant)),
+                Padding(
+                  padding: const EdgeInsets.only(left: 8.0),
+                  child: Text(trailing!,
+                      style: textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: colorScheme.onSurfaceVariant)),
+                ),
             ],
           ),
           if (showLegend) ...[
