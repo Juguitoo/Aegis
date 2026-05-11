@@ -48,18 +48,6 @@ class CalendarScreenMobile extends ConsumerWidget {
         surfaceTintColor: Colors.transparent,
         shadowColor: colorScheme.shadow.withValues(alpha: 0.1),
         actions: [
-          IconButton(
-            icon: Icon(Icons.add, color: colorScheme.primary, size: 28),
-            onPressed: () {
-              showModalBottomSheet(
-                context: context,
-                isScrollControlled: true,
-                useSafeArea: true,
-                backgroundColor: Colors.transparent,
-                builder: (context) => const EventFormMobile(),
-              );
-            },
-          ),
           Padding(
             padding: const EdgeInsets.only(right: 8.0),
             child: IconButton(
@@ -206,14 +194,32 @@ class CalendarScreenMobile extends ConsumerWidget {
             child: ListView(
               padding: const EdgeInsets.all(16),
               children: [
-                Text(
-                  DateFormat('EEEE, d MMMM', 'es')
-                      .format(state.selectedDay)
-                      .capitalize(),
-                  style: textTheme.bodyLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: colorScheme.onSurfaceVariant,
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      DateFormat('EEEE, d MMMM', 'es')
+                          .format(state.selectedDay)
+                          .capitalize(),
+                      style: textTheme.bodyLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                    IconButton(
+                      icon:
+                          Icon(Icons.add, color: colorScheme.primary, size: 28),
+                      onPressed: () {
+                        showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          useSafeArea: true,
+                          backgroundColor: Colors.transparent,
+                          builder: (context) => const EventFormMobile(),
+                        );
+                      },
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 16),
                 if (selectedItems.isEmpty)

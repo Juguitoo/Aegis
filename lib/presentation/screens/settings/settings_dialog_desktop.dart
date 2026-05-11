@@ -119,32 +119,51 @@ class _SettingsDialogState extends ConsumerState<SettingsDialogDesktop> {
     final textTheme = Theme.of(context).textTheme;
 
     ref.listen<AsyncValue<void>>(backupViewModelProvider, (previous, next) {
+      final screenSize = MediaQuery.of(context).size;
+      final sideMargin =
+          screenSize.width > 600 ? (screenSize.width - 400) / 2 : 16.0;
+      final bottomMargin = (screenSize.height - 120).clamp(16.0, 4000.0);
+
+      void showToast(String message, bool isError) {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                Icon(isError ? Icons.error_outline : Icons.check_circle_outline,
+                    color: Colors.white),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    message,
+                    style: const TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.w600),
+                  ),
+                ),
+              ],
+            ),
+            backgroundColor:
+                isError ? colorScheme.error : const Color(0xFF10B981),
+            behavior: SnackBarBehavior.floating,
+            margin: EdgeInsets.only(
+                bottom: bottomMargin, left: sideMargin, right: sideMargin),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            elevation: 6,
+            dismissDirection: DismissDirection.up,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+
       next.when(
         data: (_) {
           if (previous is AsyncLoading) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: const Text('Operación completada con éxito',
-                    style: TextStyle(fontWeight: FontWeight.bold)),
-                backgroundColor: colorScheme.primary,
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12)),
-              ),
-            );
+            showToast('Operación completada con éxito', false);
           }
         },
         error: (error, stackTrace) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(error.toString().replaceAll('Exception: ', ''),
-                  style: const TextStyle(fontWeight: FontWeight.bold)),
-              backgroundColor: colorScheme.error,
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
-            ),
-          );
+          showToast(error.toString().replaceAll('Exception: ', ''), true);
         },
         loading: () {},
       );

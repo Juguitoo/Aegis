@@ -47,9 +47,14 @@ class _DiaryScreenDesktopState extends ConsumerState<DiaryScreenDesktop>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Diario',
-              style: textTheme.displayMedium?.copyWith(fontSize: 32),
+            SizedBox(
+              height: 48,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text('Diario', style: textTheme.displayLarge),
+                ],
+              ),
             ),
             Divider(
                 height: 16, color: colorScheme.outline.withValues(alpha: 0.2)),

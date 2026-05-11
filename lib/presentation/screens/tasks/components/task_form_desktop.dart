@@ -366,15 +366,14 @@ class _TaskDetailsColumn extends StatelessWidget {
           const SizedBox(height: 12),
           Wrap(
             spacing: 8,
-            runSpacing:
-                8, // Añadido para que respire si salta de línea en móviles estrechos
+            runSpacing: 8,
             children: [
               ChoiceChip(
                 label: const Text('Ninguna'),
                 selected: selectedPriority == 0,
                 onSelected: (selected) => onPriorityChanged(0),
                 selectedColor: colorScheme.primary.withValues(alpha: 0.15),
-                checkmarkColor: colorScheme.primary, // Tick visible
+                checkmarkColor: colorScheme.primary,
                 labelStyle: textTheme.bodyMedium?.copyWith(
                   color: selectedPriority == 0
                       ? colorScheme.primary
@@ -552,6 +551,7 @@ class _TaskChecklistColumn extends StatelessWidget {
                 index: index,
                 item: item,
                 isLastEmpty: isLastEmpty,
+                autofocus: isLastEmpty && index > 0,
                 onChanged: (text) => onUpdate(index, text),
                 onToggle: () => onToggle(index),
                 onRemove: () => onRemove(index),
@@ -568,6 +568,7 @@ class _InlineChecklistRow extends StatefulWidget {
   final int index;
   final TaskChecklistItem item;
   final bool isLastEmpty;
+  final bool autofocus;
   final ValueChanged<String> onChanged;
   final VoidCallback onToggle;
   final VoidCallback onRemove;
@@ -577,6 +578,7 @@ class _InlineChecklistRow extends StatefulWidget {
     required this.index,
     required this.item,
     required this.isLastEmpty,
+    required this.autofocus,
     required this.onChanged,
     required this.onToggle,
     required this.onRemove,
@@ -595,6 +597,14 @@ class _InlineChecklistRowState extends State<_InlineChecklistRow> {
     super.initState();
     _controller = TextEditingController(text: widget.item.title);
     _focusNode = FocusNode();
+
+    if (widget.autofocus) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          _focusNode.requestFocus();
+        }
+      });
+    }
 
     _focusNode.addListener(() {
       if (!_focusNode.hasFocus) {
@@ -665,10 +675,18 @@ class _InlineChecklistRowState extends State<_InlineChecklistRow> {
                 controller: _controller,
                 focusNode: _focusNode,
                 textCapitalization: TextCapitalization.sentences,
-                onSubmitted: (_) {
-                  Future.delayed(const Duration(milliseconds: 50), () {
-                    if (mounted) FocusScope.of(context).nextFocus();
-                  });
+                textInputAction: widget.isLastEmpty
+                    ? TextInputAction.done
+                    : TextInputAction.next,
+                onSubmitted: (value) {
+                  if (value.trim().isNotEmpty) {
+                    widget.onChanged(value);
+                    if (!widget.isLastEmpty) {
+                      Future.delayed(const Duration(milliseconds: 50), () {
+                        if (mounted) FocusScope.of(context).nextFocus();
+                      });
+                    }
+                  }
                 },
                 style: textTheme.bodyLarge?.copyWith(
                   color: widget.item.isCompleted

@@ -31,7 +31,7 @@ class StatisticsState {
   final double estimationAccuracy;
   final int habitStreak;
   final List<ChartDataPoint> chartData;
-  final List<ProjectDistributionData> areaDistribution;
+  final List<AreaDistributionData> areaDistribution;
 
   StatisticsState({
     this.isLoading = true,
@@ -58,7 +58,7 @@ class StatisticsState {
     double? estimationAccuracy,
     int? habitStreak,
     List<ChartDataPoint>? chartData,
-    List<ProjectDistributionData>? areaDistribution,
+    List<AreaDistributionData>? areaDistribution,
   }) {
     return StatisticsState(
       isLoading: isLoading ?? this.isLoading,

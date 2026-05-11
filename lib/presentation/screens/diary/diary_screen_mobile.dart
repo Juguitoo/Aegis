@@ -60,7 +60,6 @@ class _DiaryScreenMobileState extends ConsumerState<DiaryScreenMobile>
           Padding(
             padding: const EdgeInsets.only(right: 8.0),
             child: IconButton(
-              iconSize: 28,
               icon: Icon(Icons.settings, color: colorScheme.onSurface),
               onPressed: () {
                 Navigator.push(

@@ -48,12 +48,38 @@ mixin EventFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
   void _showSnackBar(String message, {bool isError = false}) {
     if (!mounted) return;
     final colorScheme = Theme.of(context).colorScheme;
+    final screenSize = MediaQuery.of(context).size;
+
+    final sideMargin =
+        screenSize.width > 600 ? (screenSize.width - 400) / 2 : 16.0;
+    final bottomMargin = (screenSize.height - 120).clamp(16.0, 4000.0);
+
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message),
-        backgroundColor: isError ? colorScheme.error : Colors.green.shade500,
+        content: Row(
+          children: [
+            Icon(isError ? Icons.error_outline : Icons.check_circle_outline,
+                color: Colors.white),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(message,
+                  style: const TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.w600)),
+            ),
+          ],
+        ),
+        backgroundColor: isError ? colorScheme.error : const Color(0xFF10B981),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        margin: EdgeInsets.only(
+          bottom: bottomMargin,
+          left: sideMargin,
+          right: sideMargin,
+        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        elevation: 6,
+        dismissDirection: DismissDirection.up,
+        duration: const Duration(seconds: 3),
       ),
     );
   }

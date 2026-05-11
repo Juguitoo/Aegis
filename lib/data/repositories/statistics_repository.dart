@@ -1,12 +1,12 @@
 import 'package:aegis/data/local/database/app_database.dart';
 import 'package:drift/drift.dart';
 
-class ProjectDistributionData {
+class AreaDistributionData {
   final String areaName;
   final String colorHex;
   final int taskCount;
 
-  ProjectDistributionData({
+  AreaDistributionData({
     required this.areaName,
     required this.colorHex,
     required this.taskCount,
@@ -79,7 +79,7 @@ class StatisticsRepository {
     return result.read(sumExpr) ?? 0;
   }
 
-  Future<List<ProjectDistributionData>> getTaskDistributionByProject(
+  Future<List<AreaDistributionData>> getTaskDistributionByProject(
       DateTime start, DateTime end) async {
     final countExpr = _db.tasks.id.count();
 
@@ -93,7 +93,7 @@ class StatisticsRepository {
     final results = await query.get();
 
     return results.map((row) {
-      return ProjectDistributionData(
+      return AreaDistributionData(
         areaName: row.read(_db.areas.name) ?? 'Sin Proyecto',
         colorHex: row.read(_db.areas.colorHex) ?? '#000000',
         taskCount: row.read(countExpr) ?? 0,

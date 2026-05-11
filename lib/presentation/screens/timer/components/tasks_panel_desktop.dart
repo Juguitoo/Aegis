@@ -128,12 +128,12 @@ class _TasksPanelDesktopState extends ConsumerState<TasksPanelDesktop> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.assignment_add, color: colorScheme.primary, size: 32),
+            Icon(Icons.assignment_add, color: colorScheme.onSurface, size: 32),
             const SizedBox(height: 4),
             Text(
               'Reloj libre',
               style: textTheme.bodyLarge?.copyWith(
-                color: colorScheme.primary,
+                color: colorScheme.onSurface,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -141,7 +141,7 @@ class _TasksPanelDesktopState extends ConsumerState<TasksPanelDesktop> {
             Text(
               'Selecciona una tarea de la lista',
               style: textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.primary.withValues(alpha: 0.7),
+                  color: colorScheme.onSurface.withValues(alpha: 0.7),
                   fontWeight: FontWeight.w100,
                   fontSize: 13),
               textAlign: TextAlign.center,

@@ -89,6 +89,41 @@ class _MainMobileLayoutState extends ConsumerState<MainMobileLayout>
     }
   }
 
+  BottomNavigationBarItem _buildNavItem({
+    required IconData icon,
+    required String label,
+    required Color primaryColor,
+    required double itemWidth,
+  }) {
+    return BottomNavigationBarItem(
+      icon: Icon(icon),
+      activeIcon: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, color: primaryColor),
+          const SizedBox(height: 4),
+          SizedBox(
+            width: itemWidth,
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.center,
+              child: Text(
+                label,
+                style: TextStyle(
+                  color: primaryColor,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+      label: label,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -117,6 +152,9 @@ class _MainMobileLayoutState extends ConsumerState<MainMobileLayout>
       const DiaryScreenMobile(),
     ];
 
+    final screenWidth = MediaQuery.of(context).size.width;
+    final maxItemWidth = (screenWidth / screens.length) - 8;
+
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(child: screens[currentIndex]),
@@ -139,29 +177,39 @@ class _MainMobileLayoutState extends ConsumerState<MainMobileLayout>
           backgroundColor: colorScheme.surface,
           selectedItemColor: colorScheme.primary,
           unselectedItemColor: colorScheme.onSurfaceVariant,
-          showSelectedLabels: true,
+          showSelectedLabels: false,
           showUnselectedLabels: false,
           elevation: 0,
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.calendar_today),
+          items: [
+            _buildNavItem(
+              icon: Icons.calendar_today,
               label: 'Calendario',
+              primaryColor: colorScheme.primary,
+              itemWidth: maxItemWidth,
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.timer_outlined),
+            _buildNavItem(
+              icon: Icons.timer_outlined,
               label: 'Temporizador',
+              primaryColor: colorScheme.primary,
+              itemWidth: maxItemWidth,
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.check_box),
+            _buildNavItem(
+              icon: Icons.check_box,
               label: 'Tareas',
+              primaryColor: colorScheme.primary,
+              itemWidth: maxItemWidth,
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.bar_chart),
+            _buildNavItem(
+              icon: Icons.bar_chart,
               label: 'Estadísticas',
+              primaryColor: colorScheme.primary,
+              itemWidth: maxItemWidth,
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.menu_book),
+            _buildNavItem(
+              icon: Icons.menu_book,
               label: 'Diario',
+              primaryColor: colorScheme.primary,
+              itemWidth: maxItemWidth,
             ),
           ],
         ),

@@ -37,9 +37,14 @@ class CalendarScreenDesktop extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Calendario',
-              style: textTheme.displayMedium?.copyWith(fontSize: 32),
+            SizedBox(
+              height: 48,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text('Calendario', style: textTheme.displayLarge),
+                ],
+              ),
             ),
             Divider(
                 height: 16, color: colorScheme.outline.withValues(alpha: 0.2)),
@@ -159,6 +164,7 @@ class CalendarScreenDesktop extends ConsumerWidget {
                           },
                           markerBuilder: (context, date, items) {
                             if (items.isEmpty) return const SizedBox();
+
                             if (isSameDay(state.selectedDay, date)) {
                               return const SizedBox();
                             }
@@ -175,13 +181,13 @@ class CalendarScreenDesktop extends ConsumerWidget {
                               indicatorColor = Colors.orange.shade400;
                             }
 
-                            return Positioned.fill(
+                            return Center(
                               child: Container(
-                                margin: const EdgeInsets.all(6.0),
+                                width: 50,
+                                height: 50,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: indicatorColor.withValues(
-                                      alpha: 0.05),
+                                  color: indicatorColor.withValues(alpha: 0.05),
                                   border: Border.all(
                                     color:
                                         indicatorColor.withValues(alpha: 0.6),
@@ -237,7 +243,7 @@ class CalendarScreenDesktop extends ConsumerWidget {
                                   );
                                 },
                                 icon: const Icon(Icons.add),
-                                label: const Text('Nuevo evento'),
+                                label: const Text('Nuevo Evento'),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: colorScheme.primary,
                                   foregroundColor: colorScheme.onPrimary,

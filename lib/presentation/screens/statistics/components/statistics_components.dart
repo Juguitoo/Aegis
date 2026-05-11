@@ -820,15 +820,15 @@ class _GroupedBarChartState extends State<GroupedBarChart> {
   }
 }
 
-class ProjectPieChart extends StatefulWidget {
-  final List<ProjectDistributionData> data;
-  const ProjectPieChart({super.key, required this.data});
+class AreaPieChart extends StatefulWidget {
+  final List<AreaDistributionData> data;
+  const AreaPieChart({super.key, required this.data});
 
   @override
-  State<ProjectPieChart> createState() => _ProjectPieChartState();
+  State<AreaPieChart> createState() => _AreaPieChartState();
 }
 
-class _ProjectPieChartState extends State<ProjectPieChart> {
+class _AreaPieChartState extends State<AreaPieChart> {
   int? _touchedIndex;
 
   @override
