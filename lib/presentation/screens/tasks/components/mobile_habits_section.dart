@@ -16,11 +16,6 @@ class MobileHabitsSection extends ConsumerWidget {
 
     void submitHabit(BuildContext dialogContext, String value) {
       if (value.trim().isEmpty) {
-        final screenSize = MediaQuery.of(dialogContext).size;
-        final sideMargin =
-            screenSize.width > 600 ? (screenSize.width - 400) / 2 : 16.0;
-        final bottomMargin = (screenSize.height - 120).clamp(16.0, 4000.0);
-
         ScaffoldMessenger.of(dialogContext).hideCurrentSnackBar();
         ScaffoldMessenger.of(dialogContext).showSnackBar(
           SnackBar(
@@ -38,9 +33,7 @@ class MobileHabitsSection extends ConsumerWidget {
               ],
             ),
             backgroundColor: colorScheme.error,
-            behavior: SnackBarBehavior.floating,
-            margin: EdgeInsets.only(
-                bottom: bottomMargin, left: sideMargin, right: sideMargin),
+            behavior: SnackBarBehavior.fixed,
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             elevation: 6,

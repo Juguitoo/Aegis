@@ -17,6 +17,7 @@ class TagFormDialog extends ConsumerStatefulWidget {
 }
 
 class _TagFormDialogState extends ConsumerState<TagFormDialog> {
+  final _formMessengerKey = GlobalKey<ScaffoldMessengerState>();
   late TextEditingController nameController;
   late TextEditingController descriptionController;
   late TextEditingController hexController;
@@ -68,233 +69,247 @@ class _TagFormDialogState extends ConsumerState<TagFormDialog> {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    return AlertDialog(
-      backgroundColor: colorScheme.surface,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(24),
-      ),
-      title: Text(isEditing ? 'Editar etiqueta' : 'Nueva etiqueta',
-          style: textTheme.displayMedium),
-      content: Container(
-        constraints: const BoxConstraints(maxWidth: 400),
-        width: double.maxFinite,
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              AegisTextField(
-                controller: nameController,
-                textCapitalization: TextCapitalization.sentences,
-                maxLines: 3,
-                minLines: 1,
-                maxLength: 30,
-                labelText: 'Nombre de la etiqueta',
-                hintText: "Email, 5mins...",
-                autofocus: true,
-              ),
-              const SizedBox(height: 16),
-              AegisTextField(
-                controller: descriptionController,
-                textCapitalization: TextCapitalization.sentences,
-                maxLines: 3,
-                minLines: 1,
-                maxLength: 120,
-                labelText: 'Descripción de la etiqueta',
-                hintText: 'Detalles sobre la etiqueta...',
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'Color',
-                style: textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
+    return ScaffoldMessenger(
+      key: _formMessengerKey,
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        resizeToAvoidBottomInset: false,
+        body: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () => Navigator.of(context).pop(),
+          child: Center(
+            child: GestureDetector(
+              onTap: () {},
+              child: AlertDialog(
+                backgroundColor: colorScheme.surface,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(24),
                 ),
-              ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      showDialog(
-                        context: context,
-                        builder: (context) {
-                          Color tempColor = selectedColor;
-                          return AlertDialog(
-                            title: const Text('Selecciona un color'),
-                            content: SingleChildScrollView(
-                              child: ColorPicker(
-                                pickerColor: selectedColor,
-                                onColorChanged: (color) {
-                                  tempColor = color;
-                                },
-                                enableAlpha: false,
-                                displayThumbColor: true,
-                                pickerAreaHeightPercent: 0.8,
+                title: Text(isEditing ? 'Editar etiqueta' : 'Nueva etiqueta',
+                    style: textTheme.displayMedium),
+                content: Container(
+                  constraints: const BoxConstraints(maxWidth: 400),
+                  width: double.maxFinite,
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        AegisTextField(
+                          controller: nameController,
+                          textCapitalization: TextCapitalization.sentences,
+                          maxLines: 3,
+                          minLines: 1,
+                          maxLength: 30,
+                          labelText: 'Nombre de la etiqueta',
+                          hintText: "Email, 5mins...",
+                          autofocus: true,
+                        ),
+                        const SizedBox(height: 16),
+                        AegisTextField(
+                          controller: descriptionController,
+                          textCapitalization: TextCapitalization.sentences,
+                          maxLines: 3,
+                          minLines: 1,
+                          maxLength: 120,
+                          labelText: 'Descripción de la etiqueta',
+                          hintText: 'Detalles sobre la etiqueta...',
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Color',
+                          style: textTheme.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Row(
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    Color tempColor = selectedColor;
+                                    return AlertDialog(
+                                      title: const Text('Selecciona un color'),
+                                      content: SingleChildScrollView(
+                                        child: ColorPicker(
+                                          pickerColor: selectedColor,
+                                          onColorChanged: (color) {
+                                            tempColor = color;
+                                          },
+                                          enableAlpha: false,
+                                          displayThumbColor: true,
+                                          pickerAreaHeightPercent: 0.8,
+                                        ),
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () =>
+                                              Navigator.pop(context),
+                                          child: const Text('Cancelar'),
+                                        ),
+                                        ElevatedButton(
+                                          onPressed: () {
+                                            setState(() {
+                                              selectedColor = tempColor;
+                                              hexController.text =
+                                                  ColorUtils.colorToHex(
+                                                      selectedColor);
+                                            });
+                                            Navigator.pop(context);
+                                          },
+                                          child: const Text('Seleccionar'),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              },
+                              child: Container(
+                                width: 48,
+                                height: 48,
+                                decoration: BoxDecoration(
+                                  color: selectedColor,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                      color: colorScheme.outline
+                                          .withValues(alpha: 0.3),
+                                      width: 2),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: selectedColor.withAlpha(100),
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 4),
+                                    )
+                                  ],
+                                ),
                               ),
                             ),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(context),
-                                child: const Text('Cancelar'),
-                              ),
-                              ElevatedButton(
-                                onPressed: () {
-                                  setState(() {
-                                    selectedColor = tempColor;
-                                    hexController.text =
-                                        ColorUtils.colorToHex(selectedColor);
-                                  });
-                                  Navigator.pop(context);
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: AegisTextField(
+                                controller: hexController,
+                                focusNode: hexFocusNode,
+                                onChanged: (value) {
+                                  final newColor =
+                                      ColorUtils.parseColorStrict(value);
+                                  if (newColor != null) {
+                                    setState(() {
+                                      selectedColor = newColor;
+                                    });
+                                  }
                                 },
-                                child: const Text('Seleccionar'),
-                              ),
-                            ],
-                          );
-                        },
-                      );
-                    },
-                    child: Container(
-                      width: 48,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        color: selectedColor,
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                            color: colorScheme.outline.withValues(alpha: 0.3),
-                            width: 2),
-                        boxShadow: [
-                          BoxShadow(
-                            color: selectedColor.withAlpha(100),
-                            blurRadius: 8,
-                            offset: const Offset(0, 4),
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: AegisTextField(
-                      controller: hexController,
-                      focusNode: hexFocusNode,
-                      onChanged: (value) {
-                        final newColor = ColorUtils.parseColorStrict(value);
-                        if (newColor != null) {
-                          setState(() {
-                            selectedColor = newColor;
-                          });
-                        }
-                      },
-                      hintText: '#HEX',
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-      actions: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            if (isEditing)
-              Expanded(
-                child: AegisButton(
-                  height: 44,
-                  text: 'Eliminar',
-                  onPressed: () {
-                    ref
-                        .read(tagListViewModelProvider.notifier)
-                        .deleteTag(widget.existingTag!);
-                    Navigator.pop(context);
-                  },
-                  type: ButtonType.destructive,
-                ),
-              )
-            else
-              Expanded(
-                child: AegisButton(
-                  height: 44,
-                  text: 'Cancelar',
-                  onPressed: () => Navigator.pop(context),
-                  type: ButtonType.secondary,
-                ),
-              ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: AegisButton(
-                height: 44,
-                text: isEditing ? 'Actualizar' : 'Guardar',
-                onPressed: () {
-                  if (nameController.text.trim().isNotEmpty) {
-                    final hexToSave = ColorUtils.colorToHex(selectedColor);
-                    final description = descriptionController.text.trim();
-
-                    if (isEditing) {
-                      final updatedTag = Tag(
-                        id: widget.existingTag!.id,
-                        name: nameController.text.trim(),
-                        colorHex: hexToSave,
-                        description: description,
-                      );
-                      ref
-                          .read(tagListViewModelProvider.notifier)
-                          .updateTag(updatedTag);
-                    } else {
-                      ref.read(tagListViewModelProvider.notifier).addTag(
-                            nameController.text.trim(),
-                            hexToSave,
-                            description,
-                          );
-                    }
-                    Navigator.pop(context);
-                  } else {
-                    final screenSize = MediaQuery.of(context).size;
-                    final sideMargin = screenSize.width > 600
-                        ? (screenSize.width - 400) / 2
-                        : 16.0;
-                    final bottomMargin =
-                        (screenSize.height - 120).clamp(16.0, 4000.0);
-
-                    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Row(
-                          children: [
-                            const Icon(Icons.error_outline,
-                                color: Colors.white),
-                            const SizedBox(width: 12),
-                            const Expanded(
-                              child: Text(
-                                'El nombre de la etiqueta es obligatorio',
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w600),
+                                hintText: '#HEX',
                               ),
                             ),
                           ],
                         ),
-                        backgroundColor: colorScheme.error,
-                        behavior: SnackBarBehavior.floating,
-                        margin: EdgeInsets.only(
-                            bottom: bottomMargin,
-                            left: sideMargin,
-                            right: sideMargin),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12)),
-                        elevation: 6,
-                        dismissDirection: DismissDirection.up,
-                        duration: const Duration(seconds: 3),
-                      ),
-                    );
-                  }
-                },
+                      ],
+                    ),
+                  ),
+                ),
+                actions: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      if (isEditing)
+                        Expanded(
+                          child: AegisButton(
+                            height: 44,
+                            text: 'Eliminar',
+                            onPressed: () {
+                              ref
+                                  .read(tagListViewModelProvider.notifier)
+                                  .deleteTag(widget.existingTag!);
+                              Navigator.pop(context);
+                            },
+                            type: ButtonType.destructive,
+                          ),
+                        )
+                      else
+                        Expanded(
+                          child: AegisButton(
+                            height: 44,
+                            text: 'Cancelar',
+                            onPressed: () => Navigator.pop(context),
+                            type: ButtonType.secondary,
+                          ),
+                        ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: AegisButton(
+                          height: 44,
+                          text: isEditing ? 'Actualizar' : 'Guardar',
+                          onPressed: () {
+                            if (nameController.text.trim().isNotEmpty) {
+                              final hexToSave =
+                                  ColorUtils.colorToHex(selectedColor);
+                              final description =
+                                  descriptionController.text.trim();
+
+                              if (isEditing) {
+                                final updatedTag = Tag(
+                                  id: widget.existingTag!.id,
+                                  name: nameController.text.trim(),
+                                  colorHex: hexToSave,
+                                  description: description,
+                                );
+                                ref
+                                    .read(tagListViewModelProvider.notifier)
+                                    .updateTag(updatedTag);
+                              } else {
+                                ref
+                                    .read(tagListViewModelProvider.notifier)
+                                    .addTag(
+                                      nameController.text.trim(),
+                                      hexToSave,
+                                      description,
+                                    );
+                              }
+                              Navigator.pop(context);
+                            } else {
+                              _formMessengerKey.currentState
+                                  ?.hideCurrentSnackBar();
+                              _formMessengerKey.currentState?.showSnackBar(
+                                SnackBar(
+                                  content: Row(
+                                    children: [
+                                      const Icon(Icons.error_outline,
+                                          color: Colors.white),
+                                      const SizedBox(width: 12),
+                                      const Expanded(
+                                        child: Text(
+                                          'El nombre de la etiqueta es obligatorio',
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w600),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  backgroundColor: colorScheme.error,
+                                  behavior: SnackBarBehavior.floating,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12)),
+                                  elevation: 6,
+                                  dismissDirection: DismissDirection.up,
+                                  duration: const Duration(seconds: 3),
+                                ),
+                              );
+                            }
+                          },
+                        ),
+                      )
+                    ],
+                  ),
+                ],
               ),
-            )
-          ],
+            ),
+          ),
         ),
-      ],
+      ),
     );
   }
 }

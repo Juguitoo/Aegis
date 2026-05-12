@@ -10,6 +10,7 @@ import '../../../viewmodels/task_list_viewmodel.dart';
 mixin TaskFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
   Task? get initialTask;
 
+  final formMessengerKey = GlobalKey<ScaffoldMessengerState>();
   final titleController = TextEditingController();
   final descriptionController = TextEditingController();
   final estimatedDurationController = TextEditingController();
@@ -33,41 +34,35 @@ mixin TaskFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
   void _showSnackBar(String message, {bool isError = false}) {
     if (!mounted) return;
     final colorScheme = Theme.of(context).colorScheme;
-    final screenSize = MediaQuery.of(context).size;
 
-    final sideMargin =
-        screenSize.width > 600 ? (screenSize.width - 400) / 2 : 16.0;
-
-    final bottomMargin = (screenSize.height - 120).clamp(16.0, 4000.0);
-
-    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            Icon(isError ? Icons.error_outline : Icons.check_circle_outline,
-                color: Colors.white),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(message,
-                  style: const TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.w600)),
-            ),
-          ],
-        ),
-        backgroundColor: isError ? colorScheme.error : const Color(0xFF10B981),
-        behavior: SnackBarBehavior.floating,
-        margin: EdgeInsets.only(
-          bottom: bottomMargin,
-          left: sideMargin,
-          right: sideMargin,
-        ),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        elevation: 6,
-        dismissDirection: DismissDirection.up,
-        duration: const Duration(seconds: 3),
+    final snackBar = SnackBar(
+      content: Row(
+        children: [
+          Icon(isError ? Icons.error_outline : Icons.check_circle_outline,
+              color: Colors.white),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(message,
+                style: const TextStyle(
+                    color: Colors.white, fontWeight: FontWeight.w600)),
+          ),
+        ],
       ),
+      backgroundColor: isError ? colorScheme.error : const Color(0xFF10B981),
+      behavior: SnackBarBehavior.floating,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      elevation: 6,
+      dismissDirection: DismissDirection.up,
+      duration: const Duration(seconds: 3),
     );
+
+    if (isError && formMessengerKey.currentState != null) {
+      formMessengerKey.currentState?.hideCurrentSnackBar();
+      formMessengerKey.currentState?.showSnackBar(snackBar);
+    } else {
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
   }
 
   void _ensureEmptyItem() {
@@ -307,9 +302,7 @@ mixin TaskFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
         Navigator.of(context).pop();
         _showSnackBar('Tarea creada correctamente');
       }
-    } catch (e, stackTrace) {
-      debugPrint('🔴 ERROR REAL AL GUARDAR TAREA: $e');
-      debugPrint('🔴 STACKTRACE: $stackTrace');
+    } catch (e) {
       _showSnackBar('Error al crear la tarea. Inténtalo de nuevo.',
           isError: true);
     }
@@ -363,9 +356,7 @@ mixin TaskFormMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
         Navigator.of(context).pop();
         _showSnackBar('Tarea actualizada correctamente');
       }
-    } catch (e, stackTrace) {
-      debugPrint('🔴 ERROR REAL AL GUARDAR TAREA: $e');
-      debugPrint('🔴 STACKTRACE: $stackTrace');
+    } catch (e) {
       _showSnackBar('Error al crear la tarea. Inténtalo de nuevo.',
           isError: true);
     }

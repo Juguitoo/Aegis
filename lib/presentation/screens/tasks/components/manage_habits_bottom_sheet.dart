@@ -26,7 +26,7 @@ class _ManageHabitsBottomSheetState
           SnackBar(
             content: const Text('El nombre del hábito no puede estar vacío'),
             backgroundColor: colorScheme.error,
-            behavior: SnackBarBehavior.floating,
+            behavior: SnackBarBehavior.fixed,
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           ),

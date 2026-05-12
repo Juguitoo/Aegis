@@ -53,11 +53,6 @@ class SettingsScreenMobile extends ConsumerWidget {
     final textTheme = Theme.of(context).textTheme;
 
     ref.listen<AsyncValue<void>>(backupViewModelProvider, (previous, next) {
-      final screenSize = MediaQuery.of(context).size;
-      final sideMargin =
-          screenSize.width > 600 ? (screenSize.width - 400) / 2 : 16.0;
-      final bottomMargin = (screenSize.height - 120).clamp(16.0, 4000.0);
-
       void showToast(String message, bool isError) {
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
         ScaffoldMessenger.of(context).showSnackBar(
@@ -78,9 +73,7 @@ class SettingsScreenMobile extends ConsumerWidget {
             ),
             backgroundColor:
                 isError ? colorScheme.error : const Color(0xFF10B981),
-            behavior: SnackBarBehavior.floating,
-            margin: EdgeInsets.only(
-                bottom: bottomMargin, left: sideMargin, right: sideMargin),
+            behavior: SnackBarBehavior.fixed,
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             elevation: 6,

@@ -41,99 +41,113 @@ class _TaskFormMobileState extends ConsumerState<TaskFormMobile>
           color: colorScheme.surface,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         ),
-        child: DefaultTabController(
-          length: 3,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
-                child: Text(
-                  widget.task == null ? "Crear nueva tarea" : "Editar tarea",
-                  style: textTheme.displayMedium,
-                ),
-              ),
-              const SizedBox(height: 16),
-              TabBar(
-                labelColor: colorScheme.primary,
-                unselectedLabelColor: colorScheme.outline,
-                indicatorColor: colorScheme.primary,
-                dividerColor: colorScheme.outline.withValues(alpha: 0.2),
-                tabs: const [
-                  Tab(text: 'Detalles'),
-                  Tab(text: 'Subtareas'),
-                  Tab(text: 'Notas'),
-                ],
-              ),
-              Expanded(
-                child: TabBarView(
-                  children: [
-                    _TaskDetailsTab(
-                      titleController: titleController,
-                      descriptionController: descriptionController,
-                      estimatedDurationController: estimatedDurationController,
-                      dueDateController: dueDateController,
-                      notificationDateController: notificationDateController,
-                      onPickDueDate: pickDueDate,
-                      onPickNotificationDate: pickNotificationDate,
-                      areasAsync: areasAsync,
-                      selectedAreaId: selectedAreaId,
-                      onProjectChanged: (value) =>
-                          setState(() => selectedAreaId = value),
-                      selectedPriority: selectedPriority,
-                      onPriorityChanged: (value) =>
-                          setState(() => selectedPriority = value),
-                      selectedTagIds: selectedTagIds,
-                      onTagsChanged: (value) =>
-                          setState(() => selectedTagIds = value),
+        child: ScaffoldMessenger(
+          key: formMessengerKey,
+          child: Scaffold(
+            backgroundColor: Colors.transparent,
+            resizeToAvoidBottomInset: false,
+            body: DefaultTabController(
+              length: 3,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
+                    child: Text(
+                      widget.task == null
+                          ? "Crear nueva tarea"
+                          : "Editar tarea",
+                      style: textTheme.displayMedium,
                     ),
-                    _TaskChecklistTab(
-                      checklist: currentChecklist,
-                      onUpdate: updateChecklistItem,
-                      onToggle: toggleChecklistItem,
-                      onRemove: removeChecklistItem,
-                      onReorder: reorderChecklist,
-                    ),
-                    _TaskNotesTab(notesController: notesController),
-                  ],
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: colorScheme.surface,
-                  border: Border(
-                    top: BorderSide(
-                        color: colorScheme.outline.withValues(alpha: 0.2)),
                   ),
-                ),
-                child: SafeArea(
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: AegisButton(
-                          text: widget.task != null ? 'Eliminar' : 'Limpiar',
-                          type: widget.task != null
-                              ? ButtonType.destructive
-                              : ButtonType.secondary,
-                          onPressed:
-                              widget.task != null ? deleteTask : clearTask,
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: AegisButton(
-                          text: widget.task == null ? 'Guardar' : 'Actualizar',
-                          type: ButtonType.primary,
-                          onPressed:
-                              widget.task == null ? saveTask : updateTask,
-                        ),
-                      ),
+                  const SizedBox(height: 16),
+                  TabBar(
+                    labelColor: colorScheme.primary,
+                    unselectedLabelColor: colorScheme.outline,
+                    indicatorColor: colorScheme.primary,
+                    dividerColor: colorScheme.outline.withValues(alpha: 0.2),
+                    tabs: const [
+                      Tab(text: 'Detalles'),
+                      Tab(text: 'Subtareas'),
+                      Tab(text: 'Notas'),
                     ],
                   ),
-                ),
+                  Expanded(
+                    child: TabBarView(
+                      children: [
+                        _TaskDetailsTab(
+                          titleController: titleController,
+                          descriptionController: descriptionController,
+                          estimatedDurationController:
+                              estimatedDurationController,
+                          dueDateController: dueDateController,
+                          notificationDateController:
+                              notificationDateController,
+                          onPickDueDate: pickDueDate,
+                          onPickNotificationDate: pickNotificationDate,
+                          areasAsync: areasAsync,
+                          selectedAreaId: selectedAreaId,
+                          onProjectChanged: (value) =>
+                              setState(() => selectedAreaId = value),
+                          selectedPriority: selectedPriority,
+                          onPriorityChanged: (value) =>
+                              setState(() => selectedPriority = value),
+                          selectedTagIds: selectedTagIds,
+                          onTagsChanged: (value) =>
+                              setState(() => selectedTagIds = value),
+                        ),
+                        _TaskChecklistTab(
+                          checklist: currentChecklist,
+                          onUpdate: updateChecklistItem,
+                          onToggle: toggleChecklistItem,
+                          onRemove: removeChecklistItem,
+                          onReorder: reorderChecklist,
+                        ),
+                        _TaskNotesTab(notesController: notesController),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: colorScheme.surface,
+                      border: Border(
+                        top: BorderSide(
+                            color: colorScheme.outline.withValues(alpha: 0.2)),
+                      ),
+                    ),
+                    child: SafeArea(
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: AegisButton(
+                              text:
+                                  widget.task != null ? 'Eliminar' : 'Limpiar',
+                              type: widget.task != null
+                                  ? ButtonType.destructive
+                                  : ButtonType.secondary,
+                              onPressed:
+                                  widget.task != null ? deleteTask : clearTask,
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: AegisButton(
+                              text: widget.task == null
+                                  ? 'Guardar'
+                                  : 'Actualizar',
+                              type: ButtonType.primary,
+                              onPressed:
+                                  widget.task == null ? saveTask : updateTask,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),
