@@ -40,8 +40,11 @@ class _MainMobileLayoutState extends ConsumerState<MainMobileLayout>
       checkAndPromptPermissions(context, ref);
     });
 
-    _notificationSubscription =
-        NotificationService.selectNotificationStream.stream.listen((payload) {
+    _notificationSubscription = ref
+        .read(notificationServiceProvider)
+        .selectNotificationStream
+        .stream
+        .listen((payload) {
       if (payload != null) {
         _handleNotificationClick(payload);
       }

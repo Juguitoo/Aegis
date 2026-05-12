@@ -112,7 +112,9 @@ class _SystemPermissionsScreenState
                   icon: Icons.notifications_active_outlined,
                   isGranted: _hasRequestedNotifications,
                   onTap: () async {
-                    await NotificationService.requestPermissions();
+                    await ref
+                        .read(notificationServiceProvider)
+                        .requestPermissions();
                     if (mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(

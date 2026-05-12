@@ -46,7 +46,7 @@ void main() {
     await tester.pumpWidget(buildTestableTaskRow(task));
     expect(find.text('Configurar servidor'), findsOneWidget);
     final titleText = tester.widget<Text>(find.text('Configurar servidor'));
-    expect(titleText.style?.decoration, isNull);
+    expect(titleText.style?.decoration, TextDecoration.none);
   });
 
   testWidgets('TaskRow renderiza el titulo tachado si esta completada',

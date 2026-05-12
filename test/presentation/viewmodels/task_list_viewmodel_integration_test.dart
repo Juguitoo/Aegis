@@ -1,16 +1,21 @@
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:aegis/data/local/database/app_database.dart';
 import 'package:aegis/data/repositories/task_repository.dart';
 import 'package:aegis/presentation/viewmodels/task_list_viewmodel.dart';
 import 'package:aegis/core/providers/repository_providers.dart';
+import 'package:aegis/core/services/notification_service.dart';
+
+class MockNotificationService extends Mock implements NotificationService {}
 
 void main() {
   late AppDatabase db;
   late TaskRepository realRepository;
   late ProviderContainer container;
   ProviderSubscription? subscription;
+  late MockNotificationService mockNotificationService;
 
   setUp(() {
     db = AppDatabase.forTesting(NativeDatabase.memory(
@@ -18,11 +23,25 @@ void main() {
         db.execute('PRAGMA foreign_keys = ON;');
       },
     ));
+
     realRepository = TaskRepository(db);
+    mockNotificationService = MockNotificationService();
+
+    when(() => mockNotificationService.cancelNotification(any()))
+        .thenAnswer((_) async {});
+
+    when(() => mockNotificationService.scheduleNotification(
+          id: any(named: 'id'),
+          title: any(named: 'title'),
+          body: any(named: 'body'),
+          scheduledDate: any(named: 'scheduledDate'),
+          payload: any(named: 'payload'),
+        )).thenAnswer((_) async {});
 
     container = ProviderContainer(
       overrides: [
         taskRepositoryProvider.overrideWithValue(realRepository),
+        notificationServiceProvider.overrideWithValue(mockNotificationService),
       ],
     );
 

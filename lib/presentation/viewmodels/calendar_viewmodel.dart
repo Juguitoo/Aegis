@@ -97,8 +97,9 @@ class CalendarState {
 
 class CalendarViewModel extends StateNotifier<CalendarState> {
   final EventsRepository _repository;
+  final NotificationService _notificationService;
 
-  CalendarViewModel(this._repository)
+  CalendarViewModel(this._repository, this._notificationService)
       : super(CalendarState(
           selectedDay: DateTime.now(),
           focusedDay: DateTime.now(),
@@ -135,7 +136,7 @@ class CalendarViewModel extends StateNotifier<CalendarState> {
           ? 'Tienes un evento para hoy'
           : 'Evento programado a las ${DateFormat('HH:mm').format(date)}';
 
-      await NotificationService.scheduleNotification(
+      await _notificationService.scheduleNotification(
         id: notifId,
         title: '📅 Evento: $title',
         body: body,
@@ -159,7 +160,7 @@ class CalendarViewModel extends StateNotifier<CalendarState> {
           ? 'Tienes un evento para hoy'
           : 'Evento programado a las ${DateFormat('HH:mm').format(event.date)}';
 
-      await NotificationService.scheduleNotification(
+      await _notificationService.scheduleNotification(
         id: notifId,
         title: '📅 Evento: ${event.title}',
         body: body,
@@ -167,18 +168,21 @@ class CalendarViewModel extends StateNotifier<CalendarState> {
         payload: payload,
       );
     } else {
-      await NotificationService.cancelNotification(notifId);
+      await _notificationService.cancelNotification(notifId);
     }
   }
 
   Future<void> deleteEvent(int eventId) async {
-    await NotificationService.cancelNotification(
-        NotificationIdManager.getEventId(eventId));
+    await _notificationService
+        .cancelNotification(NotificationIdManager.getEventId(eventId));
     await _repository.deleteEvent(eventId);
   }
 }
 
 final calendarViewModelProvider =
     StateNotifierProvider<CalendarViewModel, CalendarState>((ref) {
-  return CalendarViewModel(ref.read(eventsRepositoryProvider));
+  return CalendarViewModel(
+    ref.read(eventsRepositoryProvider),
+    ref.read(notificationServiceProvider),
+  );
 });

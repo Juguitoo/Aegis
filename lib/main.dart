@@ -16,8 +16,10 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting('es_ES', null);
 
-  await NotificationService.init();
-  await NotificationService.requestPermissions();
+  final container = ProviderContainer();
+  await container.read(notificationServiceProvider).init();
+  runApp(
+      UncontrolledProviderScope(container: container, child: const AegisApp()));
 
   if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
     await windowManager.ensureInitialized();

@@ -470,11 +470,11 @@ class TimerViewmodel extends Notifier<TimerState> with WidgetsBindingObserver {
         ? 'Tómate un descanso, te lo has ganado.'
         : 'Vuelta al trabajo.';
 
-    await NotificationService.showImmediateNotification(
-      title,
-      body,
-      payload: 'timer',
-    );
+    await ref.read(notificationServiceProvider).showImmediateNotification(
+          title,
+          body,
+          payload: 'timer',
+        );
   }
 }
 

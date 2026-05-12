@@ -74,7 +74,7 @@ class _AreaFormDialogState extends ConsumerState<AreaFormDialog> {
         borderRadius: BorderRadius.circular(20),
       ),
       title: Text(
-        isEditing ? 'Editar area' : 'Nuevo área',
+        isEditing ? 'Editar área' : 'Nuevo área',
         style: textTheme.displayMedium?.copyWith(fontSize: 20),
       ),
       content: Container(

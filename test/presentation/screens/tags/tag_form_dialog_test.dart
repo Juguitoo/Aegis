@@ -59,7 +59,7 @@ void main() {
       await tester.tap(find.text('Abrir Dialogo'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Nueva Etiqueta'), findsOneWidget);
+      expect(find.text('Nueva etiqueta'), findsOneWidget);
 
       await tester.tap(find.text('Guardar'));
       await tester.pump();
@@ -92,7 +92,7 @@ void main() {
 
       verify(() => mockRepository.insertTag(any())).called(1);
 
-      expect(find.text('Nueva Etiqueta'), findsNothing);
+      expect(find.text('Nueva etiqueta'), findsNothing);
     });
 
     testWidgets('El formulario se pre-rellena en modo edicion',
@@ -109,7 +109,7 @@ void main() {
       await tester.tap(find.text('Abrir Dialogo'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Editar Etiqueta'), findsOneWidget);
+      expect(find.text('Editar etiqueta'), findsOneWidget);
       expect(find.text('Gimnasio'), findsOneWidget);
     });
   });

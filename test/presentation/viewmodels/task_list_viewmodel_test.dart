@@ -5,8 +5,11 @@ import 'package:aegis/data/repositories/task_repository.dart';
 import 'package:aegis/presentation/viewmodels/task_list_viewmodel.dart';
 import 'package:aegis/data/local/database/app_database.dart';
 import 'package:aegis/core/providers/repository_providers.dart';
+import 'package:aegis/core/services/notification_service.dart';
 
 class MockTaskRepository extends Mock implements TaskRepository {}
+
+class MockNotificationService extends Mock implements NotificationService {}
 
 class FakeTask extends Fake implements Task {}
 
@@ -14,6 +17,7 @@ class FakeTasksCompanion extends Fake implements TasksCompanion {}
 
 void main() {
   late MockTaskRepository mockRepository;
+  late MockNotificationService mockNotificationService;
   late ProviderContainer container;
   ProviderSubscription? subscription;
 
@@ -39,6 +43,18 @@ void main() {
 
   setUp(() {
     mockRepository = MockTaskRepository();
+    mockNotificationService = MockNotificationService();
+
+    when(() => mockNotificationService.cancelNotification(any()))
+        .thenAnswer((_) async {});
+
+    when(() => mockNotificationService.scheduleNotification(
+          id: any(named: 'id'),
+          title: any(named: 'title'),
+          body: any(named: 'body'),
+          scheduledDate: any(named: 'scheduledDate'),
+          payload: any(named: 'payload'),
+        )).thenAnswer((_) async {});
 
     when(() => mockRepository.watchAllTasks()).thenAnswer((_) =>
         Stream.fromFuture(
@@ -54,6 +70,7 @@ void main() {
     container = ProviderContainer(
       overrides: [
         taskRepositoryProvider.overrideWithValue(mockRepository),
+        notificationServiceProvider.overrideWithValue(mockNotificationService),
       ],
     );
 

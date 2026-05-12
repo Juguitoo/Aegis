@@ -3,11 +3,12 @@ import 'dart:math';
 import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
-import '../../core/providers/repository_providers.dart';
-import '../../data/local/database/app_database.dart';
-import '../../data/repositories/task_repository.dart';
-import '../../core/services/notification_service.dart';
-import '../../core/utils/notification_id_manager.dart';
+
+import 'package:aegis/core/providers/repository_providers.dart';
+import 'package:aegis/data/local/database/app_database.dart';
+import 'package:aegis/data/repositories/task_repository.dart';
+import 'package:aegis/core/services/notification_service.dart';
+import 'package:aegis/core/utils/notification_id_manager.dart';
 
 class TaskChecklistItem {
   final int? id;
@@ -30,6 +31,8 @@ final searchQueryProvider = StateProvider<String>((ref) => '');
 
 class TaskListViewModel extends StreamNotifier<List<Task>> {
   TaskRepository get _repository => ref.read(taskRepositoryProvider);
+  NotificationService get _notificationService =>
+      ref.read(notificationServiceProvider);
 
   @override
   Stream<List<Task>> build() {
@@ -115,7 +118,7 @@ class TaskListViewModel extends StreamNotifier<List<Task>> {
     );
 
     if (notificationAt != null && notificationAt.isAfter(DateTime.now())) {
-      await NotificationService.scheduleNotification(
+      await _notificationService.scheduleNotification(
         id: NotificationIdManager.getTaskId(taskId),
         title: '📋 Tarea: $title',
         body: description?.isNotEmpty == true
@@ -152,7 +155,7 @@ class TaskListViewModel extends StreamNotifier<List<Task>> {
     if (task.completedAt == null &&
         task.notificationAt != null &&
         task.notificationAt!.isAfter(DateTime.now())) {
-      await NotificationService.scheduleNotification(
+      await _notificationService.scheduleNotification(
         id: notifId,
         title: '📋 Tarea: ${task.title}',
         body: task.description?.isNotEmpty == true
@@ -162,19 +165,19 @@ class TaskListViewModel extends StreamNotifier<List<Task>> {
         payload: 'task|${task.id}',
       );
     } else {
-      await NotificationService.cancelNotification(notifId);
+      await _notificationService.cancelNotification(notifId);
     }
   }
 
   Future<int> deleteTask(Task task) async {
-    await NotificationService.cancelNotification(
-        NotificationIdManager.getTaskId(task.id));
+    await _notificationService
+        .cancelNotification(NotificationIdManager.getTaskId(task.id));
     return await _repository.deleteTask(task);
   }
 
   Future<int> deleteTaskById(int id) async {
-    await NotificationService.cancelNotification(
-        NotificationIdManager.getTaskId(id));
+    await _notificationService
+        .cancelNotification(NotificationIdManager.getTaskId(id));
     return await _repository.deleteTaskById(id);
   }
 
@@ -191,7 +194,7 @@ class TaskListViewModel extends StreamNotifier<List<Task>> {
     if (isCurrentlyCompleted) {
       if (task.notificationAt != null &&
           task.notificationAt!.isAfter(DateTime.now())) {
-        await NotificationService.scheduleNotification(
+        await _notificationService.scheduleNotification(
           id: notifId,
           title: '📋 Tarea: ${task.title}',
           body: task.description?.isNotEmpty == true
@@ -202,7 +205,7 @@ class TaskListViewModel extends StreamNotifier<List<Task>> {
         );
       }
     } else {
-      await NotificationService.cancelNotification(notifId);
+      await _notificationService.cancelNotification(notifId);
     }
 
     return result;

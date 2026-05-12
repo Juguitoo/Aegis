@@ -59,7 +59,7 @@ void main() {
       await tester.tap(find.text('Abrir Dialogo'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Nuevo Proyecto'), findsOneWidget);
+      expect(find.text('Nuevo área'), findsOneWidget);
 
       await tester.tap(find.text('Guardar'));
       await tester.pump();
@@ -83,7 +83,7 @@ void main() {
       await tester.tap(find.text('Abrir Dialogo'));
       await tester.pumpAndSettle();
 
-      await tester.enterText(find.byType(TextField).first, 'Proyecto Prueba');
+      await tester.enterText(find.byType(TextField).first, 'Área Prueba');
       await tester.pump();
 
       await tester.tap(find.text('Guardar'));
@@ -91,7 +91,7 @@ void main() {
 
       verify(() => mockRepository.insertArea(any())).called(1);
 
-      expect(find.text('Nuevo Proyecto'), findsNothing);
+      expect(find.text('Nuevo área'), findsNothing);
     });
 
     testWidgets('El formulario se pre-rellena en modo edicion',
@@ -107,7 +107,7 @@ void main() {
       await tester.tap(find.text('Abrir Dialogo'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Editar Proyecto'), findsOneWidget);
+      expect(find.text('Editar área'), findsOneWidget);
       expect(find.text('Desarrollo App'), findsOneWidget);
     });
   });

@@ -12,19 +12,19 @@ final notificationServiceProvider = Provider<NotificationService>((ref) {
 });
 
 class NotificationService {
-  static final FlutterLocalNotificationsPlugin _notificationsPlugin =
+  final FlutterLocalNotificationsPlugin _notificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
-  static final StreamController<String?> selectNotificationStream =
+  final StreamController<String?> selectNotificationStream =
       StreamController<String?>.broadcast();
 
-  static Future<void> init() async {
+  Future<void> init() async {
     if (kIsWeb) return;
     tz.initializeTimeZones();
 
     try {
-      final String timeZoneName = FlutterTimezone.getLocalTimezone().toString();
-      tz.setLocalLocation(tz.getLocation(timeZoneName));
+      final timeZone = await FlutterTimezone.getLocalTimezone();
+      tz.setLocalLocation(tz.getLocation(timeZone.identifier));
     } catch (e) {
       tz.setLocalLocation(tz.getLocation('Europe/Madrid'));
     }
@@ -74,7 +74,7 @@ class NotificationService {
     }
   }
 
-  static Future<void> requestPermissions() async {
+  Future<void> requestPermissions() async {
     if (kIsWeb) return;
     if (Platform.isAndroid) {
       final AndroidFlutterLocalNotificationsPlugin? androidImplementation =
@@ -102,7 +102,7 @@ class NotificationService {
     }
   }
 
-  static Future<void> scheduleNotification({
+  Future<void> scheduleNotification({
     required int id,
     required String title,
     required String body,
@@ -147,17 +147,17 @@ class NotificationService {
     );
   }
 
-  static Future<void> cancelNotification(int id) async {
+  Future<void> cancelNotification(int id) async {
     if (kIsWeb) return;
     await _notificationsPlugin.cancel(id: id);
   }
 
-  static Future<void> cancelAllNotifications() async {
+  Future<void> cancelAllNotifications() async {
     if (kIsWeb) return;
     await _notificationsPlugin.cancelAll();
   }
 
-  static Future<void> showImmediateNotification(String? title, String? body,
+  Future<void> showImmediateNotification(String? title, String? body,
       {String? payload}) async {
     if (kIsWeb) return;
     const WindowsNotificationDetails windowsDetails =

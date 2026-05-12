@@ -51,7 +51,7 @@ void main() {
     await tester.pumpWidget(buildTestableTaskCard(task));
     expect(find.text('Comprar leche'), findsOneWidget);
     final titleText = tester.widget<Text>(find.text('Comprar leche'));
-    expect(titleText.style?.decoration, isNull);
+    expect(titleText.style?.decoration, TextDecoration.none);
   });
 
   testWidgets('TaskCard renderiza el titulo tachado si esta completada',
