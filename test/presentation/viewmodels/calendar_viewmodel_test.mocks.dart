@@ -42,15 +42,15 @@ class _FakeStreamController_0<T> extends _i1.SmartFake
 /// See the documentation for Mockito's code generation for more information.
 class MockNotificationService extends _i1.Mock
     implements _i3.NotificationService {
-  MockNotificationService() {
-    _i1.throwOnMissingStub(this);
-  }
-
   @override
   _i2.StreamController<String?> get selectNotificationStream =>
       (super.noSuchMethod(
         Invocation.getter(#selectNotificationStream),
         returnValue: _FakeStreamController_0<String?>(
+          this,
+          Invocation.getter(#selectNotificationStream),
+        ),
+        returnValueForMissingStub: _FakeStreamController_0<String?>(
           this,
           Invocation.getter(#selectNotificationStream),
         ),
@@ -144,11 +144,7 @@ class MockNotificationService extends _i1.Mock
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockNotificationIdManager extends _i1.Mock
-    implements _i4.NotificationIdManager {
-  MockNotificationIdManager() {
-    _i1.throwOnMissingStub(this);
-  }
-}
+    implements _i4.NotificationIdManager {}
 
 /// A class which mocks [EventsRepository].
 ///

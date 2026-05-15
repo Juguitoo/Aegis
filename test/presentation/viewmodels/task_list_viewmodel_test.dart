@@ -1,3 +1,4 @@
+import 'package:drift/drift.dart' hide isNotNull;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -127,7 +128,7 @@ void main() {
     });
   });
 
-  group('TaskListViewModel Methods', () {
+  group('TaskListViewModel Methods (addTask, updateTask, delete)', () {
     test('Debe fabricar los Companions y llamar al repositorio al añadir tarea',
         () async {
       when(() => mockRepository.insertTask(
@@ -160,6 +161,86 @@ void main() {
       expect(subtasksPassed.first.position.value, 0);
     });
 
+    test('addTask debe agendar notificación si se proporciona una fecha futura',
+        () async {
+      when(() => mockRepository.insertTask(
+            any(),
+            tagIds: any(named: 'tagIds'),
+            subtasks: any(named: 'subtasks'),
+          )).thenAnswer((_) async => 5);
+
+      final futureDate = DateTime.now().add(const Duration(days: 1));
+
+      await container.read(taskListViewModelProvider.notifier).addTask(
+            title: 'Nueva Tarea',
+            description: '',
+            notificationAt: futureDate,
+          );
+
+      verify(() => mockNotificationService.scheduleNotification(
+            id: any(named: 'id'),
+            title: any(named: 'title'),
+            body: 'Tienes una tarea pendiente programada',
+            scheduledDate: futureDate,
+            payload: any(named: 'payload'),
+          )).called(1);
+    });
+
+    test(
+        'updateTask actualiza y cancela notificación si la tarea está completada o no tiene fecha',
+        () async {
+      when(() => mockRepository.updateTask(
+            any(),
+            tagIds: any(named: 'tagIds'),
+            subtasks: any(named: 'subtasks'),
+          )).thenAnswer((_) async {});
+
+      final completedTask = task1.copyWith(completedAt: Value(DateTime.now()));
+
+      await container.read(taskListViewModelProvider.notifier).updateTask(
+        task: completedTask,
+        tagIds: [1],
+        checklist: [TaskChecklistItem(title: 'Subtarea', id: 1)],
+      );
+
+      verify(() => mockRepository.updateTask(
+            completedTask,
+            tagIds: [1],
+            subtasks: any(named: 'subtasks'),
+          )).called(1);
+
+      verify(() => mockNotificationService.cancelNotification(any())).called(1);
+    });
+
+    test(
+        'updateTask actualiza y agenda notificación si la tarea está pendiente y tiene fecha futura',
+        () async {
+      when(() => mockRepository.updateTask(
+            any(),
+            tagIds: any(named: 'tagIds'),
+            subtasks: any(named: 'subtasks'),
+          )).thenAnswer((_) async {});
+
+      final futureDate = DateTime.now().add(const Duration(days: 1));
+      final taskWithNotif = task1.copyWith(
+        completedAt: const Value(null),
+        notificationAt: Value(futureDate),
+        description: const Value('Descripción test'),
+      );
+
+      await container.read(taskListViewModelProvider.notifier).updateTask(
+            task: taskWithNotif,
+          );
+
+      verify(() => mockNotificationService.scheduleNotification(
+            id: any(named: 'id'),
+            title: '📋 Tarea: Tarea 1',
+            body: 'Descripción test',
+            scheduledDate: futureDate,
+            payload: any(named: 'payload'),
+          )).called(1);
+    });
+
     test('Debe llamar al repositorio al eliminar una tarea', () async {
       when(() => mockRepository.deleteTask(any())).thenAnswer((_) async => 1);
 
@@ -168,8 +249,29 @@ void main() {
           .deleteTask(task1);
 
       verify(() => mockRepository.deleteTask(task1)).called(1);
+      verify(() => mockNotificationService.cancelNotification(any())).called(1);
     });
 
+    test('Debe llamar al repositorio en getTagsForTask y deleteTaskById',
+        () async {
+      when(() => mockRepository.getTagIdsForTask(1))
+          .thenAnswer((_) async => [10, 20]);
+      when(() => mockRepository.deleteTaskById(1)).thenAnswer((_) async => 1);
+
+      final tags = await container
+          .read(taskListViewModelProvider.notifier)
+          .getTagsForTask(1);
+      expect(tags, [10, 20]);
+
+      await container
+          .read(taskListViewModelProvider.notifier)
+          .deleteTaskById(1);
+      verify(() => mockRepository.deleteTaskById(1)).called(1);
+      verify(() => mockNotificationService.cancelNotification(any())).called(1);
+    });
+  });
+
+  group('TaskListViewModel toggleTaskCompletion', () {
     test('Debe hacer toggle de isCompleted y actualizar usando updateTaskBasic',
         () async {
       when(() => mockRepository.updateTaskBasic(any()))
@@ -184,6 +286,45 @@ void main() {
       final updatedTask = captured.first as Task;
 
       expect(updatedTask.completedAt, isNotNull);
+    });
+
+    test(
+        'Al marcar como completada (toggle de pendiente a completada), debe cancelar la notificación',
+        () async {
+      when(() => mockRepository.updateTaskBasic(any()))
+          .thenAnswer((_) async => true);
+
+      await container
+          .read(taskListViewModelProvider.notifier)
+          .toggleTaskCompletion(task1);
+
+      verify(() => mockNotificationService.cancelNotification(any())).called(1);
+    });
+
+    test(
+        'Al marcar como pendiente (toggle de completada a pendiente), debe agendar si hay fecha futura',
+        () async {
+      when(() => mockRepository.updateTaskBasic(any()))
+          .thenAnswer((_) async => true);
+
+      final futureDate = DateTime.now().add(const Duration(days: 1));
+
+      final completedTaskWithNotif = task1.copyWith(
+        completedAt: Value(DateTime.now()),
+        notificationAt: Value(futureDate),
+      );
+
+      await container
+          .read(taskListViewModelProvider.notifier)
+          .toggleTaskCompletion(completedTaskWithNotif);
+
+      verify(() => mockNotificationService.scheduleNotification(
+            id: any(named: 'id'),
+            title: any(named: 'title'),
+            body: any(named: 'body'),
+            scheduledDate: futureDate,
+            payload: any(named: 'payload'),
+          )).called(1);
     });
   });
 }

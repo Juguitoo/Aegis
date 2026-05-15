@@ -68,7 +68,7 @@ void main() {
 
       verifyNever(() => mockRepository.insertTag(any()));
 
-      ScaffoldMessenger.of(tester.element(find.byType(Scaffold)))
+      ScaffoldMessenger.of(tester.element(find.text('Guardar')))
           .clearSnackBars();
       await tester.pumpAndSettle();
     });

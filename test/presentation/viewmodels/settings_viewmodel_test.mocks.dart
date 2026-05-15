@@ -30,10 +30,6 @@ import 'package:mockito/mockito.dart' as _i1;
 /// See the documentation for Mockito's code generation for more information.
 class MockSettingsRepository extends _i1.Mock
     implements _i2.SettingsRepository {
-  MockSettingsRepository() {
-    _i1.throwOnMissingStub(this);
-  }
-
   @override
   _i3.Stream<_i4.Setting?> watchSettings() => (super.noSuchMethod(
         Invocation.method(
@@ -41,6 +37,7 @@ class MockSettingsRepository extends _i1.Mock
           [],
         ),
         returnValue: _i3.Stream<_i4.Setting?>.empty(),
+        returnValueForMissingStub: _i3.Stream<_i4.Setting?>.empty(),
       ) as _i3.Stream<_i4.Setting?>);
 
   @override
@@ -50,6 +47,7 @@ class MockSettingsRepository extends _i1.Mock
           [],
         ),
         returnValue: _i3.Future<_i4.Setting?>.value(),
+        returnValueForMissingStub: _i3.Future<_i4.Setting?>.value(),
       ) as _i3.Future<_i4.Setting?>);
 
   @override
@@ -70,6 +68,7 @@ class MockSettingsRepository extends _i1.Mock
           [],
         ),
         returnValue: _i3.Future<int>.value(0),
+        returnValueForMissingStub: _i3.Future<int>.value(0),
       ) as _i3.Future<int>);
 
   @override
@@ -87,10 +86,6 @@ class MockSettingsRepository extends _i1.Mock
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockSessionRepository extends _i1.Mock implements _i5.SessionRepository {
-  MockSessionRepository() {
-    _i1.throwOnMissingStub(this);
-  }
-
   @override
   _i3.Future<int> insertSession(_i4.FocusSessionsCompanion? session) =>
       (super.noSuchMethod(
@@ -99,6 +94,7 @@ class MockSessionRepository extends _i1.Mock implements _i5.SessionRepository {
           [session],
         ),
         returnValue: _i3.Future<int>.value(0),
+        returnValueForMissingStub: _i3.Future<int>.value(0),
       ) as _i3.Future<int>);
 
   @override
@@ -109,6 +105,8 @@ class MockSessionRepository extends _i1.Mock implements _i5.SessionRepository {
           [],
         ),
         returnValue:
+            _i3.Future<List<_i4.FocusSession>>.value(<_i4.FocusSession>[]),
+        returnValueForMissingStub:
             _i3.Future<List<_i4.FocusSession>>.value(<_i4.FocusSession>[]),
       ) as _i3.Future<List<_i4.FocusSession>>);
 

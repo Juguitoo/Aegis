@@ -112,5 +112,79 @@ void main() {
       tasks = await taskRepo.watchAllTasks().first;
       expect(tasks.isEmpty, true);
     });
+
+    test('Debe borrar una tarea pasando la tarea', () async {
+      await taskRepo.insertTask(
+        const TasksCompanion(title: Value('Tarea efimera')),
+      );
+
+      var tasks = await taskRepo.watchAllTasks().first;
+      expect(tasks.length, 1);
+
+      await taskRepo.deleteTask(tasks.first);
+
+      tasks = await taskRepo.watchAllTasks().first;
+      expect(tasks.isEmpty, true);
+    });
+  });
+
+  group('TaskRepository Streams (watch)', () {
+    test('watchTagIdsForTask debe reaccionar a cambios en los tags', () async {
+      final tag1 = await db
+          .into(db.tags)
+          .insert(const TagsCompanion(name: Value('TagA')));
+      final tag2 = await db
+          .into(db.tags)
+          .insert(const TagsCompanion(name: Value('TagB')));
+
+      final taskId = await taskRepo.insertTask(
+        const TasksCompanion(title: Value('Tarea Watch Tags')),
+        tagIds: [tag1],
+      );
+
+      final task = await (db.select(db.tasks)
+            ..where((t) => t.id.equals(taskId)))
+          .getSingle();
+
+      final stream = taskRepo.watchTagIdsForTask(taskId);
+
+      expect(await stream.first, [tag1]);
+
+      await taskRepo.updateTask(task, tagIds: [tag1, tag2]);
+
+      expect(await stream.first, [tag1, tag2]);
+    });
+
+    test(
+        'watchSubtasksForTask debe emitir subtareas ordenadas y reaccionar a cambios',
+        () async {
+      final taskId = await taskRepo.insertTask(
+          const TasksCompanion(title: Value('Tarea Watch Subtasks')),
+          subtasks: [
+            const SubtasksCompanion(title: Value('Sub A'), position: Value(1)),
+          ]);
+
+      final task = await (db.select(db.tasks)
+            ..where((t) => t.id.equals(taskId)))
+          .getSingle();
+      final stream = taskRepo.watchSubtasksForTask(taskId);
+
+      var initialSubtasks = await stream.first;
+      expect(initialSubtasks.length, 1);
+      expect(initialSubtasks.first.title, 'Sub A');
+      expect(initialSubtasks.first.position, 1);
+
+      await taskRepo.updateTask(task, subtasks: [
+        const SubtasksCompanion(title: Value('Sub B'), position: Value(0)),
+        const SubtasksCompanion(title: Value('Sub A'), position: Value(1)),
+      ]);
+
+      var updatedSubtasks = await stream.first;
+      expect(updatedSubtasks.length, 2);
+      expect(updatedSubtasks[0].title, 'Sub B');
+      expect(updatedSubtasks[0].position, 0);
+      expect(updatedSubtasks[1].title, 'Sub A');
+      expect(updatedSubtasks[1].position, 1);
+    });
   });
 }

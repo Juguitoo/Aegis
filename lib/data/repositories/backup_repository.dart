@@ -5,10 +5,61 @@ import 'package:file_picker/file_picker.dart' as fp;
 import 'package:path_provider/path_provider.dart';
 import 'package:aegis/data/local/database/app_database.dart';
 
+class BackupPlatformProvider {
+  const BackupPlatformProvider();
+
+  bool get isDesktop =>
+      Platform.isWindows || Platform.isMacOS || Platform.isLinux;
+
+  Future<String?> pickSaveFile() async {
+    return await fp.FilePicker.saveFile(
+      dialogTitle: 'Guardar copia de seguridad',
+      fileName: 'aegis_backup.json',
+      type: fp.FileType.custom,
+      allowedExtensions: ['json'],
+    );
+  }
+
+  Future<String?> pickImportFile() async {
+    final result = await fp.FilePicker.pickFiles(
+      type: fp.FileType.custom,
+      allowedExtensions: ['json'],
+    );
+    return result?.files.single.path;
+  }
+
+  Future<void> writeStringToFile(String path, String content) async {
+    final file = File(path);
+    await file.writeAsString(content);
+  }
+
+  Future<String> readStringFromFile(String path) async {
+    final file = File(path);
+    return await file.readAsString();
+  }
+
+  Future<String> getTemporaryFilePath(String fileName) async {
+    final directory = await getTemporaryDirectory();
+    return '${directory.path}/$fileName';
+  }
+
+  Future<bool> shareFile(String path, String mimeType) async {
+    final params = ShareParams(
+      files: [XFile(path, mimeType: mimeType)],
+    );
+    final result = await SharePlus.instance.share(params);
+    return result.status != ShareResultStatus.dismissed;
+  }
+}
+
 class BackupRepository {
   final AppDatabase _db;
+  final BackupPlatformProvider _platformProvider;
 
-  BackupRepository(this._db);
+  BackupRepository(this._db,
+      {BackupPlatformProvider platformProvider =
+          const BackupPlatformProvider()})
+      : _platformProvider = platformProvider;
 
   Future<void> exportDatabase() async {
     final data = {
@@ -46,57 +97,39 @@ class BackupRepository {
 
     final jsonString = jsonEncode(data);
 
-    if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
-      final outputFile = await fp.FilePicker.saveFile(
-        dialogTitle: 'Guardar copia de seguridad',
-        fileName: 'aegis_backup.json',
-        type: fp.FileType.custom,
-        allowedExtensions: ['json'],
-      );
+    if (_platformProvider.isDesktop) {
+      final outputFile = await _platformProvider.pickSaveFile();
 
       if (outputFile != null) {
-        final file = File(outputFile);
-        await file.writeAsString(jsonString);
+        await _platformProvider.writeStringToFile(outputFile, jsonString);
       } else {
         throw Exception('Operación cancelada por el usuario');
       }
     } else {
-      final directory = await getTemporaryDirectory();
-      final file = File('${directory.path}/aegis_backup.json');
-      await file.writeAsString(jsonString);
+      final filePath =
+          await _platformProvider.getTemporaryFilePath('aegis_backup.json');
+      await _platformProvider.writeStringToFile(filePath, jsonString);
 
-      final params = ShareParams(
-        files: [
-          XFile(
-            file.path,
-            mimeType: 'application/json',
-          )
-        ],
-      );
+      final success =
+          await _platformProvider.shareFile(filePath, 'application/json');
 
-      final result = await SharePlus.instance.share(params);
-
-      if (result.status == ShareResultStatus.dismissed) {
+      if (!success) {
         throw Exception('Operación cancelada por el usuario');
       }
     }
   }
 
   Future<void> importDatabase() async {
-    final result = await fp.FilePicker.pickFiles(
-      type: fp.FileType.custom,
-      allowedExtensions: ['json'],
-    );
+    final filePath = await _platformProvider.pickImportFile();
 
-    if (result == null || result.files.single.path == null) {
+    if (filePath == null) {
       throw Exception('Operación cancelada por el usuario');
     }
 
-    final file = File(result.files.single.path!);
     Map<String, dynamic> data;
 
     try {
-      final jsonString = await file.readAsString();
+      final jsonString = await _platformProvider.readStringFromFile(filePath);
       data = jsonDecode(jsonString) as Map<String, dynamic>;
 
       if (data['version'] == null) {

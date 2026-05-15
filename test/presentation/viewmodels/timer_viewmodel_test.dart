@@ -1,4 +1,6 @@
 import 'package:aegis/core/utils/adaptive_interval_calculator.dart';
+import 'package:aegis/core/utils/native_app_monitor.dart';
+import 'package:aegis/data/repositories/blacklist_repository.dart';
 import 'package:aegis/data/repositories/sessions_repository.dart';
 import 'package:aegis/data/repositories/task_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -9,7 +11,9 @@ import 'package:aegis/presentation/viewmodels/timer_state.dart';
 import 'package:aegis/presentation/viewmodels/timer_viewmodel.dart';
 import 'package:aegis/presentation/viewmodels/settings_viewmodel.dart';
 import 'package:aegis/data/local/database/app_database.dart';
+import 'package:aegis/core/services/notification_service.dart';
 import 'package:aegis/core/providers/repository_providers.dart';
+import 'package:mocktail/mocktail.dart';
 
 class MockSettingsViewmodel extends SettingsViewmodel {
   @override
@@ -101,10 +105,24 @@ class FakeSessionRepository implements SessionRepository {
   }
 }
 
+class MockNativeAppMonitor extends Mock implements NativeAppMonitor {}
+
+class MockBlacklistRepository extends Mock implements BlacklistRepository {}
+
+class MockNotificationService extends Mock implements NotificationService {}
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+
+  setUpAll(() {
+    registerFallbackValue(const Duration(seconds: 1));
+  });
+
   late FakeTaskRepository fakeTaskRepo;
   late FakeSessionRepository fakeSessionRepo;
+  late MockNativeAppMonitor mockMonitor;
+  late MockBlacklistRepository mockBlacklistRepo;
+  late MockNotificationService mockNotificationService;
 
   ProviderContainer createContainer() {
     final container = ProviderContainer(
@@ -115,6 +133,9 @@ void main() {
         adaptiveCalculatorProvider
             .overrideWithValue(AdaptiveIntervalCalculator()),
         audioPlayerProvider.overrideWith((ref) => null),
+        nativeAppMonitorProvider.overrideWithValue(mockMonitor),
+        blacklistRepositoryProvider.overrideWithValue(mockBlacklistRepo),
+        notificationServiceProvider.overrideWithValue(mockNotificationService),
       ],
     );
     addTearDown(container.dispose);
@@ -124,6 +145,19 @@ void main() {
   setUp(() {
     fakeTaskRepo = FakeTaskRepository();
     fakeSessionRepo = FakeSessionRepository();
+    mockMonitor = MockNativeAppMonitor();
+    mockBlacklistRepo = MockBlacklistRepository();
+    mockNotificationService = MockNotificationService();
+
+    when(() => mockMonitor.onAppChanged)
+        .thenAnswer((_) => const Stream.empty());
+    when(() => mockMonitor.startMonitoring(interval: any(named: 'interval')))
+        .thenAnswer((_) {});
+    when(() => mockMonitor.stopMonitoring()).thenAnswer((_) {});
+    when(() => mockBlacklistRepo.getBlacklistedPackages())
+        .thenAnswer((_) async => ['com.evil.app']);
+    when(() => mockNotificationService.showImmediateNotification(any(), any(),
+        payload: any(named: 'payload'))).thenAnswer((_) async {});
   });
 
   group('TimerViewmodel Tests', () {
@@ -291,6 +325,146 @@ void main() {
       final state = container.read(timerViewModelProvider);
 
       expect(state.assignedTask, isNull);
+    });
+
+    test('updateAssignedTask actualiza la tarea si los IDs coinciden', () {
+      final container = createContainer();
+      final dummyTask = Task(
+        id: 1,
+        title: 'Tarea 1',
+        description: '',
+        priority: 1,
+        estimatedDuration: 1500,
+        actualDuration: 0,
+      );
+
+      final updatedTask = Task(
+        id: 1,
+        title: 'Tarea 1 Actualizada',
+        description: '',
+        priority: 1,
+        estimatedDuration: 1500,
+        actualDuration: 0,
+      );
+
+      final notifier = container.read(timerViewModelProvider.notifier);
+
+      notifier.assignTask(dummyTask);
+      notifier.updateAssignedTask(updatedTask);
+
+      final state = container.read(timerViewModelProvider);
+      expect(state.assignedTask!.title, 'Tarea 1 Actualizada');
+    });
+
+    test('registerBlocklistAttempt incrementa el contador si esta corriendo',
+        () {
+      final container = createContainer();
+      final notifier = container.read(timerViewModelProvider.notifier);
+
+      notifier.start();
+      notifier.registerBlocklistAttempt();
+
+      final state = container.read(timerViewModelProvider);
+      expect(state.blocklistAttempts, 1);
+    });
+
+    test('toggleDynamicMode cambia el estado del modo dinamico', () {
+      final container = createContainer();
+      final notifier = container.read(timerViewModelProvider.notifier);
+
+      expect(
+          container.read(timerViewModelProvider).isDynamicModeActive, isFalse);
+
+      notifier.toggleDynamicMode();
+
+      expect(
+          container.read(timerViewModelProvider).isDynamicModeActive, isTrue);
+    });
+
+    test('acceptSuggestion aplica el modo sugerido y arranca el timer', () {
+      final container = createContainer();
+      final notifier = container.read(timerViewModelProvider.notifier);
+
+      final suggestion = SuggestionResult(
+          suggestedMode: TimerMode.longBreak,
+          suggestedDurationSeconds: 1200,
+          fallbackMode: TimerMode.shortBreak,
+          fallbackDurationSeconds: 300,
+          reason: "Descanso sugerido");
+
+      container.read(timerViewModelProvider.notifier).state = container
+          .read(timerViewModelProvider)
+          .copyWith(pendingSuggestion: suggestion);
+
+      notifier.acceptSuggestion();
+
+      final state = container.read(timerViewModelProvider);
+      expect(state.mode, TimerMode.longBreak);
+      expect(state.remainingSeconds, 1200);
+      expect(state.status, TimerStatus.running);
+      expect(state.pendingSuggestion, isNull);
+    });
+
+    test('rejectSuggestion aplica el modo fallback y arranca el timer', () {
+      final container = createContainer();
+      final notifier = container.read(timerViewModelProvider.notifier);
+
+      final suggestion = SuggestionResult(
+          suggestedMode: TimerMode.longBreak,
+          suggestedDurationSeconds: 1200,
+          fallbackMode: TimerMode.shortBreak,
+          fallbackDurationSeconds: 300,
+          reason: "Descanso sugerido");
+
+      container.read(timerViewModelProvider.notifier).state = container
+          .read(timerViewModelProvider)
+          .copyWith(pendingSuggestion: suggestion);
+
+      notifier.rejectSuggestion();
+
+      final state = container.read(timerViewModelProvider);
+      expect(state.mode, TimerMode.shortBreak);
+      expect(state.remainingSeconds, 300);
+      expect(state.status, TimerStatus.running);
+      expect(state.pendingSuggestion, isNull);
+    });
+
+    test('_handleForegroundAppChange dispara provider si app está en blacklist',
+        () async {
+      final streamController = StreamController<String>();
+      when(() => mockMonitor.onAppChanged)
+          .thenAnswer((_) => streamController.stream);
+
+      final container = createContainer();
+      final notifier = container.read(timerViewModelProvider.notifier);
+
+      notifier.start();
+
+      streamController.add('com.evil.app');
+
+      await Future.delayed(const Duration(milliseconds: 50));
+
+      final triggeredApp = container.read(blockedAppTriggerProvider);
+      expect(triggeredApp, 'com.evil.app');
+
+      await streamController.close();
+    });
+
+    test('_handleSessionComplete avanza modo de focus a short break', () async {
+      final container = createContainer();
+      final notifier = container.read(timerViewModelProvider.notifier);
+
+      container.read(timerViewModelProvider.notifier).state = container
+          .read(timerViewModelProvider)
+          .copyWith(remainingSeconds: 0, status: TimerStatus.running);
+
+      notifier.didChangeAppLifecycleState(AppLifecycleState.paused);
+      notifier.didChangeAppLifecycleState(AppLifecycleState.resumed);
+
+      final state = container.read(timerViewModelProvider);
+
+      expect(state.mode, TimerMode.shortBreak);
+      expect(state.sessionsCompleted, 1);
     });
   });
 }

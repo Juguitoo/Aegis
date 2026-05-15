@@ -37,9 +37,26 @@ void main() {
       const packageName = 'com.example.app';
       const appName = 'Example App';
       await blacklistRepository.addAppToBlacklist(packageName, appName);
+      var entries = await blacklistRepository.getBlacklistedPackages();
+      expect(entries, isNotEmpty);
 
       await blacklistRepository.removeAppFromBlacklist(packageName);
-      final entries = await blacklistRepository.getBlacklistedPackages();
+      entries = await blacklistRepository.getBlacklistedPackages();
+      expect(entries.isEmpty, true);
+    });
+
+    test(
+        'watchBlacklistedPackages devuelve un stream y detecta los cambios correctamente',
+        () async {
+      const packageName = 'com.example.app';
+      const appName = 'Example App';
+      await blacklistRepository.addAppToBlacklist(packageName, appName);
+      final entriesStream = blacklistRepository.watchBlacklistedPackages();
+      var entries = await entriesStream.first;
+      expect(entries, isNotEmpty);
+
+      await blacklistRepository.removeAppFromBlacklist(packageName);
+      entries = await entriesStream.first;
       expect(entries.isEmpty, true);
     });
   });

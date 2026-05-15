@@ -2,6 +2,7 @@ import 'package:aegis/core/providers/repository_providers.dart';
 import 'package:aegis/core/services/notification_service.dart';
 import 'package:aegis/core/utils/notification_id_manager.dart';
 import 'package:aegis/data/local/database/app_database.dart';
+import 'package:aegis/data/repositories/events_repository.dart';
 import 'package:aegis/presentation/viewmodels/calendar_viewmodel.dart';
 import 'package:aegis/presentation/viewmodels/task_list_viewmodel.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -46,6 +47,7 @@ class FakeTaskListViewModel extends StreamNotifier<List<Task>>
 
 @GenerateNiceMocks(
     [MockSpec<NotificationService>(), MockSpec<NotificationIdManager>()])
+@GenerateMocks([EventsRepository])
 void main() {
   setUpAll(() {
     tz.initializeTimeZones();

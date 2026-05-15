@@ -1,10 +1,5 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:drift/drift.dart';
 import 'package:aegis/data/local/database/app_database.dart';
-
-final appDatabaseProvider = Provider<AppDatabase>((ref) {
-  return AppDatabase();
-});
 
 class SessionRepository {
   final AppDatabase _db;

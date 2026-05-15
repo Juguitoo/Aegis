@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -12,8 +11,10 @@ final notificationServiceProvider = Provider<NotificationService>((ref) {
 });
 
 class NotificationService {
-  final FlutterLocalNotificationsPlugin _notificationsPlugin =
-      FlutterLocalNotificationsPlugin();
+  final FlutterLocalNotificationsPlugin _notificationsPlugin;
+
+  NotificationService({FlutterLocalNotificationsPlugin? plugin})
+      : _notificationsPlugin = plugin ?? FlutterLocalNotificationsPlugin();
 
   final StreamController<String?> selectNotificationStream =
       StreamController<String?>.broadcast();
@@ -24,7 +25,7 @@ class NotificationService {
 
     try {
       final timeZone = await FlutterTimezone.getLocalTimezone();
-      tz.setLocalLocation(tz.getLocation(timeZone.identifier));
+      tz.setLocalLocation(tz.getLocation(timeZone.toString()));
     } catch (e) {
       tz.setLocalLocation(tz.getLocation('Europe/Madrid'));
     }
@@ -76,13 +77,14 @@ class NotificationService {
 
   Future<void> requestPermissions() async {
     if (kIsWeb) return;
-    if (Platform.isAndroid) {
+
+    if (defaultTargetPlatform == TargetPlatform.android) {
       final AndroidFlutterLocalNotificationsPlugin? androidImplementation =
           _notificationsPlugin.resolvePlatformSpecificImplementation<
               AndroidFlutterLocalNotificationsPlugin>();
       await androidImplementation?.requestNotificationsPermission();
       await androidImplementation?.requestExactAlarmsPermission();
-    } else if (Platform.isIOS || Platform.isMacOS) {
+    } else if (defaultTargetPlatform == TargetPlatform.iOS) {
       await _notificationsPlugin
           .resolvePlatformSpecificImplementation<
               IOSFlutterLocalNotificationsPlugin>()
@@ -91,6 +93,7 @@ class NotificationService {
             badge: true,
             sound: true,
           );
+    } else if (defaultTargetPlatform == TargetPlatform.macOS) {
       await _notificationsPlugin
           .resolvePlatformSpecificImplementation<
               MacOSFlutterLocalNotificationsPlugin>()
@@ -167,6 +170,7 @@ class NotificationService {
       android: AndroidNotificationDetails(
           'aegis_reminders_channel', 'Recordatorios'),
     );
+
     await _notificationsPlugin.show(
       id: 999,
       title: title ?? '¡Prueba instantánea!',
