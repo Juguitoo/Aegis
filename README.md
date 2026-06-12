@@ -18,7 +18,7 @@ Este proyecto ha sido desarrollado como Trabajo de Fin de Grado (TFG) en Ingenie
 
 ## 🛠️ Stack Tecnológico y Arquitectura
 
-La aplicación está construida siguiendo los principios de **Clean Architecture** y el patrón de diseño **MVVM** (Model-View-ViewModel) para garantizar la escalabilidad, testeabilidad y separación de responsabilidades.
+La aplicación está construida siguiendo el patrón de diseño **MVVM** (Model-View-ViewModel) para garantizar la escalabilidad, testeabilidad y separación de responsabilidades.
 
 *   **Framework:** [Flutter](https://flutter.dev/) (Soporte adaptativo para Mobile y Desktop)
 *   **Lenguaje:** Dart
