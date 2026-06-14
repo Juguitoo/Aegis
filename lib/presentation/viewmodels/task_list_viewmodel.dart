@@ -70,6 +70,12 @@ class TaskListViewModel extends StreamNotifier<List<Task>> {
         filteredTasks = tasksWithSelectedTags;
       }
 
+      filteredTasks.sort((a, b) {
+        if (a.completedAt == null && b.completedAt != null) return -1;
+        if (a.completedAt != null && b.completedAt == null) return 1;
+        return 0;
+      });
+
       return filteredTasks;
     });
   }
