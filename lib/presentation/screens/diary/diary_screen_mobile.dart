@@ -12,7 +12,10 @@ class DiaryScreenMobile extends ConsumerStatefulWidget {
 }
 
 class _DiaryScreenMobileState extends ConsumerState<DiaryScreenMobile>
-    with DiaryStateMixin {
+    with DiaryStateMixin, AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
   final List<String> _months = [
     'Ene',
     'Feb',
@@ -30,6 +33,8 @@ class _DiaryScreenMobileState extends ConsumerState<DiaryScreenMobile>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
+
     final selectedDate = ref.watch(selectedDiaryDateProvider);
     final notesAsyncValue = ref.watch(diaryViewModelProvider);
     final viewModel = ref.read(diaryViewModelProvider.notifier);

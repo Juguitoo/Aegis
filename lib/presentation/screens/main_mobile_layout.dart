@@ -29,7 +29,10 @@ class MainMobileLayout extends ConsumerStatefulWidget {
 }
 
 class _MainMobileLayoutState extends ConsumerState<MainMobileLayout>
-    with WidgetsBindingObserver {
+    with WidgetsBindingObserver, AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
   StreamSubscription<String?>? _notificationSubscription;
   late PageController _pageController;
 
@@ -133,6 +136,7 @@ class _MainMobileLayoutState extends ConsumerState<MainMobileLayout>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final colorScheme = Theme.of(context).colorScheme;
 
     ref.listen(blockedAppTriggerProvider, (previous, next) async {

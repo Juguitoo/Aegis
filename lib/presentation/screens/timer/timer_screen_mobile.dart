@@ -11,11 +11,22 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:aegis/presentation/screens/timer/immersive_timer_screen_mobile.dart';
 
-class TimerScreenMobile extends ConsumerWidget {
+class TimerScreenMobile extends ConsumerStatefulWidget {
   const TimerScreenMobile({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<TimerScreenMobile> createState() => _TimerScreenMobileState();
+}
+
+class _TimerScreenMobileState extends ConsumerState<TimerScreenMobile>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 

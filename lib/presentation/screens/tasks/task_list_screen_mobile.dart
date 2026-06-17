@@ -24,7 +24,11 @@ class TaskListScreenMobile extends ConsumerStatefulWidget {
       _TaskListScreenMobileState();
 }
 
-class _TaskListScreenMobileState extends ConsumerState<TaskListScreenMobile> {
+class _TaskListScreenMobileState extends ConsumerState<TaskListScreenMobile>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
   final ScrollController _mainScrollController = ScrollController();
 
   @override
@@ -45,6 +49,8 @@ class _TaskListScreenMobileState extends ConsumerState<TaskListScreenMobile> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
+
     final tasksAsync = ref.watch(taskListViewModelProvider);
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;

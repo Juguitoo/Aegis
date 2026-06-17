@@ -9,11 +9,23 @@ import 'package:aegis/presentation/screens/tasks/components/task_form_mobile.dar
 import 'package:aegis/presentation/screens/calendar/components/event_form_mobile.dart';
 import 'package:aegis/presentation/screens/settings/settings_screen_mobile.dart';
 
-class CalendarScreenMobile extends ConsumerWidget {
+class CalendarScreenMobile extends ConsumerStatefulWidget {
   const CalendarScreenMobile({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<CalendarScreenMobile> createState() =>
+      _CalendarScreenMobileState();
+}
+
+class _CalendarScreenMobileState extends ConsumerState<CalendarScreenMobile>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+
     final state = ref.watch(calendarViewModelProvider);
     final eventsMap = ref.watch(calendarItemsProvider);
     final tasksListAsync = ref.watch(taskListViewModelProvider);

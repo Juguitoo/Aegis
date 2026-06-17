@@ -14,8 +14,11 @@ class StatisticsScreenMobile extends ConsumerStatefulWidget {
       _StatisticsScreenMobileState();
 }
 
-class _StatisticsScreenMobileState
-    extends ConsumerState<StatisticsScreenMobile> {
+class _StatisticsScreenMobileState extends ConsumerState<StatisticsScreenMobile>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
   final PageController _kpiPageController =
       PageController(viewportFraction: 0.5, initialPage: 1000);
   int _currentKpiPage = 0;
@@ -57,6 +60,7 @@ class _StatisticsScreenMobileState
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final state = ref.watch(statisticsViewModelProvider);
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
