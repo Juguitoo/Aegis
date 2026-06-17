@@ -31,10 +31,13 @@ class MainMobileLayout extends ConsumerStatefulWidget {
 class _MainMobileLayoutState extends ConsumerState<MainMobileLayout>
     with WidgetsBindingObserver {
   StreamSubscription<String?>? _notificationSubscription;
+  late PageController _pageController;
 
   @override
   void initState() {
     super.initState();
+    _pageController =
+        PageController(initialPage: ref.read(navigationIndexProvider));
     WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       checkAndPromptPermissions(context, ref);
@@ -55,6 +58,7 @@ class _MainMobileLayoutState extends ConsumerState<MainMobileLayout>
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _notificationSubscription?.cancel();
+    _pageController.dispose();
     super.dispose();
   }
 
@@ -145,14 +149,20 @@ class _MainMobileLayoutState extends ConsumerState<MainMobileLayout>
       }
     });
 
+    ref.listen(navigationIndexProvider, (previous, next) {
+      if (_pageController.hasClients && _pageController.page?.toInt() != next) {
+        _pageController.jumpToPage(next);
+      }
+    });
+
     final currentIndex = ref.watch(navigationIndexProvider);
 
-    final screens = [
-      const CalendarScreenMobile(),
-      const TimerScreenMobile(),
-      const TaskListScreenMobile(),
-      const StatisticsScreenMobile(),
-      const DiaryScreenMobile(),
+    final screens = const [
+      CalendarScreenMobile(),
+      TimerScreenMobile(),
+      TaskListScreenMobile(),
+      StatisticsScreenMobile(),
+      DiaryScreenMobile(),
     ];
 
     final screenWidth = MediaQuery.of(context).size.width;
@@ -160,7 +170,13 @@ class _MainMobileLayoutState extends ConsumerState<MainMobileLayout>
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: SafeArea(child: screens[currentIndex]),
+      body: SafeArea(
+        child: PageView(
+          controller: _pageController,
+          physics: const NeverScrollableScrollPhysics(),
+          children: screens,
+        ),
+      ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           boxShadow: [

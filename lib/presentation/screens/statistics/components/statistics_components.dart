@@ -413,7 +413,7 @@ class _FocusBarChartState extends State<FocusBarChart> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    if (widget.data.isEmpty || widget.data.every((d) => d.actualSeconds == 0)) {
+    if (widget.data.isEmpty || widget.data.every((d) => d.focusSeconds == 0)) {
       return Center(
           child: Text('No hay datos',
               style: TextStyle(color: colorScheme.outline)));
@@ -421,7 +421,7 @@ class _FocusBarChartState extends State<FocusBarChart> {
 
     double maxData = 0;
     for (var d in widget.data) {
-      final hours = d.actualSeconds / 3600;
+      final hours = d.focusSeconds / 3600;
       if (hours > maxData) maxData = hours;
     }
     if (maxData == 0) maxData = 1;
@@ -453,7 +453,7 @@ class _FocusBarChartState extends State<FocusBarChart> {
           touchTooltipData: BarTouchTooltipData(
             getTooltipColor: (group) => colorScheme.onSurface,
             getTooltipItem: (group, groupIndex, rod, rodIndex) {
-              final seconds = widget.data[groupIndex].actualSeconds;
+              final seconds = widget.data[groupIndex].focusSeconds;
               return BarTooltipItem(
                 formatChartDuration(seconds),
                 TextStyle(
@@ -524,7 +524,7 @@ class _FocusBarChartState extends State<FocusBarChart> {
             x: entry.value.index,
             barRods: [
               BarChartRodData(
-                toY: entry.value.actualSeconds / 3600,
+                toY: entry.value.focusSeconds / 3600,
                 color: colorScheme.primary.withValues(alpha: opacity),
                 width: barWidth,
                 borderRadius:

@@ -10,6 +10,7 @@ class ChartDataPoint {
   final int tasksCompleted;
   final int estimatedSeconds;
   final int actualSeconds;
+  final int focusSeconds;
 
   ChartDataPoint({
     required this.label,
@@ -17,6 +18,7 @@ class ChartDataPoint {
     required this.tasksCompleted,
     required this.estimatedSeconds,
     required this.actualSeconds,
+    this.focusSeconds = 0,
   });
 }
 
@@ -123,16 +125,28 @@ class StatisticsViewModel extends StateNotifier<StatisticsState> {
 
     int totalEstimated = 0;
     int totalActual = 0;
+    double totalAccuracySum = 0.0;
+    int tasksWithBoth = 0;
     for (var task in tasksWithDurations) {
       totalEstimated += task.estimatedDuration ?? 0;
       totalActual += task.actualDuration ?? 0;
+
+      double est = (task.estimatedDuration ?? 0).toDouble();
+      double act = (task.actualDuration ?? 0).toDouble();
+      if (est > 0 || act > 0) {
+        if (est == 0 || act == 0) {
+          tasksWithBoth++;
+        } else {
+          double minV = est < act ? est : act;
+          double maxV = est > act ? est : act;
+          totalAccuracySum += (minV / maxV);
+          tasksWithBoth++;
+        }
+      }
     }
 
-    double accuracy = 0.0;
-    if (totalActual > 0 && totalEstimated > 0) {
-      accuracy = (totalEstimated / totalActual) * 100;
-      if (accuracy > 100) accuracy = 100;
-    }
+    double accuracy =
+        tasksWithBoth > 0 ? (totalAccuracySum / tasksWithBoth) * 100 : 0.0;
 
     final habitDates = await _repository.getDistinctHabitEntryDates();
     int streak = 0;
@@ -172,12 +186,16 @@ class StatisticsViewModel extends StateNotifier<StatisticsState> {
           dailyAct += t.actualDuration ?? 0;
         }
 
+        final dailyFocusTime =
+            await _repository.getFocusTimeByDate(dayStart, dayEnd);
+
         generatedChartData.add(ChartDataPoint(
           label: labels[i],
           index: i,
           tasksCompleted: dailyTasksCount,
           estimatedSeconds: dailyEst,
           actualSeconds: dailyAct,
+          focusSeconds: dailyFocusTime,
         ));
       }
     } else if (state.currentPeriod == ChartPeriod.month) {
@@ -199,12 +217,16 @@ class StatisticsViewModel extends StateNotifier<StatisticsState> {
           dailyAct += t.actualDuration ?? 0;
         }
 
+        final dailyFocusTime =
+            await _repository.getFocusTimeByDate(dayStart, dayEnd);
+
         generatedChartData.add(ChartDataPoint(
           label: '${i + 1}',
           index: i,
           tasksCompleted: dailyTasksCount,
           estimatedSeconds: dailyEst,
           actualSeconds: dailyAct,
+          focusSeconds: dailyFocusTime,
         ));
       }
     } else if (state.currentPeriod == ChartPeriod.year) {
@@ -239,12 +261,16 @@ class StatisticsViewModel extends StateNotifier<StatisticsState> {
           monthlyAct += t.actualDuration ?? 0;
         }
 
+        final monthlyFocusTime =
+            await _repository.getFocusTimeByDate(monthStart, monthEnd);
+
         generatedChartData.add(ChartDataPoint(
           label: labels[i],
           index: i,
           tasksCompleted: monthlyTasksCount,
           estimatedSeconds: monthlyEst,
           actualSeconds: monthlyAct,
+          focusSeconds: monthlyFocusTime,
         ));
       }
     }
